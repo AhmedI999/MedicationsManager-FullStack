@@ -1,7 +1,7 @@
 services:
   db:
     container_name: postgres
-    image: postgres
+    image: postgres:16.1
     environment:
       POSTGRES_DB: medicinemanager
       POSTGRES_USER: postgres
@@ -18,7 +18,7 @@ services:
     container_name: medicinesmanager-api
     image: ahmedi999/medicinesmanager-api
     environment:
-      -SPRING_DATASOURCE_URL: jdbc:postgresql://URLPATH:5432/medicinemanager
+      -SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/medicinemanager
       -SPRING_JPA_hibernate_ddl-auto: update
     ports:
       - "8088:8080"
