@@ -5,7 +5,7 @@
       "name": "medicinemanager-api",
       "image": "ahmedi999/medicinesmanager-api:latest",
       "essential": true,
-      "memory": 256,
+      "memory": 128,
       "portMappings": [
         {
           "hostPort": 80,
@@ -14,7 +14,7 @@
       ],
      "environment": [{
        "name": "SPRING_DATASOURCE_URL",
-       "value": "jdbc:postgresql://db:5432/medicinemanager"
+       "value": "jdbc:postgresql://URLHERE:5432/medicinemanager"
      },
        {
         "name": "SPRING_JPA_hibernate_ddl-auto",
