@@ -1,10 +1,12 @@
 name: CI - Build Backend
+
 on:
   pull_request:
     branches:
       - master
     paths:
       - backend/**
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,8 +14,8 @@ jobs:
       postgres:
         image: postgres:16.1
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ahmed
+          POSTGRES_USER: ahmed
+          POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanager,medicinemanagertest
         ports:
           - 5332:5432
