@@ -23,7 +23,6 @@ spring:
     user: postgres
     password: ahmedroot
 
-
 logging:
   level:
     org.flywaydb: trace
