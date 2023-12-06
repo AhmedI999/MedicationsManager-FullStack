@@ -9,13 +9,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     services:
-      postgres:
+      localhost:
         image: postgres:16.1
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanager,medicinemanagertest
-          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/MedicineManagerTest
         ports:
           - 5332:5432
         options: >-
