@@ -14,7 +14,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ahmedroot
-          POSTGRES_DB: MedicineManagerTest
+          POSTGRES_DB: MedicineManager
         ports:
           - 5332:5432
         options: >-
@@ -33,16 +33,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-      - name: Debug PostgreSQL Connection (Production)
+      - name: Create Production Database
         run: |
           apt-get update
           apt-get install -y postgresql-client
-          psql -h localhost -U postgres -p 5432 -d MedicineManager -c 'SELECT 1;'
-      - name: Debug PostgreSQL Connection (Test)
-        run: |
-          apt-get update
-          apt-get install -y postgresql-client
-          psql -h localhost -U postgres -p 5432 -d MedicineManagerTest -c 'SELECT 1;'   
-
+          psql -h localhost -U postgres -p 5432 -c 'CREATE DATABASE "MedicineManagerTest";'
       - name: Build and run Unit/Integration Tests with Maven
-        run: mvn -ntp -B verify -Ddatabase.url=jdbc:postgresql://localhost:5332/MedicineManager -Ddatabase.username=postgres -Ddatabase.password=ahmedroot -Ddatabase.test.url=jdbc:postgresql://localhost:5332/MedicineManagerTest -Ddatabase.test.username=postgres -Ddatabase.test.password=ahmedroot
+        run: mvn -ntp -B verify
