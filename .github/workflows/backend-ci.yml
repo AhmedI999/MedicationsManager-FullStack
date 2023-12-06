@@ -17,7 +17,7 @@ jobs:
           POSTGRES_DB: medicinemanager,medicinemanagertest
           SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5332/MedicineManagerTest
         ports:
-          - 5332:5432
+          - 5332
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -35,17 +35,5 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-      #  DEBUGGING
-      - name: Wait / Sleep
-        uses: jakejarvis/wait-action@v0.1.0
-        with:
-          time: '10s'
-
-      - name: Collect Docker Logs
-        uses: jwalton/gh-docker-logs@v1.0.0
-
-      - name: Check running containers
-        run: docker ps -a
-      #  END OF DEBUG
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
