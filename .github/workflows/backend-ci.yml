@@ -34,16 +34,6 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Get PostgreSQL Container Name
-        id: get_postgres_container
-        run: echo "::set-output name=container::$(docker ps --format '{{.Names}}' -f "ancestor=postgres:16.1")"
-
-      - name: Check PostgreSQL Status
-        run: |
-          docker exec -it ${{ steps.get_postgres_container.outputs.container }} psql -U postgres -h localhost -p 5432
-        env:
-          PGPASSWORD: ahmedroot
-
       - name: Debugging Information
         run: |
           echo "PGHOST: $PGHOST"
