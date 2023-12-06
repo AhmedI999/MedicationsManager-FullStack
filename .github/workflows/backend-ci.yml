@@ -37,6 +37,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-          PGPASSWORD=ahmedroot psql -h localhost -U postgres -p 5332 -d MedicineManagerTest -W -c 'CREATE DATABASE "MedicineManagerTest";'
+          PGPASSWORD=ahmedroot psql -h localhost -U postgres -p 5332 -c 'CREATE DATABASE "MedicineManagerTest";'
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
