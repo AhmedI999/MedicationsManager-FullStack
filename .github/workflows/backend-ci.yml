@@ -15,7 +15,6 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: MedicineManager,MedicineManagerTest
-          SPRING_DATASOURCE_URL: jdbc:postgresql://0.0.0.0:5432/MedicineManagerTest
         ports:
           - 5332:5433
         options: >-
