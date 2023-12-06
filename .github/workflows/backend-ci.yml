@@ -8,37 +8,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    #    services:
-    #      postgres:
-    #        image: postgres:16.1
-    #        env:
-    #          POSTGRES_USER: postgres
-    #          POSTGRES_PASSWORD: ahmedroot
-    #          POSTGRES_DB: medicinemanager,medicinemanagertest
-    #        ports:
-    #          - 5332:5432
-    #        options: >-
-    #          --health-cmd pg_isready
-    #          --health-interval 10s
-    #          --health-timeout 5s
-    #          --health-retries 5
+    services:
+      postgres:
+        image: postgres:16.1
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ahmedroot
+          POSTGRES_DB: medicinemanager,medicinemanagertest
+        ports:
+          - 5332:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     defaults:
       run:
         working-directory: ./backend
 
     steps:
-      # Change postgres password to my needs
-      - name: Create additional user
-        run: |
-          sudo -u postgres psql --command="ALTER USER postgres WITH PASSWORD 'ahmedroot'" --command="\du"
-          sudo service postgresql restart
-
-      # Change database name to meet your requirements
-      - name: Create additional database
-        run: |
-          sudo -u postgres createdb --owner=postgres medicinemanager,medicinemanagertest
-          PGPASSWORD=ahmedroot psql --username=postgres --host=localhost --list timetable
-
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
