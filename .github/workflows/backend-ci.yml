@@ -35,7 +35,7 @@ jobs:
           cache: 'maven'
       - name: Check PostgreSQL Status
         run: |
-          docker exec -it postgres psql -U postgres -h localhost -p 5432
+          docker exec -it d2fbb521c08b4200b7e658a385577e2d_postgres161_620153 psql -U postgres -h localhost -p 5432
         env:
           PGPASSWORD: ahmedroot
 
