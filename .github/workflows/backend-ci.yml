@@ -34,14 +34,5 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Debugging Information
-        run: |
-          echo "PGHOST: $PGHOST"
-          echo "PGPORT: $PGPORT"
-          echo "PGUSER: $PGUSER"
-          echo "PGPASSWORD: $PGPASSWORD"
-          docker ps
-          docker inspect postgres    
-
       - name: Build and run Unit/Integration Tests with Maven
-        run: mvn -ntp -B verify
+        run: mvn verify
