@@ -14,7 +14,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ahmedroot
-          POSTGRES_DB: MedicineManager
+          POSTGRES_DB: MedicineManager,MedicineManagerTest
         ports:
           - 5332:5432
         options: >-
@@ -33,13 +33,6 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-      - name: Create Production Database
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-          PGPASSWORD=ahmedroot psql -h localhost -U postgres -p 5332 -c 'CREATE DATABASE "MedicineManagerTest";'
-          PGPASSWORD=ahmedroot psql -h localhost -U postgres -p 5332 -c 'CREATE DATABASE "MedicineManager";'
-
       - name: Check PostgreSQL Status
         run: |
           docker exec -it postgres psql -U postgres -h localhost -p 5432
