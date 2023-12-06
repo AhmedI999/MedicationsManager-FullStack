@@ -33,5 +33,16 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
+      - name: Debug PostgreSQL Connection (Production)
+        run: |
+          apt-get update
+          apt-get install -y postgresql-client
+          psql -h localhost -U postgres -p 5432 -d MedicineManager -c 'SELECT 1;'
+      - name: Debug PostgreSQL Connection (Test)
+        run: |
+          apt-get update
+          apt-get install -y postgresql-client
+          psql -h localhost -U postgres -p 5432 -d MedicineManagerTest -c 'SELECT 1;'   
+
       - name: Build and run Unit/Integration Tests with Maven
-        run: mvn -ntp -B verify
+        run: mvn -ntp -B verify -Ddatabase.url=jdbc:postgresql://localhost:5332/MedicineManager -Ddatabase.username=postgres -Ddatabase.password=ahmedroot -Ddatabase.test.url=jdbc:postgresql://localhost:5332/MedicineManagerTest -Ddatabase.test.username=postgres -Ddatabase.test.password=ahmedroot
