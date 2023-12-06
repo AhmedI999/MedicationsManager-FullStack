@@ -34,7 +34,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-#  DEBUGGING
+      #  DEBUGGING
       - name: Wait / Sleep
         uses: jakejarvis/wait-action@v0.1.0
         with:
@@ -45,6 +45,6 @@ jobs:
 
       - name: Check running containers
         run: docker ps -a
-#  END OF DEBUG
+      #  END OF DEBUG
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
