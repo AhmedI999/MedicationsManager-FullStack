@@ -16,7 +16,7 @@ jobs:
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: MedicineManager,MedicineManagerTest
         ports:
-          - 5332:5433
+          - 5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
