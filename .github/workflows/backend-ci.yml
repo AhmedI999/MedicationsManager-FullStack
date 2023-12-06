@@ -23,13 +23,11 @@ jobs:
     #          --health-timeout 5s
     #          --health-retries 5
 
-    steps:
-      # Use preinstalled PostgreSQL
-      - name: Start PostgreSQL on Ubuntu
-        run: |
-          sudo systemctl start postgresql.service
-          pg_isready
+    defaults:
+      run:
+        working-directory: ./backend
 
+    steps:
       # Change postgres password to my needs
       - name: Create additional user
         run: |
@@ -51,6 +49,3 @@ jobs:
 
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
-    defaults:
-      run:
-        working-directory: ./backend
