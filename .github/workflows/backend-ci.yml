@@ -54,6 +54,8 @@ jobs:
       - name: Initialize Database
         run: |
           sleep 10s
+          sudo systemctl start docker
+          docker start postgresTest
           psql -h localhost -U ahmed -d medicinemanagertest -a -f src/main/resources/db/migration/V1__initial_setup.sql
 
       - name: Build and run Unit/Integration Tests with Maven
