@@ -55,4 +55,5 @@ jobs:
           cache: 'maven'
       - name: Build and run Unit/Integration Tests with Maven
         run: |
+          sudo systemctl start docker
           mvn -ntp -B verify
