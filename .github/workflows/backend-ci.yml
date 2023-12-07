@@ -47,8 +47,6 @@ jobs:
         uses: |
           sudo systemctl start docker
           pg_isready -h localhost -p 5432 -d medicinemanagertest
-
-
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
