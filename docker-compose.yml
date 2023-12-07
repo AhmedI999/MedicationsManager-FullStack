@@ -4,13 +4,13 @@ services:
     image: postgres:16.1
     environment:
       POSTGRES_DB: medicinemanager
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ahmed
       POSTGRES_PASSWORD: ahmedroot
       PGDATA: /data/postgres
     volumes:
       - db:/data/postgres
     ports:
-      - "5332:5432"
+      - "5330:5432"
     networks:
       - db
     restart: unless-stopped
