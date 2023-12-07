@@ -10,35 +10,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      # Database for production
-      postgres:
-        image: postgres:16.1
-        env:
-          POSTGRES_USER: ahmed
-          POSTGRES_PASSWORD: ahmedroot
-          POSTGRES_DB: medicinemanager
-        ports:
-          - 5332
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      # Database for Integration tests
-      postgresTest:
-        image: postgres:16.1
-        env:
-          POSTGRES_USER: ahmed
-          POSTGRES_PASSWORD: ahmedroot
-          POSTGRES_DB: medicinemanagertest
-        ports:
-          - 5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+#    services:
+#      # Database for production
+#      postgres:
+#        image: postgres:16.1
+#        env:
+#          POSTGRES_USER: ahmed
+#          POSTGRES_PASSWORD: ahmedroot
+#          POSTGRES_DB: medicinemanager
+#        ports:
+#          - 5332
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#      # Database for Integration tests
+#      postgresTest:
+#        image: postgres:16.1
+#        env:
+#          POSTGRES_USER: ahmed
+#          POSTGRES_PASSWORD: ahmedroot
+#          POSTGRES_DB: medicinemanagertest
+#        ports:
+#          - 5432
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
 
     defaults:
       run:
