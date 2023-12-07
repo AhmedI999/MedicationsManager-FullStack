@@ -56,6 +56,8 @@ jobs:
           sleep 10s
           sudo systemctl start docker
           sudo apt  install docker-compose
+          cd ..
           docker-compose -f docker-compose.Github.yml up
+          cd backend
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
