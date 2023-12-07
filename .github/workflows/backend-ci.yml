@@ -44,8 +44,6 @@ jobs:
         working-directory: ./backend
 
     steps:
-      - name: Wait for Databases Initialization
-        run: sleep 10s
       - name: Upload Log Files as Artifacts
         uses: actions/upload-artifact@v2
         with:
