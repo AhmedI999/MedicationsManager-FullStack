@@ -18,6 +18,7 @@ jobs:
           POSTGRES_USER: ahmed
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanager
+          POSTGRES_URL: jdbc:postgresql://localhost:5332/medicinemanager
         ports:
           - 5332
         options: >-
@@ -26,12 +27,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       # Database for Integration tests
-      localhost:
+      postgresTest:
         image: postgres:16.1
         env:
           POSTGRES_USER: ahmed
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanagertest
+          POSTGRES_URL: jdbc:postgresql://localhost:5432/medicinemanagertest
         ports:
           - 5432
         options: >-

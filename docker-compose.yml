@@ -4,7 +4,7 @@ services:
     image: postgres:16.1
     environment:
       POSTGRES_DB: medicinemanager
-      POSTGRES_USER: postgres
+      POSTGRES_USER: ahmed
       POSTGRES_PASSWORD: ahmedroot
       PGDATA: /data/postgres
     volumes:
