@@ -60,6 +60,5 @@ jobs:
           cd ..
           docker-compose -f docker-compose.Github.yml up
           cd backend
-          docker-compose -f docker-compose.Github.yml up
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
