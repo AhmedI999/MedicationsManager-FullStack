@@ -10,55 +10,54 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-#    services:
-#      # Database for production
-#      postgres:
-#        image: postgres:16.1
-#        env:
-#          POSTGRES_USER: ahmed
-#          POSTGRES_PASSWORD: ahmedroot
-#          POSTGRES_DB: medicinemanager
-#        ports:
-#          - 5332
-#        options: >-
-#          --health-cmd pg_isready
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#      # Database for Integration tests
-#      postgresTest:
-#        image: postgres:16.1
-#        env:
-#          POSTGRES_USER: ahmed
-#          POSTGRES_PASSWORD: ahmedroot
-#          POSTGRES_DB: medicinemanagertest
-#        ports:
-#          - 5432
-#        options: >-
-#          --health-cmd pg_isready
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-
+    services:
+      # Database for production
+      postgres:
+        image: postgres:16.1
+        env:
+          POSTGRES_USER: ahmed
+          POSTGRES_PASSWORD: ahmedroot
+          POSTGRES_DB: medicinemanager
+        ports:
+          - 5332
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      # Database for Integration tests
+      postgresTest:
+        image: postgres:16.1
+        env:
+          POSTGRES_USER: ahmed
+          POSTGRES_PASSWORD: ahmedroot
+          POSTGRES_DB: medicinemanagertest
+        ports:
+          - 5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: ./backend
 
     steps:
+      - name: Wait for Databases Initialization
+        run: sleep 10s
+      - name: Upload Log Files as Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: logs
+          path: |
+            maven_build.log
+
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
-
-      - name: Initialize Database
-        run: |
-          sudo systemctl start docker
-          sudo apt  install docker-compose
-          cd ..
-          docker-compose -f docker-compose.Github.yml up -d
-          sleep 10s
-          cd backend
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
