@@ -54,11 +54,11 @@ jobs:
 
       - name: Initialize Database
         run: |
-          sleep 10s
           sudo systemctl start docker
           sudo apt  install docker-compose
           cd ..
-          docker-compose -f docker-compose.Github.yml up
+          docker-compose -f docker-compose.Github.yml up -d
+          sleep 10s
           cd backend
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
