@@ -51,7 +51,11 @@ jobs:
           path: |
             maven_build.log
       - name: View PostgreSQL Service Logs
-        run: docker logs postgresTest
+        run: |
+          sudo systemctl start docker
+          docker ps -a
+          docker start postgresTest
+          docker logs postgresTest
 
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
