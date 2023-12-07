@@ -42,7 +42,6 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
-
     steps:
       - name: ensure postgres is accepting connections
         uses: |
