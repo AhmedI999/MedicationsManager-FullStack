@@ -51,6 +51,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
+
       - name: Initialize Database
         run: |
           sleep 10s
