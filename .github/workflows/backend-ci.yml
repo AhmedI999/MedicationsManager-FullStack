@@ -50,6 +50,8 @@ jobs:
           name: logs
           path: |
             maven_build.log
+      - name: View PostgreSQL Service Logs
+        run: docker logs postgresTest
 
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
