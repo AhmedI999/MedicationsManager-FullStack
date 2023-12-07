@@ -15,7 +15,7 @@ jobs:
       postgres:
         image: postgres:16.1
         env:
-          POSTGRES_USER: ahmed
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanager
         ports:
@@ -29,7 +29,7 @@ jobs:
       postgresTest:
         image: postgres:16.1
         env:
-          POSTGRES_USER: ahmed
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanagertest
         ports:
