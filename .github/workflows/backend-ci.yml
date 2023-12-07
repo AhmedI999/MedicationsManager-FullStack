@@ -55,8 +55,7 @@ jobs:
         run: |
           sleep 10s
           sudo systemctl start docker
-          docker compose up
-          psql -h localhost -U ahmed -d medicinemanagertest -a -f src/main/resources/db/migration/V1__initial_setup.sql
-
+          sudo apt  install docker-compose
+          docker-compose -f docker-compose.Github.yml up
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
