@@ -15,7 +15,7 @@ jobs:
       postgres:
         image: postgres:16.1
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: ahmed
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanager
         ports:
@@ -26,10 +26,10 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       # Database for Integration tests
-      postgresTest:
+      localhost:
         image: postgres:16.1
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: ahmed
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanagertest
         ports:
@@ -54,5 +54,3 @@ jobs:
 
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
-        env:
-          POSTGRES_HOST: localhost
