@@ -44,19 +44,6 @@ jobs:
         working-directory: ./backend
 
     steps:
-      - name: Upload Log Files as Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: logs
-          path: |
-            maven_build.log
-      - name: View PostgreSQL Service Logs
-        run: |
-          sudo systemctl start docker
-          docker ps -a
-          docker start postgresTest
-          docker logs postgresTest
-
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
@@ -64,4 +51,6 @@ jobs:
           java-version: '21'
           cache: 'maven'
       - name: Build and run Unit/Integration Tests with Maven
-        run: mvn -ntp -B verify
+        run: |
+          sudo systemctl start docker
+          mvn -ntp -B verify
