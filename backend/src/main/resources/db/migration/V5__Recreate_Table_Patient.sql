@@ -1,9 +1,9 @@
+DROP TABLE medicine;
 -- Create a sequence starting from 1
 DROP SEQUENCE IF EXISTS medicine_id_seq;
 CREATE SEQUENCE medicine_id_seq START 1;
 
 -- Create the medicine table
-DROP TABLE medicine;
 CREATE TABLE medicine
 (
     id BIGINT DEFAULT nextval('medicine_id_seq') PRIMARY KEY,
