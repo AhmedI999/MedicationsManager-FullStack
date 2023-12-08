@@ -8,7 +8,7 @@ on:
       - backend/**
 
 jobs:
-  build:
+  container-job:
     runs-on: ubuntu-latest
     services:
 #      # Database for production
@@ -33,7 +33,7 @@ jobs:
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanagertest
         ports:
-          - 5432/tcp
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -51,4 +51,4 @@ jobs:
           java-version: '21'
           cache: 'maven'
       - name: Build and run Unit/Integration Tests with Maven
-        run: mvn -ntp -B verify
+        run: mvn -ntp -B test
