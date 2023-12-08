@@ -3,7 +3,7 @@ name: CI - Build Backend
 on:
   push:
     branches:
-      - master
+      - Dev
     paths:
       - backend/**
 
