@@ -14,6 +14,22 @@ services:
     networks:
       - db
     restart: unless-stopped
+  prodDb:
+    container_name: postgresProd
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: medicinemanager
+      POSTGRES_USER: ahmed
+      POSTGRES_PASSWORD: ahmedroot
+      PGDATA: /data/postgresProd
+    volumes:
+      - prodDb:/data/postgresProd
+    ports:
+      - "5331:5431"
+    networks:
+      - prodDb
+    restart: unless-stopped
+
   medicinesmanager-api:
     container_name: medicinesmanager-api
     image: ahmedi999/medicinesmanager-api
@@ -31,6 +47,9 @@ services:
 networks:
   db:
     driver: bridge
+  prodDb:
+    driver: bridge
 
 volumes:
   db:
+  prodDb:
