@@ -22,7 +22,6 @@ spring:
     enabled: true
     user: ahmed
     password: ahmedroot
-    schemas: public
 
 logging:
   level:
