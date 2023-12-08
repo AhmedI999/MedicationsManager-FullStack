@@ -33,7 +33,7 @@ jobs:
           POSTGRES_PASSWORD: ahmedroot
           POSTGRES_DB: medicinemanagertest
         ports:
-          - 5430
+          - 5432/tcp
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
