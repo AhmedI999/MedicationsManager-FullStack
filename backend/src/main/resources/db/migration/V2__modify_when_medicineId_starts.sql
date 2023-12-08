@@ -4,6 +4,9 @@ ALTER TABLE medicine ALTER COLUMN id DROP DEFAULT;
 -- Drop the default sequence created for medicine id
 DROP SEQUENCE IF EXISTS medicine_id_seq;
 
+-- Change the id type back to BIGINT
+ALTER TABLE medicine ALTER COLUMN id TYPE BIGINT;
+
 -- Create a new sequence starting from 1
 CREATE SEQUENCE medicine_id_seq START 1;
 
