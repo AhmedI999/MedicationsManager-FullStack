@@ -25,7 +25,7 @@ public class PatientMedicinesController {
     public ResponseEntity<MedicineResponse> getMedicine(@PathVariable("patientId") Integer patientId,
                                                         @PathVariable("medicineId") Integer medicineId){
         Medicine medicine = medicineService.getPatientMedicineById(patientId, medicineId);
-        return ResponseEntity.ok(new MedicineResponse(medicine.getBrandName(), medicine.getActiveIngredient(),
+        return ResponseEntity.ok(new MedicineResponse(medicine.getMedicineNumber(), medicine.getBrandName(), medicine.getActiveIngredient(),
                 medicine.getTimesDaily(), medicine.getInstructions(), medicine.getInteractions()));
     }
     @GetMapping("{patientId}/medicines")
