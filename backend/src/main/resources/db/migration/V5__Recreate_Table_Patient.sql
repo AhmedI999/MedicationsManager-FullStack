@@ -6,7 +6,7 @@ CREATE SEQUENCE medicine_id_seq START 1;
 -- Create the medicine table
 CREATE TABLE medicine
 (
-    id BIGINT DEFAULT nextval('medicine_id_seq') PRIMARY KEY,
+    id INT DEFAULT nextval('medicine_id_seq') PRIMARY KEY,
     brand_name VARCHAR(255) NOT NULL,
     active_ingredient VARCHAR(255),
     times_daily INT NOT NULL,
