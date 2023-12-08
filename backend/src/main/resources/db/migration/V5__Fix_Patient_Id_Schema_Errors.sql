@@ -14,7 +14,7 @@ ALTER TABLE medicine ALTER COLUMN id SET DEFAULT nextval('medicine_id_seq');
 SELECT setval('medicine_id_seq', COALESCE((SELECT MAX(id) FROM medicine), 1));
 
 -- Alter the column to change the data type back to BIGSERIAL
-ALTER TABLE medicine ALTER COLUMN id TYPE BIGSERIAL;
+ALTER TABLE medicine ALTER COLUMN id TYPE BIGINT;
 
 -- Add the default constraint back on the id column in the medicine table
 ALTER TABLE medicine ALTER COLUMN id SET DEFAULT nextval('medicine_id_seq');
