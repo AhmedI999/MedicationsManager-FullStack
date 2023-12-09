@@ -87,4 +87,4 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
-          git push https://${{ secrets.GH_TOKEN }}@github.com/AhmedI999/MedicationsManager-FullStack.git HEAD:master
+          git push https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/MedicationsManager-FullStack.git HEAD:master
