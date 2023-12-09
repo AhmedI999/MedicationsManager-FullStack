@@ -1,11 +1,11 @@
 name: CD - Deploy Backend
 
 on:
-  pull_request:
+  push:
     branches:
       - master
     paths:
-      - ./backend/**
+      - backend/**
 
 jobs:
   deploy:
