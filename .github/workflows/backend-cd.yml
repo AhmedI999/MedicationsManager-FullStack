@@ -5,11 +5,13 @@ on:
     branches:
       - master
     paths:
-      - ./backend/**
+      - backend/**
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     services:
     # Database for production
       postgres:
@@ -65,7 +67,7 @@ jobs:
         run: |
           echo "Dockerrun.aws.json before updating tag"
           cat Dockerrun.aws.json
-          sed -i -E 's_(ahmedi999/medicinesmanager-api:)([^"]*)_\1'${BUILD_NUMBER}'_' Dockerrun.aws.json
+          sed -i -E 's_(ahmedi999/medicinesmanager-api:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' Dockerrun.aws.json
           echo "Dockerrun.aws.json after updating tag"
           cat Dockerrun.aws.json
 
@@ -81,10 +83,10 @@ jobs:
 #          version_description: ${{ github.SHA }}
 #          region: ${{ secrets.EB_REGION }}
 #          deployment_package: Dockerrun.aws.json
-#      - name: commit and push Dockerrun.aws.json
-#        run: |
-#          git config user.name github-actions
-#          git config user.email github-actions@github.com
-#          git add .
-#          git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
-#          git push
+      - name: commit and push Dockerrun.aws.json
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
+          git push
