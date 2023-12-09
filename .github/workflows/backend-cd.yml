@@ -85,6 +85,8 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          echo ${{ secrets.GH_TOKEN }} >githubToken
+          git config --global credential.helper "store --file=githubToken"
           git add .
           git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
-          git push https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/MedicationsManager-FullStack.git HEAD:master
+          git push
