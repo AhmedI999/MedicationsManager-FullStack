@@ -1,10 +1,9 @@
 name: CD - Deploy Backend
 
 on:
-  merge_group:
+  pull_request:
     branches:
       - master
-      - Dev
     paths:
       - backend/**
 
