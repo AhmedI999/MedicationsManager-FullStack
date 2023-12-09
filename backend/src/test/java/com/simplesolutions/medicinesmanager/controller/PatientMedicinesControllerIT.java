@@ -163,7 +163,8 @@ class PatientMedicinesControllerIT {
                     Medicine actualMedicine = response.getResponseBody();
                     assertThat(actualMedicine)
                             .usingRecursiveComparison()
-                            .ignoringFields("id", "patient")
+                            // medicine number is automatically created like id so no need to check it
+                            .ignoringFields("id", "medicineNumber", "patient")
                             .isEqualTo(expectedMedicine);
                 });
     }
@@ -185,7 +186,8 @@ class PatientMedicinesControllerIT {
                 })
                 .returnResult().getResponseBody();
         assertThat(allMedicines)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "patient")
+                // medicine number is automatically created like id so no need to check it
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "medicineNumber", "patient")
                 .contains(expectedMedicine);
     }
     @Test

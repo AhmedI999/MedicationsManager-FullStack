@@ -20,12 +20,14 @@ import java.util.List;
 public class PatientMedicinesController {
     private final PatientService patientService;
     private final MedicineService medicineService;
+    // todo some endpoints here won't be used directly by the user and may add more
+    // todo consider if making an end point to get a medicine by patientEmail and Medicine number is useful
 
     @GetMapping("/{patientId}/medicines/{medicineId}")
     public ResponseEntity<MedicineResponse> getMedicine(@PathVariable("patientId") Integer patientId,
                                                         @PathVariable("medicineId") Integer medicineId){
         Medicine medicine = medicineService.getPatientMedicineById(patientId, medicineId);
-        return ResponseEntity.ok(new MedicineResponse(medicine.getBrandName(), medicine.getActiveIngredient(),
+        return ResponseEntity.ok(new MedicineResponse(medicine.getMedicineNumber(), medicine.getBrandName(), medicine.getActiveIngredient(),
                 medicine.getTimesDaily(), medicine.getInstructions(), medicine.getInteractions()));
     }
     @GetMapping("{patientId}/medicines")

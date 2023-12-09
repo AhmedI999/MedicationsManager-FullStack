@@ -18,7 +18,9 @@ import java.util.List;
 public class Medicine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    Integer id;
+    @Column(name = "medicine_number")
+    Integer medicineNumber;
     @Column(name = "brand_name")
     String brandName;
     @Column(name = "active_ingredient")

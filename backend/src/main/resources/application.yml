@@ -23,6 +23,7 @@ spring:
     user: ahmed
     password: ahmedroot
 
+
 logging:
   level:
     org.flywaydb: trace
