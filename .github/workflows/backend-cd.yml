@@ -2,7 +2,7 @@ name: CD - Deploy Backend
 
 on:
   workflow_dispatch:
-  merge_group:
+  pull_request:
     branches:
       - master
     paths:
