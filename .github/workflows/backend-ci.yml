@@ -50,5 +50,27 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'maven'
+      - name: Send Slack Message
+        run: >
+          curl -X POST -H 'Content-type: application/json' --data '
+          {"text":"Continues Integration Started! :progress_bar: :cool-doge:"}'
+          ${{ secrets.SLACK_WEBHOOK_URL }}
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
+      - name: Send Slack Message
+        run: >
+          curl -X POST -H 'Content-type: application/json' 
+          --data '{"text":"Continues Integration Completed :github-check-mark: :party_blob: :amongustwerkhalloween:"}' 
+          ${{ secrets.SLACK_WEBHOOK_URL }}   
+      - name: Send Slack Message
+        if: always()
+        run: >
+          curl -X POST -H 'Content-type: application/json' 
+          --data '{"text":"Job Status ${{ job.status }}"}' 
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Send Slack Message on Failure
+        if: failure()
+        run: >
+          curl -X POST -H 'Content-type: application/json'
+          --data '{"text":"Continues Integration Failed :warning: :sad-doge:  :elmofire:"}'
+          ${{ secrets.SLACK_WEBHOOK_URL }}
