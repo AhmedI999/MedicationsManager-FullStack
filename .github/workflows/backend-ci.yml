@@ -53,7 +53,7 @@ jobs:
       - name: Send Slack Message
         run: >
           curl -X POST -H 'Content-type: application/json' --data '
-          {"text":"Continues Integration Started! :progress_bar: :cool-doge:"}'
+          {"text":"Continues Integration Started! Testing with maven :progress_bar: :cool-doge:"}'
           ${{ secrets.SLACK_WEBHOOK_URL }}
       - name: Build and run Unit/Integration Tests with Maven
         run: mvn -ntp -B verify
