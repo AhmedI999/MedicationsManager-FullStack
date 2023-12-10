@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "medicinemanager-api",
-      "image": "ahmedi999/medicinesmanager-api:09.12.2023.19.18.10",
+      "image": "ahmedi999/medicinesmanager-api:10.12.2023.15.54.24",
       "essential": true,
       "memory": 128,
       "portMappings": [
