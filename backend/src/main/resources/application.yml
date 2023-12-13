@@ -23,6 +23,9 @@ spring:
     user: ahmed
     password: ahmedroot
 
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
 
 logging:
   level:
