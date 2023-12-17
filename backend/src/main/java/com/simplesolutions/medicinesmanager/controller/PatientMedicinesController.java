@@ -23,18 +23,19 @@ public class PatientMedicinesController {
     // todo some endpoints here won't be used directly by the user and may add more
     // todo consider if making an end point to get a medicine by patientEmail and Medicine number is useful
 
-    @GetMapping("/{patientId}/medicines/{medicineId}")
+    @GetMapping("{patientId}/medicines/{medicineId}")
     public ResponseEntity<MedicineResponse> getMedicine(@PathVariable("patientId") Integer patientId,
                                                         @PathVariable("medicineId") Integer medicineId){
         Medicine medicine = medicineService.getPatientMedicineById(patientId, medicineId);
-        return ResponseEntity.ok(new MedicineResponse(medicine.getMedicineNumber(), medicine.getBrandName(), medicine.getActiveIngredient(),
+        return ResponseEntity.ok(new MedicineResponse(medicine.getMedicineNumber(), medicine.getPictureUrl(), medicine.getBrandName(), medicine.getActiveIngredient(),
                 medicine.getTimesDaily(), medicine.getInstructions(), medicine.getInteractions()));
     }
+    // todo make it return them sorted maybe sorted by Medicine Number Descending
     @GetMapping("{patientId}/medicines")
     public List<Medicine> getAllPatientMedicines(@PathVariable("patientId") Integer id){
         return medicineService.getPatientMedicines(id);
     }
-    @PostMapping("/{patientId}/medicines")
+    @PostMapping("{patientId}/medicines")
     public ResponseEntity<String> savePatientMedicine(@PathVariable("patientId") Integer patientId,
                                                       @RequestBody @Valid MedicineRegistrationRequest request){
         Patient patient = patientService.getPatientById(patientId);
@@ -48,7 +49,7 @@ public class PatientMedicinesController {
         medicineService.editMedicineDetails(patientId, medicineId, request);
         return ResponseEntity.ok(medicineService.getPatientMedicineById(patientId, medicineId));
     }
-    @DeleteMapping ("/{patientId}/medicines/{medicineId}")
+    @DeleteMapping ("{patientId}/medicines/{medicineId}")
     public ResponseEntity<String> deleteMedicine(@PathVariable("patientId") Integer patientId,
                                                  @PathVariable("medicineId") Integer medicineId){
         medicineService.deletePatientMedicineById(patientId, medicineId);

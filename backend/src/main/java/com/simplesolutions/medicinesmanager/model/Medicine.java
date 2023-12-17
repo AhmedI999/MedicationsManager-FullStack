@@ -21,6 +21,8 @@ public class Medicine {
     Integer id;
     @Column(name = "medicine_number")
     Integer medicineNumber;
+    @Column(name = "picture_url")
+    String pictureUrl;
     @Column(name = "brand_name")
     String brandName;
     @Column(name = "active_ingredient")

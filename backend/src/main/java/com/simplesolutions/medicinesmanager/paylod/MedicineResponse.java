@@ -18,6 +18,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MedicineResponse {
     final Integer medicineNumber;
+    final String pictureUrl;
     final String brandName;
     final String activeIngredient;
     final int timesDaily;

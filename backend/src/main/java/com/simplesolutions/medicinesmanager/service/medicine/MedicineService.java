@@ -9,8 +9,12 @@ import com.simplesolutions.medicinesmanager.paylod.MedicineRegistrationRequest;
 import com.simplesolutions.medicinesmanager.paylod.MedicineUpdateRequest;
 import com.simplesolutions.medicinesmanager.service.patient.PatientDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -18,13 +22,17 @@ import java.util.List;
 public class MedicineService {
     private final PatientDao patientDao;
     private final MedicineDao medicineDao;
+    @Value("#{'${medicine.picture-url}'}")
+    private String DEFAULT_PICTURE_URL;
 
     public List<Medicine> getPatientMedicines(Integer patientID){
         Patient patient = patientDao.selectPatientById(patientID).
         orElseThrow(() -> new ResourceNotFoundException("Patient doesn't exist"));
         if (patient.getPatientMedicines() == null || patient.getPatientMedicines().isEmpty())
             throw new ResourceNotFoundException("Patient doesn't have medicines");
-        return medicineDao.selectPatientMedicines(patient.getId());
+        List<Medicine> medicines =  medicineDao.selectPatientMedicines(patient.getId());
+        medicines.sort(Comparator.comparing(Medicine::getMedicineNumber));
+        return medicines;
     }
     public Medicine getPatientMedicineById(Integer patientId, Integer medicineId){
         return medicineDao.selectPatientMedicineById(patientId, medicineId)
@@ -41,6 +49,7 @@ public class MedicineService {
             throw new DuplicateResourceException("Patient's medicine (%s) already Exists"
                     .formatted(request.getBrandName()));
         Medicine medicine =  Medicine.builder()
+                .pictureUrl(request.getPictureUrl())
                 .brandName(request.getBrandName())
                 .activeIngredient(request.getActiveIngredient())
                 .timesDaily(request.getTimesDaily())
@@ -49,6 +58,8 @@ public class MedicineService {
                 .build();
         if (!patientDao.doesPatientExists(patient.getEmail()))
             throw new ResourceNotFoundException("Patient doesn't exist");
+        if (request.getPictureUrl() == null || request.getPictureUrl().isEmpty())
+            medicine.setPictureUrl(DEFAULT_PICTURE_URL);
         medicine.setPatient(patient);
         medicineDao.saveMedicine(medicine);
     }
@@ -65,6 +76,10 @@ public class MedicineService {
                 );
             }
             medicine.setBrandName(request.getBrandName());
+            changes = true;
+        }
+        if (request.getPictureUrl() != null && !request.getPictureUrl().equals(medicine.getPictureUrl())) {
+            medicine.setPictureUrl(request.getPictureUrl());
             changes = true;
         }
         if (request.getActiveIngredient() != null && !request.getActiveIngredient().equals(medicine.getActiveIngredient())) {

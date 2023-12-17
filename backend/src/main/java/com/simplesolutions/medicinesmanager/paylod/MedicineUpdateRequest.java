@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MedicineUpdateRequest {
+    final String pictureUrl;
     final String brandName;
     final String activeIngredient;
     final Integer timesDaily;

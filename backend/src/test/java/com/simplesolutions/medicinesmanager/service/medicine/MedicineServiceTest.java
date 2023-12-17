@@ -67,9 +67,10 @@ class MedicineServiceTest {
         validatorFactory = new LocalValidatorFactoryBean();
         validatorFactory.afterPropertiesSet();
     }
-    private MedicineRegistrationRequest createMedicineRegistrationRequest(String email){
+    private MedicineRegistrationRequest createMedicineRegistrationRequest(String brandName){
         return new MedicineRegistrationRequest(
-                email,
+                faker.internet().image(),
+                brandName,
                 faker.lorem().word(),
                 faker.number().numberBetween(2,99),
                 faker.lorem().word(),
@@ -220,6 +221,29 @@ class MedicineServiceTest {
             //Then
             verify(medicineDao).saveMedicine(any(Medicine.class));
             verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.getBrandName());
+            verify(patientDao).doesPatientExists(patient.getEmail());
+        }
+        @Test
+        @DisplayName("Verify that savePatientMedicine can invoke saveMedicine dao with undefined Picture Url")
+        void savePatientMedicine_UndefinedUrl_Success() {
+            //Given
+            MedicineRegistrationRequest undefinedUrlMedicine = new MedicineRegistrationRequest(
+                    null,
+                    "brandWithNoPicUrl",
+                    faker.lorem().word(),
+                    faker.number().numberBetween(2, 99),
+                    faker.lorem().word(),
+                    Arrays.asList(faker.lorem().word(), faker.lorem().word())
+            );
+
+            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.getBrandName()))
+                    .thenReturn(false);
+            when(patientDao.doesPatientExists(patient.getEmail())).thenReturn(true);
+            //When
+            medicineTest.savePatientMedicine(undefinedUrlMedicine, patient);
+            //Then
+            verify(medicineDao).saveMedicine(any(Medicine.class));
+            verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.getBrandName());
             verify(patientDao).doesPatientExists(patient.getEmail());
         }
 
@@ -395,6 +419,24 @@ class MedicineServiceTest {
             Medicine capturedMedicine = MedicineArgumentCaptor.getValue();
             // Ensure that the patient's email has been updated I.E captured and patient in db emails are the same
             assertThat(capturedMedicine.getInstructions()).isEqualTo(medicine.getInstructions());
+        }
+        @Test
+        @DisplayName("Verify that editMedicineDetails can invoke updateMedicine for picture_url")
+        void editMedicineDetails_pictureUrlUpdated() {
+            when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.of(patient));
+            when(medicineDao.selectPatientMedicineById(patient.getId(), medicine.getId()))
+                    .thenReturn(Optional.of(medicine));
+            String pictureUrl = "https://i.imgur.com/qmgE3uS.jpeg";
+            //When
+            medicineTest.editMedicineDetails(patient.getId(), medicine.getId(),
+                    MedicineUpdateRequest.builder().pictureUrl(pictureUrl).build());
+            //Then
+            ArgumentCaptor<Medicine> MedicineArgumentCaptor = ArgumentCaptor.forClass(Medicine.class);
+            // ensure that patientDao has been called for the updated(captured) Patient object
+            verify(medicineDao).updateMedicine(MedicineArgumentCaptor.capture());
+            Medicine capturedMedicine = MedicineArgumentCaptor.getValue();
+            // Ensure that the patient's email has been updated I.E captured and patient in db emails are the same
+            assertThat(capturedMedicine.getPictureUrl()).isEqualTo(medicine.getPictureUrl());
         }
 
         @Test

@@ -14,20 +14,33 @@ import {
     Input,
     Avatar,
     useColorModeValue,
-    Image
+    Image,Wrap
 } from '@chakra-ui/react';
 
 // Import icons from the appropriate libraries
 import {FiMenu, FiSearch} from 'react-icons/fi';
-import {FaBell, FaClipboardCheck} from 'react-icons/fa'
+import {FaBell} from 'react-icons/fa'
 import {MdHome, MdKeyboardArrowRight, MdMedication} from 'react-icons/md'
 import {BsGearFill} from 'react-icons/bs'
+import DrawerForm from "../DrawerForm.jsx";
+import {CgAdd} from "react-icons/cg";
+import {useState} from "react";
 
 
-const SideBarWithNavBar = ( {children} ) => {
+const SideBarWithNavBar = ({children}) => {
     const sidebar = useDisclosure();
     const integrations = useDisclosure();
     const color = useColorModeValue("gray.600", "gray.300");
+    const [bellColor, setBellColor] = useState('grey')
+    console.log(children);
+    const handleBellClick = () => {
+        // Toggle between two colors
+        const newColor = bellColor === 'grey' ? 'green' : 'grey';
+        setBellColor(newColor);
+
+    };
+
+
 
     const NavItem = (props) => {
         const {icon, children, ...rest} = props;
@@ -125,18 +138,16 @@ const SideBarWithNavBar = ( {children} ) => {
                         transform={integrations.isOpen && "rotate(90deg)"}
                     />
                 </NavItem>
+
                 <Collapse in={integrations.isOpen}>
-                    <NavItem pl="12" py="2">
-                        Will be replaced with meds list from db
-                    </NavItem>
-                    <NavItem pl="12" py="2">
-                        **
-                    </NavItem>
-                    <NavItem pl="12" py="2">
-                        **
-                    </NavItem>
+
+                        <NavItem pl="12" py="2">
+                            meds here
+                        </NavItem>
                 </Collapse>
-                <NavItem icon={FaClipboardCheck}>TO-DO</NavItem>
+                <NavItem icon={CgAdd}>
+                    <DrawerForm/>
+                </NavItem>
                 <NavItem icon={BsGearFill}>Settings</NavItem>
             </Flex>
         </Box>
@@ -210,29 +221,18 @@ const SideBarWithNavBar = ( {children} ) => {
                         </InputLeftElement>
                         <Input placeholder="Search for Medications..."/>
                     </InputGroup>
-                    {/*navbar profile pic and alarm for meds notification*/}
-                    <Flex align="center">
-                        <Icon color="gray.500" as={FaBell} cursor="pointer"/>
-                        <Avatar
-                            ml="4"
-                            size="sm"
-                            name="anubra266"
-                            src="https://avatars.githubusercontent.com/u/30869823?v=4"
-                            cursor="pointer"
-                        />
+
+                    <Flex onClick={()=> {
+                        handleBellClick()
+                        alert("Notification On!")
+                    }}>
+                        <Icon as={FaBell} cursor="pointer" boxSize={6} color={bellColor}/>
                     </Flex>
                 </Flex>
-
-                <Box
-                    as="main"
-                    p="4"
-                    display="flex"
-                    flexDirection="column"
-                    flex="1"
-                >
-                    <Box borderWidth="4px" borderStyle="dashed" rounded="md" h="96">
-                        {children}
-                    </Box>
+                <Box as="main" p="5">
+                        <Wrap>
+                            {children}
+                        </Wrap>
                 </Box>
             </Box>
         </Box>

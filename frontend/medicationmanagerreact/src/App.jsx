@@ -1,17 +1,20 @@
-import SideBarWithNavBar from "./shared/SideBarWithNavBar.jsx";
+import SideBarWithNavBar from "./components/shared/SideBarWithNavBar.jsx";
 import {useEffect, useState} from "react";
 import {getPatients} from "./services/client.js";
-import {Spinner, Text} from "@chakra-ui/react";
+import {Spinner, Text, Wrap, WrapItem} from "@chakra-ui/react";
+import MedsCard from "./components/MedsCard.jsx";
+import DrawerForm from "./components/DrawerForm.jsx";
+import MoreDetailsDrawer from "./components/MoreDetailsPopover.jsx";
 
 function App() {
-    const [patients, setPatients] = useState([]);
+    const [medications, setMedications] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setLoading(true);
         getPatients().then(res => {
-            setPatients(res.data)
-            console.log(res.data)
+            setMedications(res.data)
+            console.log(...medications)
         }).catch(err => {
             console.error(err);
         }).finally(() => setLoading(false));
@@ -29,21 +32,25 @@ function App() {
             </SideBarWithNavBar>
         )
     }
-    if (patients.length <= 0) {
+    if (medications.length <= 0) {
         return (
-        <SideBarWithNavBar>
-            <Text>No Patient available</Text>
-        </SideBarWithNavBar>
+            <SideBarWithNavBar>
+                <Text>No Patient available</Text>
+            </SideBarWithNavBar>
         )
     }
     return (
-        <div>
-            <SideBarWithNavBar>
-                {patients.map((patient, index) => (
-                    <p key={index}>{patient.email}</p>
+        <SideBarWithNavBar>
+            <Wrap justify="left" spacing="20px">
+                {medications.map((medication, index) => (
+                    <WrapItem key={index}>
+                        <MedsCard
+                            {...medication}
+                        />
+                    </WrapItem>
                 ))}
-            </SideBarWithNavBar>
-        </div>
+            </Wrap>
+        </SideBarWithNavBar>
     );
 }
 

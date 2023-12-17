@@ -30,3 +30,9 @@ cors:
 logging:
   level:
     org.flywaydb: trace
+
+# Default value for picture url
+medicine:
+  picture-url: "https://i.imgur.com/qMA0qhd.png"
+
+

@@ -75,6 +75,7 @@ class PatientMedicinesControllerIT {
         medicineRequest = generateUniqueMedicineRequest();
         // expected Medicine To return
         expectedMedicine = Medicine.builder()
+                .pictureUrl(medicineRequest.getPictureUrl())
                 .brandName(medicineRequest.getBrandName())
                 .activeIngredient(medicineRequest.getActiveIngredient())
                 .timesDaily(medicineRequest.getTimesDaily())
@@ -122,9 +123,10 @@ class PatientMedicinesControllerIT {
         } while (!generatedBrandNames.add(brandName));
 
         return new MedicineRegistrationRequest(
+                faker.internet().image(),
                 brandName,
                 faker.lorem().characters(10),
-                faker.random().nextInt(1,5),
+                faker.random().nextInt(1, 5),
                 faker.lorem().characters(),
                 faker.lorem().words(4)
         );
@@ -225,7 +227,11 @@ class PatientMedicinesControllerIT {
         int medicineInDB_Id = medicineRepository
                 .findByPatientIdAndBrandName(patientInDB_Id, expectedMedicine.getBrandName()).getId();
         // what we are going to update in medicine
-        MedicineUpdateRequest updateRequest = MedicineUpdateRequest.builder().activeIngredient("Love").build();
+        // adding editing pictureUrl to test it
+        MedicineUpdateRequest updateRequest = MedicineUpdateRequest.builder()
+                .activeIngredient("Love")
+                .pictureUrl("https://i.imgur.com/qmgE3uS.jpeg")
+                .build();
         // updating
         webTestClient.put()
                 .uri(path + "/{patientId}/medicines/{medicineId}", patientInDB_Id, medicineInDB_Id)
@@ -245,6 +251,8 @@ class PatientMedicinesControllerIT {
                     Medicine actualMedicine = response.getResponseBody();
                         assertThat(actualMedicine.getActiveIngredient())
                                 .isEqualTo(updateRequest.getActiveIngredient());
+                    assertThat(actualMedicine.getPictureUrl())
+                            .isEqualTo(updateRequest.getPictureUrl());
                 });
     }
 

@@ -8,6 +8,7 @@ import com.simplesolutions.medicinesmanager.service.patient.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class PatientsController {
         return ResponseEntity.ok("Patient saved successfully!");
     }
 
-    @DeleteMapping("/{patientId}")
+    @DeleteMapping("{patientId}")
     public ResponseEntity<String> deletePatient(@PathVariable("patientId") Integer id) {
         patientService.deletePatient(id);
         return ResponseEntity.ok("Patient deleted successfully");
