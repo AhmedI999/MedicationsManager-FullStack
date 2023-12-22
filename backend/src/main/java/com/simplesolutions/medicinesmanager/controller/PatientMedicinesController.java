@@ -30,7 +30,6 @@ public class PatientMedicinesController {
         return ResponseEntity.ok(new MedicineResponse(medicine.getMedicineNumber(), medicine.getPictureUrl(), medicine.getBrandName(), medicine.getActiveIngredient(),
                 medicine.getTimesDaily(), medicine.getInstructions(), medicine.getInteractions()));
     }
-    // todo make it return them sorted maybe sorted by Medicine Number Descending
     @GetMapping("{patientId}/medicines")
     public List<Medicine> getAllPatientMedicines(@PathVariable("patientId") Integer id){
         return medicineService.getPatientMedicines(id);

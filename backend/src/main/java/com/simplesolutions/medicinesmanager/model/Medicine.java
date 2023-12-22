@@ -1,6 +1,7 @@
 package com.simplesolutions.medicinesmanager.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.simplesolutions.medicinesmanager.utils.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,9 +32,9 @@ public class Medicine {
     Integer timesDaily;
     @Column(name = "instructions")
     String instructions;
-    @Convert(converter = StringListConverter.class)
-    @Column(name = "interactions")
-    List<String> interactions;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "medicine", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    List<MedicationInteractions> interactions;
     @ManyToOne
     @JoinColumn(name = "patient_id")
     @JsonIgnore

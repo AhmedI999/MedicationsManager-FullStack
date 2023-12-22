@@ -2,6 +2,8 @@ package com.simplesolutions.medicinesmanager.repository;
 
 import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.AbstractTestContainers;
+import com.simplesolutions.medicinesmanager.model.InteractionType;
+import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
 import lombok.AccessLevel;
@@ -26,11 +28,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Test For Custom MedicineRepository methods")
 class MedicineRepositoryTest extends AbstractTestContainers {
     @Autowired
-    private PatientRepository patientTest;
+    PatientRepository patientTest;
     @Autowired
-    private MedicineRepository medicineTest;
-    private Patient patient;
-    private Medicine medicine;
+    MedicineRepository medicineTest;
+    Patient patient;
+    Medicine medicine;
     Faker faker;
 
     @BeforeEach
@@ -46,12 +48,16 @@ class MedicineRepositoryTest extends AbstractTestContainers {
                 .patientMedicines(Collections.singletonList(medicine))
                 .build();
 
+        MedicationInteractions interactions = MedicationInteractions.builder()
+                .name(faker.lorem().word())
+                .Type(InteractionType.Mild)
+                .build();
         medicine = Medicine.builder()
                 .brandName(faker.lorem().characters(5))
                 .activeIngredient(faker.lorem().characters(10))
                 .timesDaily(faker.random().nextInt(1,5))
                 .instructions(faker.lorem().characters())
-                .interactions(faker.lorem().words(4))
+                .interactions(Collections.singletonList(interactions))
                 .build();
         medicine.setPatient(patient);
     }

@@ -1,6 +1,7 @@
 package com.simplesolutions.medicinesmanager.paylod;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.utils.StringListConverter;
 import jakarta.persistence.Convert;
 import lombok.AccessLevel;
@@ -23,6 +24,5 @@ public class MedicineResponse {
     final String activeIngredient;
     final int timesDaily;
     final String instructions;
-    @Convert(converter = StringListConverter.class)
-    final List<String> interactions;
+    final List<MedicationInteractions> interactions;
 }

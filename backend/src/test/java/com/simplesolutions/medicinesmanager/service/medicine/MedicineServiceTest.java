@@ -1,9 +1,12 @@
 package com.simplesolutions.medicinesmanager.service.medicine;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.exception.UpdateException;
+import com.simplesolutions.medicinesmanager.model.InteractionType;
+import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
 import com.simplesolutions.medicinesmanager.paylod.MedicineRegistrationRequest;
@@ -17,12 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +41,8 @@ class MedicineServiceTest {
     Patient patient;
     Medicine medicine;
     // for medicine registration and the validation
+    @Value("#{'${medicine.picture-url}'}")
+    String DEFAULT_PICTURE_URL;
     MedicineRegistrationRequest medicineRegistrationTest;
     LocalValidatorFactoryBean validatorFactory;
 
@@ -45,12 +50,18 @@ class MedicineServiceTest {
     void setUp() {
         medicineTest = new MedicineService(patientDao, medicineDao);
         faker = new Faker();
+        MedicationInteractions interactions = MedicationInteractions.builder()
+                .name(faker.lorem().word())
+                .Type(InteractionType.Mild)
+                .build();
         medicine = Medicine.builder()
+                .pictureUrl("https://i.imgur.com/qMA0qhd.png")
                 .brandName(faker.lorem().characters(5))
                 .activeIngredient(faker.lorem().characters(10))
                 .timesDaily(faker.random().nextInt(1,5))
                 .instructions(faker.lorem().characters())
-                .interactions(faker.lorem().words(4))
+                .interactions(Collections.singletonList(interactions))
+                .patient(patient)
                 .build();
 
         patient = Patient.builder()
@@ -69,13 +80,11 @@ class MedicineServiceTest {
     }
     private MedicineRegistrationRequest createMedicineRegistrationRequest(String brandName){
         return new MedicineRegistrationRequest(
-                faker.internet().image(),
+                DEFAULT_PICTURE_URL,
                 brandName,
                 faker.lorem().word(),
-                faker.number().numberBetween(2,99),
-                faker.lorem().word(),
-                Arrays.asList(faker.lorem().word(), faker.lorem().word())
-        );
+                faker.number().numberBetween(2, 99),
+                faker.lorem().word());
     }
     @AfterEach
     void tearDown() {
@@ -90,11 +99,12 @@ class MedicineServiceTest {
         void getPatientMedicines_returnMedicines() {
             // Given
             when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.of(patient));
+            when(medicineDao.selectPatientMedicines(patient.getId())).thenReturn(Collections.singletonList(medicine));
             //When
-            medicineTest.getPatientMedicines(patient.getId());
+            List<Medicine> actualMedicines = medicineTest.getPatientMedicines(patient.getId());
             //Then
             verify(medicineDao).selectPatientMedicines(patient.getId());
-            assertThat(patient.getPatientMedicines()).isNotEmpty();
+            assertThat(actualMedicines).isNotEmpty();
         }
 
         @Test
@@ -232,8 +242,7 @@ class MedicineServiceTest {
                     "brandWithNoPicUrl",
                     faker.lorem().word(),
                     faker.number().numberBetween(2, 99),
-                    faker.lorem().word(),
-                    Arrays.asList(faker.lorem().word(), faker.lorem().word())
+                    faker.lorem().word()
             );
 
             when(medicineDao.doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.getBrandName()))
@@ -241,10 +250,13 @@ class MedicineServiceTest {
             when(patientDao.doesPatientExists(patient.getEmail())).thenReturn(true);
             //When
             medicineTest.savePatientMedicine(undefinedUrlMedicine, patient);
+            ArgumentCaptor<Medicine> medicineArgumentCaptor = ArgumentCaptor.forClass(Medicine.class);
             //Then
-            verify(medicineDao).saveMedicine(any(Medicine.class));
+            verify(medicineDao).saveMedicine(medicineArgumentCaptor.capture());
             verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.getBrandName());
-            verify(patientDao).doesPatientExists(patient.getEmail());
+            Medicine capturedMedicine = medicineArgumentCaptor.getValue();
+            assertThat(capturedMedicine.getPictureUrl()).isEqualTo(DEFAULT_PICTURE_URL);
+
         }
 
         @Test
@@ -389,10 +401,11 @@ class MedicineServiceTest {
             when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.of(patient));
             when(medicineDao.selectPatientMedicineById(patient.getId(), medicine.getId()))
                     .thenReturn(Optional.of(medicine));
-            List<String> validInteractions = Arrays.asList("Don't take before coding", "take before sleep");
+            MedicationInteractions validInteractions =
+                    MedicationInteractions.builder().name("medication").Type(InteractionType.MODERATE).build();
             //When
             medicineTest.editMedicineDetails(patient.getId(), medicine.getId(),
-                    MedicineUpdateRequest.builder().interactions(validInteractions).build());
+                    MedicineUpdateRequest.builder().interactions(Collections.singletonList(validInteractions)).build());
             //Then
             ArgumentCaptor<Medicine> MedicineArgumentCaptor = ArgumentCaptor.forClass(Medicine.class);
             // ensure that patientDao has been called for the updated(captured) Patient object

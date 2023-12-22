@@ -1,8 +1,8 @@
 package com.simplesolutions.medicinesmanager.service.medicine;
 
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
-import com.simplesolutions.medicinesmanager.exception.UpdateException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
+import com.simplesolutions.medicinesmanager.exception.UpdateException;
 import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
 import com.simplesolutions.medicinesmanager.paylod.MedicineRegistrationRequest;
@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -54,7 +52,6 @@ public class MedicineService {
                 .activeIngredient(request.getActiveIngredient())
                 .timesDaily(request.getTimesDaily())
                 .instructions(request.getInstructions())
-                .interactions(request.getInteractions())
                 .build();
         if (!patientDao.doesPatientExists(patient.getEmail()))
             throw new ResourceNotFoundException("Patient doesn't exist");

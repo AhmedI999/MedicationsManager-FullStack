@@ -1,6 +1,8 @@
 package com.simplesolutions.medicinesmanager.service.medicine;
 
 import com.github.javafaker.Faker;
+import com.simplesolutions.medicinesmanager.model.InteractionType;
+import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
 import com.simplesolutions.medicinesmanager.repository.MedicineRepository;
@@ -25,10 +27,12 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@DisplayName("For MedicineJpaDataAccessService Class")
 class MedicineJpaDataAccessServiceTest {
     MedicineJpaDataAccessService medicineJpaTest;
     Patient patient;
     Medicine medicine;
+    MedicationInteractions interactions;
     @Mock
     MedicineRepository medicineRepository;
     @Mock
@@ -38,12 +42,16 @@ class MedicineJpaDataAccessServiceTest {
     void setUp() {
         medicineJpaTest = new MedicineJpaDataAccessService(patientRepository, medicineRepository);
         Faker faker = new Faker();
+        interactions = MedicationInteractions.builder()
+                .name(faker.lorem().word())
+                .Type(InteractionType.Mild)
+                .build();
         medicine = Medicine.builder()
                 .brandName(faker.lorem().characters(5))
                 .activeIngredient(faker.lorem().characters(10))
                 .timesDaily(faker.random().nextInt(1,5))
                 .instructions(faker.lorem().characters())
-                .interactions(faker.lorem().words(4))
+                .interactions(Collections.singletonList(interactions))
                 .build();
 
         patient = Patient.builder()

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -21,10 +22,7 @@ import org.springframework.test.web.reactive.server.StatusAssertions;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,13 +37,15 @@ class PatientMedicinesControllerIT {
     @Autowired
     MedicineRepository medicineRepository;
     // Mapping for the controller
-    private static final String path = "/api/v1/patients";
+    static final String path = "/api/v1/patients";
     Faker faker;
     MedicineRegistrationRequest medicineRequest;
     Medicine expectedMedicine;
     Patient expectedPatient;
     PatientRegistrationRequest patientRequest;
     StatusAssertions savePatientStatusAssertions;
+    @Value("#{'${medicine.picture-url}'}")
+    String DEFAULT_PICTURE_URL;
     StatusAssertions saveMedicineStatusAssertions;
 
 
@@ -80,7 +80,7 @@ class PatientMedicinesControllerIT {
                 .activeIngredient(medicineRequest.getActiveIngredient())
                 .timesDaily(medicineRequest.getTimesDaily())
                 .instructions(medicineRequest.getInstructions())
-                .interactions(medicineRequest.getInteractions())
+                .interactions(Collections.emptyList())
                 .patient(expectedPatient)
                 .build();
         // webTestClientRequest called to save Medicine
@@ -123,13 +123,11 @@ class PatientMedicinesControllerIT {
         } while (!generatedBrandNames.add(brandName));
 
         return new MedicineRegistrationRequest(
-                faker.internet().image(),
+                DEFAULT_PICTURE_URL,
                 brandName,
                 faker.lorem().characters(10),
                 faker.random().nextInt(1, 5),
-                faker.lorem().characters(),
-                faker.lorem().words(4)
-        );
+                faker.lorem().characters());
     }
 
     @Test

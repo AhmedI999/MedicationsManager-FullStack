@@ -6,7 +6,6 @@ create table medicine
     active_ingredient VARCHAR(255),
     times_daily INT NOT NULL,
     instructions VARCHAR(255)   NOT NULL,
-    interactions VARCHAR(255),
     medicine_number INT DEFAULT nextval('medicine_number_seq'),
     patient_id INT REFERENCES patients(id) ON DELETE CASCADE
 );

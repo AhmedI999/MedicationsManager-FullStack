@@ -100,7 +100,7 @@ class PatientsControllerIT {
 
         // make sure that patient is present
         assertThat(allPatients)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "medicine")
                 .contains(expectedPatient);
     }
 

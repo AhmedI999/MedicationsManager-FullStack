@@ -1,17 +1,14 @@
 package com.simplesolutions.medicinesmanager.paylod;
 
-import com.simplesolutions.medicinesmanager.utils.StringListConverter;
-import jakarta.persistence.Convert;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.validator.constraints.URL;
-
-import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -27,6 +24,4 @@ public class MedicineRegistrationRequest {
     final int timesDaily;
     @NotBlank(message = "for safety reasons, instructions are required")
     final String instructions;
-    @Convert(converter = StringListConverter.class)
-    final List<String> interactions;
 }

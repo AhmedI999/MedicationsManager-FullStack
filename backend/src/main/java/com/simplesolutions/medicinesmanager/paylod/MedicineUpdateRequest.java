@@ -1,5 +1,6 @@
 package com.simplesolutions.medicinesmanager.paylod;
 
+import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.utils.StringListConverter;
 import jakarta.persistence.Convert;
 import lombok.AccessLevel;
@@ -18,6 +19,5 @@ public class MedicineUpdateRequest {
     final String activeIngredient;
     final Integer timesDaily;
     final String instructions;
-    @Convert(converter = StringListConverter.class)
-    final List<String> interactions;
+    final List<MedicationInteractions> interactions;
 }
