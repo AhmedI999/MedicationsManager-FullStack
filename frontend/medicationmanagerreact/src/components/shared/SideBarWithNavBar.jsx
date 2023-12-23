@@ -32,7 +32,6 @@ const SideBarWithNavBar = ({children}) => {
     const integrations = useDisclosure();
     const color = useColorModeValue("gray.600", "gray.300");
     const [bellColor, setBellColor] = useState('grey')
-    console.log(children);
     const handleBellClick = () => {
         // Toggle between two colors
         const newColor = bellColor === 'grey' ? 'green' : 'grey';

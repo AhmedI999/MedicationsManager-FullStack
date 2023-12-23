@@ -47,7 +47,7 @@ class InteractionsJpaDataAccessServiceTest {
         Faker faker = new Faker();
         interaction = MedicationInteractions.builder()
                 .name("U" + faker.lorem().word())
-                .Type(InteractionType.Mild)
+                .Type(InteractionType.MILD)
                 .medicine(medicine)
                 .build();
         medicine = Medicine.builder()

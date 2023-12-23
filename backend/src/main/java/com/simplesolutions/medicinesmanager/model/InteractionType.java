@@ -1,7 +1,7 @@
 package com.simplesolutions.medicinesmanager.model;
 
 public enum InteractionType {
-    Mild,
+    MILD,
     MODERATE,
     SEVERE
 }

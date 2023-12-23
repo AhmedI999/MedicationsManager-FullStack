@@ -1,6 +1,5 @@
 package com.simplesolutions.medicinesmanager.service.medicine;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
@@ -52,7 +51,7 @@ class MedicineServiceTest {
         faker = new Faker();
         MedicationInteractions interactions = MedicationInteractions.builder()
                 .name(faker.lorem().word())
-                .Type(InteractionType.Mild)
+                .Type(InteractionType.MILD)
                 .build();
         medicine = Medicine.builder()
                 .pictureUrl("https://i.imgur.com/qMA0qhd.png")

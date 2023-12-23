@@ -1,23 +1,43 @@
 import axios from 'axios';
 
-// Getting Medicines for patient 1
-export const getPatients= async () => {
+export const getPatientMedications= async (patientId) => {
     try {
-        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/1/medicines`)
+        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}/medicines`)
     } catch ( error ){
-        console.error("Error fetching patients:", error);
+        console.error("Error fetching Medications:", error);
         throw error;
     }
 
 };
-export const saveMedicine = async (medicine) => {
+export const getMedicationInteractions = async (patientId, medicationId) => {
+    try {
+        return await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}/medicines/${medicationId}/interactions`)
+    } catch ( error ){
+    console.error("Error fetching Interactions:", error);
+    throw error;
+    }
+}
+
+
+
+export const saveMedication = async (medicine, patientId) => {
    try {
        return await axios.post(
-           `${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/1/medicines`,
+           `${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}/medicines`,
            medicine)
    } catch ( error ){
        console.error("Error fetching patients:", error);
        throw error;
    }
 
+}
+export const saveMedicationInteraction = async (interaction, patientId, medicationId) => {
+    try {
+        return await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}/medicines/${medicationId}/interactions`,
+            interaction)
+    } catch ( error ){
+        console.error("Error fetching patients:", error);
+        throw error;
+    }
 }

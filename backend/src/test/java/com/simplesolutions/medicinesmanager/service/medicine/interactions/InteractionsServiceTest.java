@@ -51,7 +51,7 @@ class InteractionsServiceTest {
         faker = new Faker();
         interaction = MedicationInteractions.builder()
                 .name("U" + faker.lorem().word())
-                .Type(InteractionType.Mild)
+                .Type(InteractionType.MILD)
                 .build();
         medicine = Medicine.builder()
                 .pictureUrl(DEFAULT_PICTURE_URL)

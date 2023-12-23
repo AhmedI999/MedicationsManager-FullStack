@@ -6,9 +6,14 @@ import {
     PopoverHeader,
     PopoverBody,
     PopoverFooter,
-    chakra, Flex, List, ListItem, ListIcon, useDisclosure
+    chakra, Flex, List, ListItem, ListIcon, useDisclosure, Spinner, Text
 } from "@chakra-ui/react";
 import {MdOutlineMedication} from "react-icons/md";
+import {useEffect, useState} from "react";
+import {getMedicationInteractions} from "../services/client.js";
+import SideBarWithNavBar from "./shared/SideBarWithNavBar.jsx";
+import useMedicationInteractions from "../services/useMedicationInteractions";
+import InteractionForm from "./shared/InteractionForm.jsx";
 
 const MoreDetailsPopover = ({children}) => {
     const {
@@ -17,11 +22,36 @@ const MoreDetailsPopover = ({children}) => {
         brandName,
         id,
         instructions,
-        interactions,
         medicineNumber,
         timesDaily,
     } = children.props;
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { interactions, loading, refetchInteractions } = useMedicationInteractions(id);
+    const [shouldRefetch, setShouldRefetch] = useState(false);
+
+    useEffect(() => {
+        if (shouldRefetch){
+            setShouldRefetch(true);
+        } else {
+            setShouldRefetch(false);
+        }
+    }, [interactions]);
+
+    if (loading) {
+        return (
+            <SideBarWithNavBar>
+                <Spinner
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                />
+            </SideBarWithNavBar>
+        )
+    }
+
+
     return (
         <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
             <PopoverTrigger>
@@ -47,7 +77,7 @@ const MoreDetailsPopover = ({children}) => {
                     More Details
                 </Flex>
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent w="full">
                 <PopoverHeader>More Details on {brandName}</PopoverHeader>
                 <PopoverBody>
                     {activeIngredient.trim() !== '' && (
@@ -68,21 +98,29 @@ const MoreDetailsPopover = ({children}) => {
                         <strong>Instructions:</strong> {instructions}
                     </chakra.p>
 
-                    {interactions && (
+                    {interactions && interactions.length > 0 ? (
                         <chakra.div mt={4}>
                             <chakra.h3 fontSize="md" fontWeight="bold" mb={2}>
-                                Interactions
+                                Interactions:
                             </chakra.h3>
                             <List listStyleType="none" pl={0}>
                                 {interactions.map((interaction, index) => (
-                                    <ListItem key={`interaction-${index}`}>
-                                        <ListIcon as={MdOutlineMedication} color='green.500'/>
-                                        {interaction}
+                                    <ListItem key={`interaction-${index}`} w="full">
+                                        <ListIcon as={MdOutlineMedication} color="green.500" />
+                                        {interaction.name} | {(interaction.type).toLowerCase()}
                                     </ListItem>
                                 ))}
                             </List>
                         </chakra.div>
+                    ) : (
+                        <chakra.div mt={4}>
+                            <Text>No Interactions added</Text>
+                        </chakra.div>
                     )}
+                    <InteractionForm
+                        medicationId={id}
+                        refetchInteractions={refetchInteractions}
+                    />
                 </PopoverBody>
                 <PopoverFooter>
                     <Button onClick={onClose}>Close</Button>

@@ -6,7 +6,7 @@ import {
 import MoreDetailsDrawer from "./MoreDetailsPopover.jsx";
 import MoreDetailsPopover from "./MoreDetailsPopover.jsx";
 
-const MedsCard = ({ pictureUrl, activeIngredient, brandName, id , instructions, interactions, medicineNumber, timesDaily }) => {
+const MedsCard = ({ pictureUrl, activeIngredient, brandName, id , instructions, medicineNumber, timesDaily }) => {
     return (
         <Flex
             bg="#edf3f8"
@@ -90,7 +90,6 @@ const MedsCard = ({ pictureUrl, activeIngredient, brandName, id , instructions, 
                                 brandName={brandName}
                                 id={id}
                                 instructions={instructions}
-                                interactions={interactions}
                                 medicineNumber={medicineNumber}
                                 timesDaily={timesDaily}
                             />

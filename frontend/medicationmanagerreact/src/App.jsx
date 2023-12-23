@@ -1,24 +1,15 @@
 import SideBarWithNavBar from "./components/shared/SideBarWithNavBar.jsx";
 import {useEffect, useState} from "react";
-import {getPatients} from "./services/client.js";
+import {getPatientMedications} from "./services/client.js";
 import {Spinner, Text, Wrap, WrapItem} from "@chakra-ui/react";
 import MedsCard from "./components/MedsCard.jsx";
 import DrawerForm from "./components/DrawerForm.jsx";
 import MoreDetailsDrawer from "./components/MoreDetailsPopover.jsx";
+import useMedications from "./services/useMedications.js";
 
 function App() {
-    const [medications, setMedications] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const { medications, loading} = useMedications(4);
 
-    useEffect(() => {
-        setLoading(true);
-        getPatients().then(res => {
-            setMedications(res.data)
-            console.log(...medications)
-        }).catch(err => {
-            console.error(err);
-        }).finally(() => setLoading(false));
-    }, [])
     if (loading) {
         return (
             <SideBarWithNavBar>
@@ -30,23 +21,23 @@ function App() {
                     size='xl'
                 />
             </SideBarWithNavBar>
-        )
+        );
     }
+
     if (medications.length <= 0) {
         return (
             <SideBarWithNavBar>
-                <Text>No Patient available</Text>
+                <Text>No Medications Here. Add New Medications</Text>
             </SideBarWithNavBar>
-        )
+        );
     }
+
     return (
         <SideBarWithNavBar>
-            <Wrap justify="left" spacing="20px">
+            <Wrap justify='left' spacing='20px'>
                 {medications.map((medication, index) => (
                     <WrapItem key={index}>
-                        <MedsCard
-                            {...medication}
-                        />
+                        <MedsCard {...medication} />
                     </WrapItem>
                 ))}
             </Wrap>
@@ -54,4 +45,4 @@ function App() {
     );
 }
 
-export default App
+export default App;
