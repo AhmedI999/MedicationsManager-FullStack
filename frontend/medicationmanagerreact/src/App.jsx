@@ -8,7 +8,7 @@ import MoreDetailsDrawer from "./components/MoreDetailsPopover.jsx";
 import useMedications from "./services/useMedications.js";
 
 function App() {
-    const { medications, loading} = useMedications(4);
+    const { medications, loading, fetchMedications} = useMedications(4);
 
     if (loading) {
         return (
@@ -33,7 +33,7 @@ function App() {
     }
 
     return (
-        <SideBarWithNavBar>
+        <SideBarWithNavBar fetchMedications={fetchMedications}>
             <Wrap justify='left' spacing='20px'>
                 {medications.map((medication, index) => (
                     <WrapItem key={index}>

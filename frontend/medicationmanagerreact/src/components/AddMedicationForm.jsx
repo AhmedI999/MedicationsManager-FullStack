@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import ApplicationTermsAndConditions from "./ApplicationTermsAndConditions.jsx";
 import {saveMedication} from "../services/client.js";
+import useMedications from "../services/useMedications.js";
 
 const TextInput = ({ label, ...props }) => {
     const [field, meta] = useField(props);
@@ -34,7 +35,7 @@ const CheckboxInput = ({ children, ...props }) => {
     );
 };
 
-const AddMedicationForm = () => {
+const AddMedicationForm = ({fetchMedications}) => {
     return (
         <>
             <Formik
@@ -70,6 +71,7 @@ const AddMedicationForm = () => {
                         .then( res => {
                             console.log(res);
                             alert("MedicineSaved");
+                            fetchMedications();
                         }).catch( err => {
                         console.error(err);
                     }).finally( ()=> {

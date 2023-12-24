@@ -27,7 +27,7 @@ import {CgAdd} from "react-icons/cg";
 import {useState} from "react";
 
 
-const SideBarWithNavBar = ({children}) => {
+const SideBarWithNavBar = ({children, fetchMedications}) => {
     const sidebar = useDisclosure();
     const integrations = useDisclosure();
     const color = useColorModeValue("gray.600", "gray.300");
@@ -145,7 +145,7 @@ const SideBarWithNavBar = ({children}) => {
                         </NavItem>
                 </Collapse>
                 <NavItem icon={CgAdd}>
-                    <DrawerForm/>
+                    <DrawerForm fetchMedications={fetchMedications}/>
                 </NavItem>
                 <NavItem icon={BsGearFill}>Settings</NavItem>
             </Flex>
