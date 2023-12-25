@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useState} from "react";
 import {getMedicationInteractions} from "./client.js";
+import {errorNotification} from "./Notifications.js";
 
 const useMedicationInteractions = (medicationId) => {
     const [interactions, setInteractions] = useState([]);
@@ -11,7 +12,8 @@ const useMedicationInteractions = (medicationId) => {
             const res = await getMedicationInteractions(4, medicationId);
             setInteractions(res.data);
         } catch (err) {
-            console.error(err);
+            errorNotification(`Getting Interactions`,
+                `Couldn't Retrieve Interactions. Error ${err.code}: ${err.response.data.message}`)
         } finally {
             setLoading(false);
         }

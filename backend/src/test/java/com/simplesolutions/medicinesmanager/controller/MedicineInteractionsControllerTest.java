@@ -93,7 +93,7 @@ class MedicineInteractionsControllerTest {
         // Medicine
         medicineRequest = new MedicineRegistrationRequest(
                 DEFAULT_PICTURE_URL,
-                faker.lorem().word(),
+                "U" + faker.lorem().word(),
                 faker.lorem().characters(10),
                 faker.random().nextInt(1, 5),
                 faker.lorem().characters());

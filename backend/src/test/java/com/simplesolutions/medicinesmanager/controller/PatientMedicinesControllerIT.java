@@ -72,7 +72,13 @@ class PatientMedicinesControllerIT {
                 .expectStatus();
 
         // generate medicineRegistrationRequest with unique brandName every call
-        medicineRequest = generateUniqueMedicineRequest();
+        medicineRequest = new MedicineRegistrationRequest(
+                DEFAULT_PICTURE_URL,
+                "U" + faker.lorem().word(),
+                faker.lorem().characters(10),
+                faker.random().nextInt(1, 5),
+                faker.lorem().characters());
+
         // expected Medicine To return
         expectedMedicine = Medicine.builder()
                 .pictureUrl(medicineRequest.getPictureUrl())
@@ -80,7 +86,7 @@ class PatientMedicinesControllerIT {
                 .activeIngredient(medicineRequest.getActiveIngredient())
                 .timesDaily(medicineRequest.getTimesDaily())
                 .instructions(medicineRequest.getInstructions())
-                .interactions(Collections.emptyList())
+                .interactions(new ArrayList<>())
                 .patient(expectedPatient)
                 .build();
         // webTestClientRequest called to save Medicine
@@ -114,22 +120,6 @@ class PatientMedicinesControllerIT {
         );
     }
 
-    private MedicineRegistrationRequest generateUniqueMedicineRequest(){
-        Set<String> generatedBrandNames = new HashSet<>();
-        String brandName;
-        // generating unique email
-        do {
-            brandName = faker.lorem().word() + faker.lorem().word();
-        } while (!generatedBrandNames.add(brandName));
-
-        return new MedicineRegistrationRequest(
-                DEFAULT_PICTURE_URL,
-                brandName,
-                faker.lorem().characters(10),
-                faker.random().nextInt(1, 5),
-                faker.lorem().characters());
-    }
-
     @Test
     @DisplayName("Ensure that savePatientMedicine endpoint can save a medicine and add it to Patient")
     void savePatientMedicine() {
@@ -154,7 +144,31 @@ class PatientMedicinesControllerIT {
                 .findByPatientIdAndBrandName(patientInDB_Id, expectedMedicine.getBrandName()).getId();
         // Retrieving the medicine
         webTestClient.get()
-                .uri(path + "/{patientId}/medicines/{medicineId}", patientInDB_Id, medicineInDB_Id)
+                .uri(path + "/{patientId}/medicines/id/{medicineId}", patientInDB_Id, medicineInDB_Id)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectBody(new ParameterizedTypeReference<Medicine>() {
+                })
+                .consumeWith(response -> {
+                    Medicine actualMedicine = response.getResponseBody();
+                    assertThat(actualMedicine)
+                            .usingRecursiveComparison()
+                            // medicine number is automatically created like id so no need to check it
+                            .ignoringFields("id", "medicineNumber", "patient")
+                            .isEqualTo(expectedMedicine);
+                });
+    }
+    @Test
+    @DisplayName("ensure that getMedicineByBrandName can retrieve medicine by patient id and brandName")
+    void getMedicine_saveMedicine_retrieveByBrandName() {
+        // saving patient
+        savePatientStatusAssertions.isOk();
+        // saving medicine and verifying that response is 200
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).getId();
+        saveMedicineStatusAssertions.isOk();
+        // Retrieving the medicine
+        webTestClient.get()
+                .uri(path + "/{patientId}/medicines/{brandName}", patientInDB_Id, medicineRequest.getBrandName())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectBody(new ParameterizedTypeReference<Medicine>() {
@@ -240,7 +254,7 @@ class PatientMedicinesControllerIT {
                 .expectStatus().isOk();
         // confirming the new details
         webTestClient.get()
-                .uri(path + "/{patientId}/medicines/{medicineId}", patientInDB_Id, medicineInDB_Id)
+                .uri(path + "/{patientId}/medicines/id/{medicineId}", patientInDB_Id, medicineInDB_Id)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()

@@ -30,6 +30,11 @@ public class MedicineJpaDataAccessService implements MedicineDao {
     }
 
     @Override
+    public Medicine selectPatientMedicineByBrandName(Integer patientId, String brandName) {
+        return medicineRepository.findByPatientIdAndBrandName(patientId, brandName);
+    }
+
+    @Override
     public void saveMedicine(Medicine medicine) {
         medicineRepository.save(medicine);
     }

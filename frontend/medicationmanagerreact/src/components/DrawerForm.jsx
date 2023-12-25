@@ -11,7 +11,8 @@ import {
 import AddMedicationForm from "./AddMedicationForm.jsx";
 
 
-const DrawerForm = ( {fetchMedications} ) =>{
+
+const DrawerForm = ({fetchMedications}) =>{
     const { isOpen, onOpen, onClose } = useDisclosure()
     return <>
         <Drawer isOpen={isOpen} onClose={onClose} placement={"left"} size={"xl"}>

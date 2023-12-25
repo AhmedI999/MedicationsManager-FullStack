@@ -90,6 +90,20 @@ class MedicineJpaDataAccessServiceTest {
         //Then
         verify(medicineRepository).findByPatientIdAndId(patientId, medicineId);
     }
+    @Test
+    @DisplayName("Verify that selectPatientMedicineByBrandName() can invoke findByPatientIdAndBrandName()")
+    void selectPatientMedicineByBrandName() {
+        // Given
+        int patientId = 1;
+        when(medicineRepository.findByPatientIdAndBrandName(patientId, medicine.getBrandName()))
+                .thenReturn(medicine);
+        //When
+        medicineJpaTest.selectPatientMedicineByBrandName(patientId, medicine.getBrandName());
+        //Then
+        verify(medicineRepository).findByPatientIdAndBrandName(patientId, medicine.getBrandName());
+    }
+
+
 
     @Test
     @DisplayName("Verify that saveMedicine()  can invoke save()")

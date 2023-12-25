@@ -2,8 +2,6 @@ package com.simplesolutions.medicinesmanager.paylod;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.utils.StringListConverter;
-import jakarta.persistence.Convert;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

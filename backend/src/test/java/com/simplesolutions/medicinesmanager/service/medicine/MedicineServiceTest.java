@@ -55,7 +55,7 @@ class MedicineServiceTest {
                 .build();
         medicine = Medicine.builder()
                 .pictureUrl("https://i.imgur.com/qMA0qhd.png")
-                .brandName(faker.lorem().characters(5))
+                .brandName("U" + faker.lorem().word())
                 .activeIngredient(faker.lorem().characters(10))
                 .timesDaily(faker.random().nextInt(1,5))
                 .instructions(faker.lorem().characters())
@@ -169,7 +169,19 @@ class MedicineServiceTest {
            verify(medicineDao).selectPatientMedicineById(patientId, invalidMedicineId);
         }
     }
-
+    @Test
+    @DisplayName("Verify that getPatientMedicineById can invoke selectPatientMedicineById")
+    void getPatientMedicineByBrandName_returnMedicine() {
+        // Given
+        int patientId = 1;
+        when(medicineDao.selectPatientMedicineByBrandName(patientId, medicine.getBrandName()))
+                .thenReturn(medicine);
+        //When
+        Medicine actual = medicineTest.getPatientMedicineByBrandName(patientId, medicine.getBrandName());
+        //Then
+        verify(medicineDao).selectPatientMedicineByBrandName(patientId, medicine.getBrandName());
+        assertThat(actual).isNotNull();
+    }
     @Nested
     @DisplayName("deletePatientMedicineById test units")
     class MedicineService_deletePatientMedicineById {

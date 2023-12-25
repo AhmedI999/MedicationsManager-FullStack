@@ -2,7 +2,6 @@ package com.simplesolutions.medicinesmanager.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.simplesolutions.medicinesmanager.utils.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

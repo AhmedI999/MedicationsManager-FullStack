@@ -20,6 +20,7 @@ import {
     useDisclosure,
 } from '@chakra-ui/react';
 import {saveMedicationInteraction} from "../../services/client.js";
+import {errorNotification, successNotification} from "../../services/Notifications.js";
 const InteractionForm = ({ medicationId, refetchInteractions }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
@@ -39,22 +40,28 @@ const InteractionForm = ({ medicationId, refetchInteractions }) => {
                         validationSchema={Yup.object({
                             name: Yup.string().required('Interaction name is required'),
                         })}
-                        validateOnMount={true}
+
                         onSubmit={(interaction, { setSubmitting }) => {
                             setSubmitting(true);
-                            // Assuming saveMedicationInteraction is a valid function
+
                             saveMedicationInteraction(
                                 { ...interaction, severity: interaction.type },
                                 4,
                                 medicationId
                             )
-                                .then((res) => {
-                                    console.log(res);
-                                    refetchInteractions();
+                                .then( () => {
+                                    successNotification(
+                                        `Adding interaction ${interaction}`,
+                                        `Interaction ${interaction} has been added successfully`
+                                    )
+
                                 }).catch((err) => {
-                                    console.error(err);
-                                    setSubmitting(false);
+                                    errorNotification(
+                                        `Adding interaction ${interaction.name}`,
+                                        `Couldn't Add ${interaction.name}. Error ${err.code}: ${err.response.data.message}`
+                                    )
                                 }).finally( ()=> {
+                                refetchInteractions();
                                 setSubmitting(false);
                             })
                         }}

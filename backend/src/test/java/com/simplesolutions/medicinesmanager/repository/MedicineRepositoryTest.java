@@ -53,7 +53,7 @@ class MedicineRepositoryTest extends AbstractTestContainers {
                 .Type(InteractionType.MILD)
                 .build();
         medicine = Medicine.builder()
-                .brandName(faker.lorem().characters(5))
+                .brandName("U" + faker.lorem().word())
                 .activeIngredient(faker.lorem().characters(10))
                 .timesDaily(faker.random().nextInt(1,5))
                 .instructions(faker.lorem().characters())

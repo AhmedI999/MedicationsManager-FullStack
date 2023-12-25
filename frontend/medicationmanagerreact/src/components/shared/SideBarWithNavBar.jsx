@@ -1,23 +1,22 @@
 import {
     Box,
-    Flex,
-    Text,
-    Icon,
     Collapse,
-    useDisclosure,
     Drawer,
-    DrawerOverlay,
     DrawerContent,
+    DrawerOverlay,
+    Flex,
+    Icon,
     IconButton,
+    Image,
+    Input,
     InputGroup,
     InputLeftElement,
-    Input,
-    Avatar,
+    Text,
     useColorModeValue,
-    Image,Wrap
+    useDisclosure,
+    Wrap, WrapItem
 } from '@chakra-ui/react';
 
-// Import icons from the appropriate libraries
 import {FiMenu, FiSearch} from 'react-icons/fi';
 import {FaBell} from 'react-icons/fa'
 import {MdHome, MdKeyboardArrowRight, MdMedication} from 'react-icons/md'
@@ -25,9 +24,10 @@ import {BsGearFill} from 'react-icons/bs'
 import DrawerForm from "../DrawerForm.jsx";
 import {CgAdd} from "react-icons/cg";
 import {useState} from "react";
+import MedsCard from "../MedsCard.jsx";
 
 
-const SideBarWithNavBar = ({children, fetchMedications}) => {
+const SideBarWithNavBar = ({fetchMedications, medications}) => {
     const sidebar = useDisclosure();
     const integrations = useDisclosure();
     const color = useColorModeValue("gray.600", "gray.300");
@@ -36,11 +36,16 @@ const SideBarWithNavBar = ({children, fetchMedications}) => {
         // Toggle between two colors
         const newColor = bellColor === 'grey' ? 'green' : 'grey';
         setBellColor(newColor);
-
     };
+    const [searchTerm, setSearchTerm] = useState("");
+    const handleSearchChange = (event) => {
+        const capitalize = (str) => {
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
 
-
-
+        const newSearchTerm = event.target.value;
+        setSearchTerm(capitalize(newSearchTerm));
+    };
     const NavItem = (props) => {
         const {icon, children, ...rest} = props;
         return (
@@ -137,12 +142,12 @@ const SideBarWithNavBar = ({children, fetchMedications}) => {
                         transform={integrations.isOpen && "rotate(90deg)"}
                     />
                 </NavItem>
-
                 <Collapse in={integrations.isOpen}>
-
-                        <NavItem pl="12" py="2">
-                            meds here
+                    {fetchMedications && medications.map((medication, index) => (
+                        <NavItem key={index} pl="12" py="2">
+                            {medication.brandName}
                         </NavItem>
+                    ))}
                 </Collapse>
                 <NavItem icon={CgAdd}>
                     <DrawerForm fetchMedications={fetchMedications}/>
@@ -218,10 +223,10 @@ const SideBarWithNavBar = ({children, fetchMedications}) => {
                         <InputLeftElement color="gray.500">
                             <FiSearch/>
                         </InputLeftElement>
-                        <Input placeholder="Search for Medications..."/>
+                        <Input name="search" placeholder="Search for Medications..." onChange={handleSearchChange}/>
                     </InputGroup>
 
-                    <Flex onClick={()=> {
+                    <Flex onClick={() => {
                         handleBellClick()
                         alert("Notification On!")
                     }}>
@@ -229,9 +234,27 @@ const SideBarWithNavBar = ({children, fetchMedications}) => {
                     </Flex>
                 </Flex>
                 <Box as="main" p="5">
-                        <Wrap>
-                            {children}
-                        </Wrap>
+                    <Wrap justify='left' spacing='20px'>
+                        {fetchMedications && medications.length > 0 && searchTerm.length === 0 ? (
+                            medications.map((medication, index) => (
+                                <WrapItem key={index}>
+                                    <MedsCard {...medication}/>
+                                </WrapItem>
+                            ))
+                        ) : (
+                            medications && medications.some(med => med.brandName === searchTerm) ? (
+                                medications
+                                    .filter(filteredMed => filteredMed.brandName === searchTerm)
+                                    .map((filteredMedication, index) => (
+                                        <WrapItem key={index}>
+                                            <MedsCard {...filteredMedication} />
+                                        </WrapItem>
+                                    ))
+                            ) : (
+                                <Text>No Medication found</Text>
+                            )
+                        )}
+                    </Wrap>
                 </Box>
             </Box>
         </Box>

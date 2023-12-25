@@ -1,8 +1,6 @@
 package com.simplesolutions.medicinesmanager.paylod;
 
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.utils.StringListConverter;
-import jakarta.persistence.Convert;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

@@ -9,7 +9,7 @@ import {
     FormErrorMessage, Stack
 } from '@chakra-ui/react';
 import ApplicationTermsAndConditions from "./ApplicationTermsAndConditions.jsx";
-import {saveMedication} from "../services/client.js";
+import {editMedication} from "../services/client.js";
 import {errorNotification, successNotification} from "../services/Notifications.js";
 
 const TextInput = ({ label, ...props }) => {
@@ -35,16 +35,22 @@ const CheckboxInput = ({ children, ...props }) => {
     );
 };
 
-const AddMedicationForm = ({fetchMedications}) => {
+const EditMedicationForm = ( {   pictureUrl,
+                                activeIngredient,
+                                brandName,
+                                id ,
+                                instructions,
+                                timesDaily,
+                                fetchMedications } ) => {
     return (
         <>
             <Formik
                 initialValues={{
-                    pictureUrl: 'https://i.imgur.com/qMA0qhd.png',
-                    brandName: '',
-                    activeIngredient: '',
-                    timesDaily: 0,
-                    instructions: '',
+                    pictureUrl: `${pictureUrl}`,
+                    brandName: `${brandName}`,
+                    activeIngredient: `${activeIngredient}`,
+                    timesDaily: `${timesDaily}`,
+                    instructions: `${instructions}`,
                 }}
                 validationSchema={Yup.object({
                     pictureUrl: Yup.string()
@@ -65,18 +71,18 @@ const AddMedicationForm = ({fetchMedications}) => {
                         .required("You have to Accept the terms")
                 })}
                 validateOnMount={true}
-                onSubmit={(medicine, { setSubmitting }) => {
+                onSubmit={(medication, { setSubmitting}) => {
                     setSubmitting(true);
-                    saveMedication(medicine, 4)
+                    editMedication(4, id, medication)
                         .then( () => {
                             successNotification(
-                                `Adding New Medication`,
-                                `${medicine.brandName} Has been saved successfully`
+                                `Editing ${brandName} Information`,
+                                `${brandName} Details have been updated successfully`
                             )
                         }).catch( err => {
                         errorNotification(
-                            `Adding New Medication`,
-                            `Couldn't Add ${medicine.brandName}. Error ${err.code}: ${err.response.data.message}`
+                            `Editing ${brandName} Information`,
+                            `Couldn't Edit ${brandName}. Error ${err.code}: ${err.response.data.message}`
                         )
                     }).finally( ()=> {
                         fetchMedications();
@@ -84,7 +90,7 @@ const AddMedicationForm = ({fetchMedications}) => {
                     })
                 }}
             >
-                {({ isValid , isSubmitting}) => (
+                {({ isValid , isSubmitting, dirty}) => (
                     <Form>
                         <Stack spacing="15px">
                             <TextInput label="Picture Url" name="pictureUrl" type="text" placeholder="https://i.imgur.com/qMA0qhd.png" />
@@ -92,9 +98,9 @@ const AddMedicationForm = ({fetchMedications}) => {
                             <TextInput label="Active ingredient" name="activeIngredient" type="text" placeholder="Nebivolol" />
                             <TextInput label="Times daily" name="timesDaily" type="number" placeholder="1" />
                             <TextInput label="Instructions" name="instructions" type="text" placeholder="Take In the morning" />
-                            <CheckboxInput name="acceptedTerms" >I accept the terms and conditions</CheckboxInput>
+                            <CheckboxInput name="acceptedTerms" isChecked="true" >I accept the terms and conditions</CheckboxInput>
                             <ApplicationTermsAndConditions/>
-                            <Button isDisabled={ !isValid || isSubmitting } type="submit" mt={1}>Submit</Button>
+                            <Button isDisabled={ (!isValid && !dirty) || isSubmitting } type="submit" mt={1}>Submit</Button>
                         </Stack>
                     </Form>
                 )}
@@ -103,4 +109,4 @@ const AddMedicationForm = ({fetchMedications}) => {
     );
 };
 
-export default AddMedicationForm;
+export default EditMedicationForm;

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -36,6 +37,14 @@ public class MedicineService {
         return medicineDao.selectPatientMedicineById(patientId, medicineId)
                 .orElseThrow(() -> new ResourceNotFoundException("Medicine wasn't found"));
     }
+    public Medicine getPatientMedicineByBrandName (Integer patientId, String brandName){
+        String capitalizedName = brandName.substring(0, 1).toUpperCase() +
+                brandName.substring(1).toLowerCase();
+        Medicine medicine = medicineDao.selectPatientMedicineByBrandName(patientId, capitalizedName);
+        if (Objects.isNull(medicine)){
+            throw new ResourceNotFoundException("Medicine %s wasn't found".formatted(capitalizedName));
+        } else return medicine;
+    }
     public void deletePatientMedicineById(Integer patientId, Integer medicineId){
         medicineDao.deletePatientMedicineById(patientId, medicineId);
     }
@@ -46,9 +55,11 @@ public class MedicineService {
         if (doesMedicineExists(patient.getEmail(), request.getBrandName()))
             throw new DuplicateResourceException("Patient's medicine (%s) already Exists"
                     .formatted(request.getBrandName()));
+        String capitalizedName = request.getBrandName().substring(0, 1).toUpperCase() +
+                request.getBrandName().substring(1).toLowerCase();
         Medicine medicine =  Medicine.builder()
                 .pictureUrl(request.getPictureUrl())
-                .brandName(request.getBrandName())
+                .brandName(capitalizedName)
                 .activeIngredient(request.getActiveIngredient())
                 .timesDaily(request.getTimesDaily())
                 .instructions(request.getInstructions())

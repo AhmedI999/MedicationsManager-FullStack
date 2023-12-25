@@ -3,10 +3,11 @@ import {
     Flex,
     chakra,
 } from '@chakra-ui/react';
-import MoreDetailsDrawer from "./MoreDetailsPopover.jsx";
 import MoreDetailsPopover from "./MoreDetailsPopover.jsx";
+import DeleteMedicationConfrimation from "./shared/DeleteMedicationConfrimation.jsx";
+import EditMedicationDrawer from "./EditMedicationDrawer.jsx";
 
-const MedsCard = ({ pictureUrl, activeIngredient, brandName, id , instructions, medicineNumber, timesDaily }) => {
+const MedsCard = ( { pictureUrl, activeIngredient, brandName, id , instructions, medicineNumber, timesDaily, fetchMedications } ) => {
     return (
         <Flex
             bg="#edf3f8"
@@ -81,7 +82,6 @@ const MedsCard = ({ pictureUrl, activeIngredient, brandName, id , instructions, 
                     >
                         {timesDaily} times a day.
                     </chakra.p>
-
                     <Flex mt={2} alignItems="center" justifyContent="space-between">
                         <MoreDetailsPopover>
                             <chakra.button
@@ -94,6 +94,20 @@ const MedsCard = ({ pictureUrl, activeIngredient, brandName, id , instructions, 
                                 timesDaily={timesDaily}
                             />
                         </MoreDetailsPopover>
+                        <EditMedicationDrawer
+                            pictureUrl={pictureUrl}
+                            activeIngredient={activeIngredient}
+                            brandName={brandName}
+                            id={id}
+                            instructions={instructions}
+                            timesDaily={timesDaily}
+                            fetchMedications={fetchMedications}
+                        />
+                        <DeleteMedicationConfrimation
+                            brandName={brandName}
+                            id={id}
+                            fetchMedications={fetchMedications}
+                        />
                     </Flex>
                 </Box>
             </Flex>

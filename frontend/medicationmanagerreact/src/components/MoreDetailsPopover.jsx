@@ -12,8 +12,9 @@ import {MdOutlineMedication} from "react-icons/md";
 import {useEffect, useState} from "react";
 import {getMedicationInteractions} from "../services/client.js";
 import SideBarWithNavBar from "./shared/SideBarWithNavBar.jsx";
-import useMedicationInteractions from "../services/useMedicationInteractions";
+import useMedicationInteractions from "../services/useMedicationInteractions.jsx";
 import InteractionForm from "./shared/InteractionForm.jsx";
+import DeleteMedicationInteractionConfirmation from "./shared/DeleteMedicationInteractionConfrimation.jsx";
 
 const MoreDetailsPopover = ({children}) => {
     const {
@@ -55,7 +56,7 @@ const MoreDetailsPopover = ({children}) => {
     return (
         <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
             <PopoverTrigger>
-                <Flex
+                <Button
                     align="center"
                     px="4"
                     pl="0"
@@ -73,11 +74,12 @@ const MoreDetailsPopover = ({children}) => {
                         color: "blue.900",
                     }}
                     ml="auto"
+                    mx={16}
                 >
                     More Details
-                </Flex>
+                </Button>
             </PopoverTrigger>
-            <PopoverContent w="full">
+            <PopoverContent w="full" medicationId={id}>
                 <PopoverHeader>More Details on {brandName}</PopoverHeader>
                 <PopoverBody>
                     {activeIngredient.trim() !== '' && (
@@ -98,16 +100,21 @@ const MoreDetailsPopover = ({children}) => {
                         <strong>Instructions:</strong> {instructions}
                     </chakra.p>
 
-                    {interactions && interactions.length > 0 ? (
+                    { interactions && interactions.length > 0 ? (
                         <chakra.div mt={4}>
                             <chakra.h3 fontSize="md" fontWeight="bold" mb={2}>
                                 Interactions:
                             </chakra.h3>
                             <List listStyleType="none" pl={0}>
-                                {interactions.map((interaction, index) => (
+                                { interactions.map((interaction, index) => (
                                     <ListItem key={`interaction-${index}`} w="full">
                                         <ListIcon as={MdOutlineMedication} color="green.500" />
                                         {interaction.name} | {(interaction.type).toLowerCase()}
+                                        <DeleteMedicationInteractionConfirmation
+                                            {...interaction}
+                                            medicationId={id}
+                                            refetchInteractions={refetchInteractions}
+                                        />
                                     </ListItem>
                                 ))}
                             </List>

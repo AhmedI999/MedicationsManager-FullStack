@@ -1,13 +1,9 @@
 import SideBarWithNavBar from "./components/shared/SideBarWithNavBar.jsx";
-import {useEffect, useState} from "react";
-import {getPatientMedications} from "./services/client.js";
-import {Spinner, Text, Wrap, WrapItem} from "@chakra-ui/react";
-import MedsCard from "./components/MedsCard.jsx";
-import DrawerForm from "./components/DrawerForm.jsx";
-import MoreDetailsDrawer from "./components/MoreDetailsPopover.jsx";
-import useMedications from "./services/useMedications.js";
+import {Spinner, Text} from "@chakra-ui/react";
+import useMedications from "./services/useMedications.jsx";
 
 function App() {
+
     const { medications, loading, fetchMedications} = useMedications(4);
 
     if (loading) {
@@ -33,15 +29,7 @@ function App() {
     }
 
     return (
-        <SideBarWithNavBar fetchMedications={fetchMedications}>
-            <Wrap justify='left' spacing='20px'>
-                {medications.map((medication, index) => (
-                    <WrapItem key={index}>
-                        <MedsCard {...medication} />
-                    </WrapItem>
-                ))}
-            </Wrap>
-        </SideBarWithNavBar>
+        <SideBarWithNavBar fetchMedications={fetchMedications} medications={medications} />
     );
 }
 

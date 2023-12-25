@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface MedicineDao {
 
     Optional<Medicine> selectPatientMedicineById(Integer patientId, Integer medicineId);
+
+    Medicine selectPatientMedicineByBrandName(Integer patientId, String brandName);
     List<Medicine> selectPatientMedicines(Integer patientId);
     void saveMedicine(Medicine medicine);
     void updateMedicine(Medicine medicine);
