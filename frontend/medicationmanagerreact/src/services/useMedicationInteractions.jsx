@@ -9,7 +9,7 @@ const useMedicationInteractions = (medicationId) => {
     const fetchInteractions = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await getMedicationInteractions(4, medicationId);
+            const res = await getMedicationInteractions(1, medicationId);
             setInteractions(res.data);
         } catch (err) {
             errorNotification(`Getting Interactions`,

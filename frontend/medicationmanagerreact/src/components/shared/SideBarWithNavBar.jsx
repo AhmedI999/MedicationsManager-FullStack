@@ -27,7 +27,8 @@ import {useState} from "react";
 import MedsCard from "../MedsCard.jsx";
 
 
-const SideBarWithNavBar = ({fetchMedications, medications}) => {
+const SideBarWithNavBar = ({medications, fetchMedications}) => {
+    // const { medications,  fetchMedications} = useMedications(1);
     const sidebar = useDisclosure();
     const integrations = useDisclosure();
     const color = useColorModeValue("gray.600", "gray.300");
@@ -150,7 +151,7 @@ const SideBarWithNavBar = ({fetchMedications, medications}) => {
                     ))}
                 </Collapse>
                 <NavItem icon={CgAdd}>
-                    <DrawerForm fetchMedications={fetchMedications}/>
+                    <DrawerForm medications={medications} fetchMedications={fetchMedications}/>
                 </NavItem>
                 <NavItem icon={BsGearFill}>Settings</NavItem>
             </Flex>
@@ -234,27 +235,31 @@ const SideBarWithNavBar = ({fetchMedications, medications}) => {
                     </Flex>
                 </Flex>
                 <Box as="main" p="5">
-                    <Wrap justify='left' spacing='20px'>
-                        {fetchMedications && medications.length > 0 && searchTerm.length === 0 ? (
-                            medications.map((medication, index) => (
-                                <WrapItem key={index}>
-                                    <MedsCard {...medication}/>
-                                </WrapItem>
-                            ))
-                        ) : (
-                            medications && medications.some(med => med.brandName === searchTerm) ? (
-                                medications
-                                    .filter(filteredMed => filteredMed.brandName === searchTerm)
-                                    .map((filteredMedication, index) => (
-                                        <WrapItem key={index}>
-                                            <MedsCard {...filteredMedication} />
-                                        </WrapItem>
-                                    ))
+                    { fetchMedications && medications.length > 0 ? (
+                        <Wrap justify='left' spacing='20px'>
+                            {searchTerm.length === 0 ? (
+                                medications.map((medication, index) => (
+                                    <WrapItem key={index}>
+                                        <MedsCard {...medication} fetchMedications={fetchMedications}/>
+                                    </WrapItem>
+                                ))
                             ) : (
-                                <Text>No Medication found</Text>
-                            )
-                        )}
-                    </Wrap>
+                                medications && medications.some(med => med.brandName === searchTerm) ? (
+                                    medications
+                                        .filter(filteredMed => filteredMed.brandName === searchTerm)
+                                        .map((filteredMedication, index) => (
+                                            <WrapItem key={index}>
+                                                <MedsCard {...filteredMedication} fetchMedications={fetchMedications}/>
+                                            </WrapItem>
+                                        ))
+                                ) : (
+                                    <Text>No Medication found</Text>
+                                )
+                            )}
+                        </Wrap>
+                    ) : (
+                        <Text>No Medication Available. Add new medications</Text>
+                    )}
                 </Box>
             </Box>
         </Box>

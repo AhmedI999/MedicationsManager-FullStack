@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -27,9 +28,9 @@ public class MedicineService {
     public List<Medicine> getPatientMedicines(Integer patientID){
         Patient patient = patientDao.selectPatientById(patientID).
         orElseThrow(() -> new ResourceNotFoundException("Patient doesn't exist"));
-        if (patient.getPatientMedicines() == null || patient.getPatientMedicines().isEmpty())
-            throw new ResourceNotFoundException("Patient doesn't have medicines");
         List<Medicine> medicines =  medicineDao.selectPatientMedicines(patient.getId());
+        if ( patient.getPatientMedicines() == null )
+            throw new ResourceNotFoundException("Patient doesn't have medicines");
         medicines.sort(Comparator.comparing(Medicine::getMedicineNumber));
         return medicines;
     }
@@ -57,7 +58,7 @@ public class MedicineService {
                     .formatted(request.getBrandName()));
         String capitalizedName = request.getBrandName().substring(0, 1).toUpperCase() +
                 request.getBrandName().substring(1).toLowerCase();
-        Medicine medicine =  Medicine.builder()
+        Medicine medicine = Medicine.builder()
                 .pictureUrl(request.getPictureUrl())
                 .brandName(capitalizedName)
                 .activeIngredient(request.getActiveIngredient())

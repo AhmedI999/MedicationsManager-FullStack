@@ -16,7 +16,7 @@ function DeleteMedicationConfirmation({brandName, id, fetchMedications}) {
     const cancelRef = React.useRef();
 
     const handleDeleteMedication = () => {
-        deleteMedication(4, id).then( () => successNotification(
+        deleteMedication(1, id).then( () => successNotification(
             `Delete Medication ${brandName}`, `${brandName} has been deleted successfully`
         )).catch(err => {
             errorNotification(`Delete Medication ${brandName}`,

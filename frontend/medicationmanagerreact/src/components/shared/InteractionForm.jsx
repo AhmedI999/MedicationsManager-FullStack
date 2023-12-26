@@ -46,13 +46,13 @@ const InteractionForm = ({ medicationId, refetchInteractions }) => {
 
                             saveMedicationInteraction(
                                 { ...interaction, severity: interaction.type },
-                                4,
+                                1,
                                 medicationId
                             )
                                 .then( () => {
                                     successNotification(
-                                        `Adding interaction ${interaction}`,
-                                        `Interaction ${interaction} has been added successfully`
+                                        `Adding interaction ${interaction.name}`,
+                                        `Interaction ${interaction.name} has been added successfully`
                                     )
 
                                 }).catch((err) => {

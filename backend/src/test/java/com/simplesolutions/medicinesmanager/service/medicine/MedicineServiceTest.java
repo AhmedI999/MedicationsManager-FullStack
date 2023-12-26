@@ -120,18 +120,18 @@ class MedicineServiceTest {
         }
 
         @Test
-        @DisplayName("Verify that getPatientMedicines Throw ResourceNotFoundException when medicines empty")
+        @DisplayName("Verify that getPatientMedicines Throw ResourceNotFoundException when medicines are null")
         void getPatientMedicines_throwResourceNotFoundMedicine() {
             // Given
+            patient.setPatientMedicines(null);
             when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.of(patient));
-            patient.setPatientMedicines(new ArrayList<>());
+
             //When
             assertThatThrownBy(() -> medicineTest.getPatientMedicines(patient.getId()))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessage("Patient doesn't have medicines");
             //Then
-            verify(medicineDao, never()).selectPatientMedicines(patient.getId());
-            assertThat(patient.getPatientMedicines()).isEmpty();
+            assertThat(patient.getPatientMedicines()).isNull();
         }
     }
 

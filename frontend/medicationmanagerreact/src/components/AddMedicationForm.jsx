@@ -35,7 +35,7 @@ const CheckboxInput = ({ children, ...props }) => {
     );
 };
 
-const AddMedicationForm = ({fetchMedications}) => {
+const AddMedicationForm = ({medications, fetchMedications}) => {
     return (
         <>
             <Formik
@@ -67,8 +67,9 @@ const AddMedicationForm = ({fetchMedications}) => {
                 validateOnMount={true}
                 onSubmit={(medicine, { setSubmitting }) => {
                     setSubmitting(true);
-                    saveMedication(medicine, 4)
+                    saveMedication(medicine, 1)
                         .then( () => {
+                            fetchMedications();
                             successNotification(
                                 `Adding New Medication`,
                                 `${medicine.brandName} Has been saved successfully`

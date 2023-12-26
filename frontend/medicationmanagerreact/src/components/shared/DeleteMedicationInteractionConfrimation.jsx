@@ -20,7 +20,7 @@ function DeleteMedicationInteractionConfirmation( { medicationId, name, refetchI
     const cancelRef = React.useRef();
 
     const handleDeleteInteraction = () => {
-        deleteMedicationInteraction(4, medicationId, name).then( () => successNotification(
+        deleteMedicationInteraction(1, medicationId, name).then( () => successNotification(
             `Delete Interaction ${name}`, `${name} has been deleted successfully`
         )).catch(err => {
             errorNotification(`Delete Interaction ${name}`,
