@@ -1,5 +1,5 @@
 name: CD - Deploy Backend
-# todo change on action to be after merging from dev to master
+
 on:
   push:
     branches:
