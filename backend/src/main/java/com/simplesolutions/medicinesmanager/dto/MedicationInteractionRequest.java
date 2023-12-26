@@ -1,4 +1,4 @@
-package com.simplesolutions.medicinesmanager.paylod;
+package com.simplesolutions.medicinesmanager.dto;
 
 import com.simplesolutions.medicinesmanager.model.InteractionType;
 import lombok.AccessLevel;

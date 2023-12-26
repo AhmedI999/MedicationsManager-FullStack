@@ -4,7 +4,7 @@ import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.model.Medicine;
-import com.simplesolutions.medicinesmanager.paylod.MedicationInteractionRequest;
+import com.simplesolutions.medicinesmanager.dto.MedicationInteractionRequest;
 import com.simplesolutions.medicinesmanager.service.medicine.MedicineDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

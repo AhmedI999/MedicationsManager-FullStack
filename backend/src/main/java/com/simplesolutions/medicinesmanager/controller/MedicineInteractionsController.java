@@ -2,10 +2,9 @@ package com.simplesolutions.medicinesmanager.controller;
 
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.model.Medicine;
-import com.simplesolutions.medicinesmanager.paylod.MedicationInteractionRequest;
+import com.simplesolutions.medicinesmanager.dto.MedicationInteractionRequest;
 import com.simplesolutions.medicinesmanager.service.medicine.MedicineService;
 import com.simplesolutions.medicinesmanager.service.medicine.interactions.InteractionsService;
-import com.simplesolutions.medicinesmanager.service.patient.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

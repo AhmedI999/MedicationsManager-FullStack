@@ -5,14 +5,13 @@ import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.exception.UpdateException;
 import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.paylod.MedicineRegistrationRequest;
-import com.simplesolutions.medicinesmanager.paylod.MedicineUpdateRequest;
+import com.simplesolutions.medicinesmanager.dto.MedicineRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.MedicineUpdateRequest;
 import com.simplesolutions.medicinesmanager.service.patient.PatientDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;

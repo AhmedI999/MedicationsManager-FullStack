@@ -2,9 +2,9 @@ package com.simplesolutions.medicinesmanager.controller;
 
 import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.paylod.MedicineRegistrationRequest;
-import com.simplesolutions.medicinesmanager.paylod.MedicineResponse;
-import com.simplesolutions.medicinesmanager.paylod.MedicineUpdateRequest;
+import com.simplesolutions.medicinesmanager.dto.MedicineRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.MedicineResponse;
+import com.simplesolutions.medicinesmanager.dto.MedicineUpdateRequest;
 import com.simplesolutions.medicinesmanager.service.medicine.MedicineService;
 import com.simplesolutions.medicinesmanager.service.patient.PatientService;
 import jakarta.validation.Valid;

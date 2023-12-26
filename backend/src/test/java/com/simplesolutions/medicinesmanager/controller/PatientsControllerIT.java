@@ -2,8 +2,8 @@ package com.simplesolutions.medicinesmanager.controller;
 
 import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.paylod.PatientRegistrationRequest;
-import com.simplesolutions.medicinesmanager.paylod.PatientUpdateRequest;
+import com.simplesolutions.medicinesmanager.dto.PatientRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.PatientUpdateRequest;
 import com.simplesolutions.medicinesmanager.repository.PatientRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -18,10 +18,7 @@ import org.springframework.test.web.reactive.server.StatusAssertions;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,7 +46,6 @@ class PatientsControllerIT {
                 .firstname(patientRequest.getFirstname())
                 .lastname(patientRequest.getLastname())
                 .age(patientRequest.getAge())
-                .patientMedicines(new ArrayList<>())
                 .build();
 
         // webTestClientRequest called to save Patient
@@ -87,21 +83,19 @@ class PatientsControllerIT {
         // Send a post request to save a patient and ensuring return is 200
         savePatientStatusAssertions.isOk();
         // get all patients
-        List<Patient> allPatients = webTestClient.get()
+        webTestClient.get()
                 .uri(path)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBodyList(new ParameterizedTypeReference<Patient>() {
-                })
-                .returnResult()
-                .getResponseBody();
-
-        // make sure that patient is present
-        assertThat(allPatients)
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "medicine")
-                .contains(expectedPatient);
+                }).consumeWith(response -> {
+                    List<Patient> actualPatientList = response.getResponseBody();
+                    assertThat(actualPatientList)
+                            .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
+                            .contains(expectedPatient);
+                });
     }
 
     @Test

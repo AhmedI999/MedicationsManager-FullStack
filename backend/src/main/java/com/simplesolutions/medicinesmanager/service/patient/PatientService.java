@@ -4,8 +4,8 @@ import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException
 import com.simplesolutions.medicinesmanager.exception.UpdateException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.paylod.PatientRegistrationRequest;
-import com.simplesolutions.medicinesmanager.paylod.PatientUpdateRequest;
+import com.simplesolutions.medicinesmanager.dto.PatientRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.PatientUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -7,7 +7,7 @@ import com.simplesolutions.medicinesmanager.model.InteractionType;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
 import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.paylod.MedicationInteractionRequest;
+import com.simplesolutions.medicinesmanager.dto.MedicationInteractionRequest;
 import com.simplesolutions.medicinesmanager.service.medicine.MedicineDao;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
