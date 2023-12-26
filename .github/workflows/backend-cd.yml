@@ -1,7 +1,7 @@
 name: CD - Deploy Backend
 
 on:
-  push:
+  pull_request:
     branches:
       - master
     paths:
