@@ -52,6 +52,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/medicinesmanager-react:${{ steps.build-number.outputs.BUILD_NUMBER }}
           build-args: |
             API_BASE_URL=http://localhost:8080
+
 #        change the base url to the EC2 one to doploy correctly to aws
 
       - name: Send Slack Message Pushed to docker hub
