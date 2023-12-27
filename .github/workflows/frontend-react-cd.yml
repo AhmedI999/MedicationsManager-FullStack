@@ -61,7 +61,7 @@ jobs:
         run: |
           echo "Dockerrun.aws.json before updating tag"
           cat ../../Dockerrun.aws.json
-          sed -i -E 's_(amigoscode/amigoscode-react:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' ../../Dockerrun.aws.json
+          sed -i -E 's_(ahmedi999/medicinesmanager-react:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' ../../Dockerrun.aws.json
           echo "Dockerrun.aws.json after updating tag"
           cat ../../Dockerrun.aws.json
 
@@ -95,9 +95,9 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git pull
-          git add ../Dockerrun.aws.json
+          git add ../../Dockerrun.aws.json
           git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
-          git push origin HEAD:master
+          git push
 
       - name: Send Slack Message
         run: >
