@@ -45,7 +45,7 @@ jobs:
           {"text":"Logging to docker hub success! :meow_party:"}'
           ${{ secrets.SLACK_WEBHOOK_URL }}
       - name: display content before build and push
-        run: >
+        run: |
           cd ..
           cat medicationmanagerreact
       - name: Build and push

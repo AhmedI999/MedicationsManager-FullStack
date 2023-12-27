@@ -7,7 +7,9 @@ function App() {
 
 
     return (
+
         <SideBarWithNavBar fetchMedications={fetchMedications} medications={medications} />
+
     );
 }
 
