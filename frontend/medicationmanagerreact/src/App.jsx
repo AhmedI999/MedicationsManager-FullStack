@@ -5,7 +5,6 @@ function App() {
 
     const { medications, fetchMedications} = useMedications(1);
 
-
     return (
 
         <SideBarWithNavBar fetchMedications={fetchMedications} medications={medications} />
