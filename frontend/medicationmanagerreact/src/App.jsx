@@ -3,7 +3,6 @@ import useMedications from "./services/useMedications.jsx";
 
 function App() {
 
-
     const { medications, fetchMedications} = useMedications(1);
 
     return (
