@@ -44,13 +44,17 @@ jobs:
           curl -X POST -H 'Content-type: application/json' --data '
           {"text":"Logging to docker hub success! :meow_party:"}'
           ${{ secrets.SLACK_WEBHOOK_URL }}
+
       - name: display content before build and push
         run: |
           ls -a
+          rm .dockerignore
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/medicinesmanager-react:${{ steps.build-number.outputs.BUILD_NUMBER }}
           build-args: |
