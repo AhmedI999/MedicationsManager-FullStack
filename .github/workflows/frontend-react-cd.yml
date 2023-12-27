@@ -27,11 +27,6 @@ jobs:
       - name: Set build number
         id: build-number
         run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -45,21 +40,14 @@ jobs:
           {"text":"Logging to docker hub success! :meow_party:"}'
           ${{ secrets.SLACK_WEBHOOK_URL }}
 
-      - name: display content before build and push
+      - name: Docker Build and push
         run: |
-          rm .dockerignore
-          ls -a
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ../frontend
-          file: medicationmanagerreact/Dockerfile
-          push: true
-          tags: ${{ steps.build-number.outputs.BUILD_NUMBER }}
-          build-args: |
-            API_BASE_URL=http://localhost:8080
-            
+          chmod +x ../../.ci/build-publish.sh
+          USERNAME=ahmedi999 \
+          REPO=medicinesmanager-react \
+          TAG=${{ steps.build-number.outputs.BUILD_NUMBER }} \
+          ../../.ci/build-publish.sh . \
+            --build-arg api_base_url=http://localhost:8080
 
 #        change the base url to the EC2 one to doploy correctly to aws
 
