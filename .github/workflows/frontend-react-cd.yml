@@ -44,7 +44,10 @@ jobs:
           curl -X POST -H 'Content-type: application/json' --data '
           {"text":"Logging to docker hub success! :meow_party:"}'
           ${{ secrets.SLACK_WEBHOOK_URL }}
-
+      - name: display content before build and push
+        run: >
+          cd ..
+          cat medicationmanagerreact
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
