@@ -1,0 +1,124 @@
+name: CD - Deploy Backend
+on:
+  push:
+    branches:
+      - Fullstack-Dev
+      - Dev
+    paths:
+      - frontend/medicationmanagerreact/**
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: ./frontend/medicationmanagerreact
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Send Slack Message Deployment started For react
+        run: >
+          curl -X POST -H 'Content-type: application/json' --data '
+          {"text":"Deployment Started! :progress_bar: :cool-doge:"}'
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Set build number
+        id: build-number
+        run: echo "BUILD_NUMBER=$(date '+%d.%m.%Y.%H.%M.%S')" >> $GITHUB_OUTPUT
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Logged in to docker slack
+        run: >
+          curl -X POST -H 'Content-type: application/json' --data '
+          {"text":"Logging to docker hub success! :meow_party:"}'
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/medicinesmanager-react:${{ steps.build-number.outputs.BUILD_NUMBER }}
+          build-args: |
+            API_BASE_URL=http://localhost:8080
+#        change the base url to the EC2 one to doploy correctly to aws
+
+      - name: Send Slack Message Pushed to docker hub
+        run: >
+          curl -X POST -H 'Content-type: application/json' 
+          --data '{"text":":docker: Image tag:${{steps.build-number.outputs.BUILD_NUMBER}} pushed to Docker Repository"}' 
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      - name: Update Dockerrun.aws.json react image tag with new build number
+        run: |
+          echo "Dockerrun.aws.json before updating tag"
+          cat ../../Dockerrun.aws.json
+          sed -i -E 's_(amigoscode/amigoscode-react:)([^"]*)_\1'${{steps.build-number.outputs.BUILD_NUMBER}}'_' ../../Dockerrun.aws.json
+          echo "Dockerrun.aws.json after updating tag"
+          cat ../../Dockerrun.aws.json
+
+# Following steps to be included after starting the EC2 instance | Disabled until doing so
+#     - name: Send Slack Message
+#       run: >
+#         curl -X POST -H 'Content-type: application/json'
+#         --data '{"text":":aws: Starting deployment to Elastic Beanstalk"}'
+#         ${{ secrets.SLACK_WEBHOOK_URL }}
+#     - name: Deploy to Elastic Beanstalk
+#       uses: einaregilsson/beanstalk-deploy@v21
+#       with:
+#         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         application_name: ${{ secrets.EB_APPLICATION_NAME }}
+#         environment_name: ${{ secrets.EB_ENVIRONMENT_NAME }}
+#         version_label: ${{ steps.build-number.outputs.BUILD_NUMBER }}
+#         version_description: ${{ github.SHA }}
+#         region: ${{ secrets.EB_REGION }}
+#         deployment_package: Dockerrun.aws.json
+#         wait_for_environment_recovery:60
+
+      - name: Send Slack Message Committing changes of Dockerrun.aws.json to repo
+        run: >
+          curl -X POST -H 'Content-type: application/json' 
+          --data '{"text":":githubloading: Committing to Project Repository"}' 
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: commit and push Dockerrun.aws.json
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git pull
+          git add ../Dockerrun.aws.json
+          git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
+          git push origin HEAD:master
+
+      - name: Send Slack Message
+        run: >
+          curl -X POST -H 'Content-type: application/json' 
+          --data '{"text":"Deployment and commit completed :github-check-mark: :party_blob: :amongustwerkhalloween:"}' 
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send Slack Message
+        if: always()
+        run: >
+          curl -X POST -H 'Content-type: application/json' 
+          --data '{"text":"Job Status ${{ job.status }}"}' 
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send Slack Message on Failure
+        if: failure()
+        run: >
+          curl -X POST -H 'Content-type: application/json'
+          --data '{"text":"Deployment Failed :warning: :sad-doge:  :elmofire:"}'
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
