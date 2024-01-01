@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,9 +74,9 @@ class PatientRepositoryTest extends AbstractTestContainers {
         // Given
         patientTest.save(patient);
         //When
-        Patient actual = patientTest.findByEmail(patient.getEmail());
+        Optional<Patient> actual = patientTest.findByEmail(patient.getEmail());
         //Then
-        assertThat(actual).isEqualTo(patient);
+        assertThat(actual).isPresent().contains(patient);
     }
     @Test
     @DisplayName("Throw ResourceNotFoundException with invalid email")
@@ -83,9 +84,9 @@ class PatientRepositoryTest extends AbstractTestContainers {
         // Given
         patientTest.save(patient);
         //When
-        Patient actual = patientTest.findByEmail(patient.getEmail() + "wrong");
+        Optional<Patient> actual = patientTest.findByEmail(patient.getEmail() + "wrong");
         //Then
-        assertThat(actual).isNull();
+        assertThat(actual).isEmpty();
     }
 
 }

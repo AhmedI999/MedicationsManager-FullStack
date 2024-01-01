@@ -25,5 +25,5 @@ public class MedicationInteractions {
     @ManyToOne
     @JoinColumn(name = "medicine_id")
     @JsonBackReference
-    Medicine medicine;
+    Medication medicine;
 }

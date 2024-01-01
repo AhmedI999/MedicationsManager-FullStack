@@ -2,7 +2,7 @@ package com.simplesolutions.medicinesmanager.service.medicine.interactions;
 
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Medicine;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.repository.MedicationInteractionRepository;
 import com.simplesolutions.medicinesmanager.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,9 @@ public class InteractionsJpaDataAccessService implements InteractionDao {
 
     @Override
     public List<MedicationInteractions> selectMedicineInteractions(Integer patientId, Integer medicineId) {
-        Medicine medicine = medicineRepository.findByPatientIdAndId(patientId, medicineId)
-                .orElseThrow(() -> new ResourceNotFoundException(" Medicine doesn't exist"));
-        return medicine.getInteractions();
+        Medication medication = medicineRepository.findByPatientIdAndId(patientId, medicineId)
+                .orElseThrow(() -> new ResourceNotFoundException(" Medication doesn't exist"));
+        return medication.getInteractions();
     }
 
     @Override

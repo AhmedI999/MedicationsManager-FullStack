@@ -1,1 +1,1 @@
-medicine-manager
+medication-manager

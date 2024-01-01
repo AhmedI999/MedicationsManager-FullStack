@@ -1,12 +1,14 @@
 package com.simplesolutions.medicinesmanager.service.medicine;
 
+import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicationResponseDTO;
+import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicationDTOMapper;
+import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicineRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicineUpdateRequest;
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.exception.UpdateException;
-import com.simplesolutions.medicinesmanager.model.Medicine;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.dto.MedicineRegistrationRequest;
-import com.simplesolutions.medicinesmanager.dto.MedicineUpdateRequest;
 import com.simplesolutions.medicinesmanager.service.patient.PatientDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,36 +16,46 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class MedicineService {
     private final PatientDao patientDao;
     private final MedicineDao medicineDao;
+    private final MedicationDTOMapper medicationDTOMapper;
     @Value("#{'${medicine.picture-url}'}")
     private String DEFAULT_PICTURE_URL;
 
-    public List<Medicine> getPatientMedicines(Integer patientID){
+    public List<MedicationResponseDTO> getPatientMedicines(Integer patientID){
         Patient patient = patientDao.selectPatientById(patientID).
         orElseThrow(() -> new ResourceNotFoundException("Patient doesn't exist"));
-        List<Medicine> medicines =  medicineDao.selectPatientMedicines(patient.getId());
-        if ( patient.getPatientMedicines() == null )
-            throw new ResourceNotFoundException("Patient doesn't have medicines");
-        medicines.sort(Comparator.comparing(Medicine::getMedicineNumber));
-        return medicines;
+        List<Medication> medications =  medicineDao.selectPatientMedicines(patient.getId());
+        if ( patient.getPatientMedications() == null ) {
+            throw new ResourceNotFoundException("Patient doesn't have medications");
+        }
+        return medications.stream()
+                .map(medicationDTOMapper)
+                .sorted(Comparator.comparing(MedicationResponseDTO::getMedicineNumber))
+                .collect(Collectors.toList());
+
     }
-    public Medicine getPatientMedicineById(Integer patientId, Integer medicineId){
+    public MedicationResponseDTO getPatientMedicineById(Integer patientId, Integer medicineId){
         return medicineDao.selectPatientMedicineById(patientId, medicineId)
-                .orElseThrow(() -> new ResourceNotFoundException("Medicine wasn't found"));
+                .map(medicationDTOMapper)
+                .orElseThrow(() -> new ResourceNotFoundException("Medication %s wasn't found".formatted(medicineId)));
     }
-    public Medicine getPatientMedicineByBrandName (Integer patientId, String brandName){
+    public Medication getPatientMedicineEntityById (Integer patientId, Integer medicineId){
+        return medicineDao.selectPatientMedicineById(patientId, medicineId)
+                .orElseThrow(() -> new ResourceNotFoundException("Medication %s wasn't found".formatted(medicineId)));
+    }
+    public MedicationResponseDTO getPatientMedicineByBrandName (Integer patientId, String brandName){
         String capitalizedName = brandName.substring(0, 1).toUpperCase() +
                 brandName.substring(1).toLowerCase();
-        Medicine medicine = medicineDao.selectPatientMedicineByBrandName(patientId, capitalizedName);
-        if (Objects.isNull(medicine)){
-            throw new ResourceNotFoundException("Medicine %s wasn't found".formatted(capitalizedName));
-        } else return medicine;
+        return medicineDao.selectPatientMedicineByBrandName(patientId, capitalizedName)
+                .map(medicationDTOMapper)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Medication %s wasn't found".formatted(capitalizedName)));
     }
     public void deletePatientMedicineById(Integer patientId, Integer medicineId){
         medicineDao.deletePatientMedicineById(patientId, medicineId);
@@ -53,11 +65,11 @@ public class MedicineService {
     }
     public void savePatientMedicine(MedicineRegistrationRequest request, Patient patient){
         if (doesMedicineExists(patient.getEmail(), request.getBrandName()))
-            throw new DuplicateResourceException("Patient's medicine (%s) already Exists"
+            throw new DuplicateResourceException("Patient's medication (%s) already Exists"
                     .formatted(request.getBrandName()));
         String capitalizedName = request.getBrandName().substring(0, 1).toUpperCase() +
                 request.getBrandName().substring(1).toLowerCase();
-        Medicine medicine = Medicine.builder()
+        Medication medication = Medication.builder()
                 .pictureUrl(request.getPictureUrl())
                 .brandName(capitalizedName)
                 .activeIngredient(request.getActiveIngredient())
@@ -67,50 +79,44 @@ public class MedicineService {
         if (!patientDao.doesPatientExists(patient.getEmail()))
             throw new ResourceNotFoundException("Patient doesn't exist");
         if (request.getPictureUrl() == null || request.getPictureUrl().isEmpty())
-            medicine.setPictureUrl(DEFAULT_PICTURE_URL);
-        medicine.setPatient(patient);
-        medicineDao.saveMedicine(medicine);
+            medication.setPictureUrl(DEFAULT_PICTURE_URL);
+        medication.setPatient(patient);
+        medicineDao.saveMedicine(medication);
     }
     public void editMedicineDetails(Integer patientId,Integer medicineId, MedicineUpdateRequest request){
-        Medicine medicine = medicineDao.selectPatientMedicineById(patientId, medicineId)
-                .orElseThrow(() -> new ResourceNotFoundException("Medicine doesn't exist"));
         Patient patient = patientDao.selectPatientById(patientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient doesn't exist"));
+        Medication medication = medicineDao.selectPatientMedicineById(patientId, medicineId)
+                .orElseThrow(() -> new ResourceNotFoundException("Medication doesn't exist"));
         boolean changes = false;
-        if (request.getBrandName() != null && !request.getBrandName().equals(medicine.getBrandName())) {
+        if (request.getBrandName() != null && !request.getBrandName().trim().equals(medication.getBrandName())) {
             if (medicineDao.doesPatientMedicineExists(patient.getEmail() , request.getBrandName())) {
                 throw new DuplicateResourceException(
                         "Brand name already taken"
                 );
             }
-            medicine.setBrandName(request.getBrandName());
+            medication.setBrandName(request.getBrandName().trim());
             changes = true;
         }
-        if (request.getPictureUrl() != null && !request.getPictureUrl().equals(medicine.getPictureUrl())) {
-            medicine.setPictureUrl(request.getPictureUrl());
+        if (request.getPictureUrl() != null && !request.getPictureUrl().equals(medication.getPictureUrl())) {
+            medication.setPictureUrl(request.getPictureUrl().trim());
             changes = true;
         }
-        if (request.getActiveIngredient() != null && !request.getActiveIngredient().equals(medicine.getActiveIngredient())) {
-            medicine.setActiveIngredient(request.getActiveIngredient());
+        if (request.getActiveIngredient() != null && !request.getActiveIngredient().equals(medication.getActiveIngredient())) {
+            medication.setActiveIngredient(request.getActiveIngredient().trim());
             changes = true;
         }
-        if (request.getTimesDaily() != null && !request.getTimesDaily().equals(medicine.getTimesDaily())) {
-            medicine.setTimesDaily(request.getTimesDaily());
+        if (request.getTimesDaily() != null && !request.getTimesDaily().equals(medication.getTimesDaily())) {
+            medication.setTimesDaily(request.getTimesDaily());
             changes = true;
         }
-        if (request.getInteractions() != null && !request.getInteractions().equals(medicine.getInteractions())) {
-            medicine.setInteractions(request.getInteractions());
-            changes = true;
-        }
-        if (request.getInstructions() != null && !request.getInstructions().equals(medicine.getInstructions())) {
-            medicine.setInstructions(request.getInstructions());
+        if (request.getInstructions() != null && !request.getInstructions().equals(medication.getInstructions())) {
+            medication.setInstructions(request.getInstructions().trim());
             changes = true;
         }
        if (!changes) {
             throw new UpdateException("no data changes found");
         }
-        medicineDao.updateMedicine(medicine);
-
-
+        medicineDao.updateMedicine(medication);
     }
 }

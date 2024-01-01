@@ -4,7 +4,7 @@ import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.AbstractTestContainers;
 import com.simplesolutions.medicinesmanager.model.InteractionType;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Medicine;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ class MedicationInteractionRepositoryTest extends AbstractTestContainers {
     MedicineRepository medicineTest;
     @Autowired
     MedicationInteractionRepository interactionTest;
-    Medicine medicine;
+    Medication medication;
     @Value("#{'${medicine.picture-url}'}")
     String DEFAULT_PICTURE_URL;
     MedicationInteractions interaction;
@@ -40,9 +40,9 @@ class MedicationInteractionRepositoryTest extends AbstractTestContainers {
         interaction = MedicationInteractions.builder()
                 .name("U" + faker.lorem().word())
                 .Type(InteractionType.MILD)
-                .medicine(medicine)
+                .medicine(medication)
                 .build();
-        medicine = Medicine.builder()
+        medication = Medication.builder()
                 .pictureUrl(DEFAULT_PICTURE_URL)
                 .brandName(faker.lorem().characters(5))
                 .activeIngredient(faker.lorem().characters(10))
@@ -50,23 +50,23 @@ class MedicationInteractionRepositoryTest extends AbstractTestContainers {
                 .instructions(faker.lorem().characters())
                 .interactions(Collections.singletonList(interaction))
                 .build();
-        interaction.setMedicine(medicine);
+        interaction.setMedicine(medication);
 
     }
     @Nested
     @DisplayName("For findByMedicineIdAndName method")
-    class MedicationInteractionRepository_findByMedicineIdAndName {
+    class MedicationInteractionRepository_findByMedicationIdAndName {
 
         @Test
         @DisplayName("findByMedicineIdAndName returns interaction with valid name")
         void findByMedicineIdAndName_returnsMedicineInteraction() {
             // Given
-            medicineTest.save(medicine);
+            medicineTest.save(medication);
             interactionTest.save(interaction);
             //When
             System.out.println("after saving");
             MedicationInteractions actualInteraction = interactionTest
-                    .findByMedicineIdAndName(medicine.getId(), interaction.getName());
+                    .findByMedicineIdAndName(medication.getId(), interaction.getName());
             //Then
             assertThat(actualInteraction)
                     .usingRecursiveComparison()
@@ -78,27 +78,27 @@ class MedicationInteractionRepositoryTest extends AbstractTestContainers {
         @DisplayName("findByMedicineIdAndName throws Not found exception when invalid name is used")
         void findByMedicineIdAndName_throwsNotfound() {
             // Given
-            medicineTest.save(medicine);
+            medicineTest.save(medication);
             String invalidInteractionName = "InValid Interaction Name";
             //When
             MedicationInteractions actualInteraction = interactionTest
-                    .findByMedicineIdAndName(medicine.getId(), invalidInteractionName);
+                    .findByMedicineIdAndName(medication.getId(), invalidInteractionName);
             //Then
             assertThat(actualInteraction).isNull();
         }
     }
     @Nested
     @DisplayName("For existsByMedicineIdAndName method")
-    class MedicationInteractionRepository_existsByMedicineIdAndName {
+    class MedicationInteractionRepository_existsByMedicationIdAndName {
         @Test
         @DisplayName("Returns If An interaction exists Using a valid name")
         void existsByMedicineIdAndName_returnsTrue() {
             // Given
-            medicineTest.save(medicine);
+            medicineTest.save(medication);
             interactionTest.save(interaction);
             //When
             boolean actual = interactionTest
-                    .existsByMedicineIdAndName(medicine.getId(), interaction.getName());
+                    .existsByMedicineIdAndName(medication.getId(), interaction.getName());
             //Then
             assertThat(actual).isTrue();
         }
@@ -107,10 +107,10 @@ class MedicationInteractionRepositoryTest extends AbstractTestContainers {
         @DisplayName("Returns If An interaction Doesn't exists Using an invalid name")
         void existsByMedicineIdAndName_returnsFalse() {
             // Given
-            medicineTest.save(medicine);
+            medicineTest.save(medication);
             String invalidName = "Invalid Interaction Name";
             //When
-            boolean actual = interactionTest.existsByMedicineIdAndName(medicine.getId(), invalidName);
+            boolean actual = interactionTest.existsByMedicineIdAndName(medication.getId(), invalidName);
             //Then
             assertThat(actual).isFalse();
         }

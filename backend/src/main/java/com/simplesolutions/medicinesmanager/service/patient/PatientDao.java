@@ -12,6 +12,8 @@ public interface PatientDao {
 
     Optional<Patient> selectPatientById(Integer id);
 
+    Optional<Patient> selectPatientByEmail(String email);
+
     void updatePatient(Patient patient);
 
     void savePatient(Patient patient);

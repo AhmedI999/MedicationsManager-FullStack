@@ -3,7 +3,7 @@ package com.simplesolutions.medicinesmanager.service.medicine;
 import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.model.InteractionType;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Medicine;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.model.Patient;
 import com.simplesolutions.medicinesmanager.repository.MedicineRepository;
 import com.simplesolutions.medicinesmanager.repository.PatientRepository;
@@ -28,10 +28,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @DisplayName("For MedicineJpaDataAccessService Class")
-class MedicineJpaDataAccessServiceTest {
+class MedicationJpaDataAccessServiceTest {
     MedicineJpaDataAccessService medicineJpaTest;
     Patient patient;
-    Medicine medicine;
+    Medication medication;
     MedicationInteractions interactions;
     @Mock
     MedicineRepository medicineRepository;
@@ -46,7 +46,7 @@ class MedicineJpaDataAccessServiceTest {
                 .name(faker.lorem().word())
                 .Type(InteractionType.MILD)
                 .build();
-        medicine = Medicine.builder()
+        medication = Medication.builder()
                 .brandName(faker.lorem().characters(5))
                 .activeIngredient(faker.lorem().characters(10))
                 .timesDaily(faker.random().nextInt(1,5))
@@ -60,7 +60,7 @@ class MedicineJpaDataAccessServiceTest {
                 .firstname(faker.name().firstName())
                 .lastname(faker.name().lastName())
                 .age(faker.number().randomDigitNotZero())
-                .patientMedicines(Collections.singletonList(medicine))
+                .patientMedications(Collections.singletonList(medication))
                 .build();
     }
 
@@ -71,10 +71,10 @@ class MedicineJpaDataAccessServiceTest {
         int id = 1;
         when(patientRepository.findById(id)).thenReturn(Optional.of(patient));
         //When
-        List<Medicine> actual = medicineJpaTest.selectPatientMedicines(id);
+        List<Medication> actual = medicineJpaTest.selectPatientMedicines(id);
         //Then
         verify(patientRepository).findById(id);
-        assertThat(actual).isEqualTo(patient.getPatientMedicines());
+        assertThat(actual).isEqualTo(patient.getPatientMedications());
     }
 
     @Test
@@ -84,7 +84,7 @@ class MedicineJpaDataAccessServiceTest {
         int patientId = 1;
         int medicineId = 1;
         when(medicineRepository.findByPatientIdAndId(patientId, medicineId))
-                .thenReturn(Optional.of(medicine));
+                .thenReturn(Optional.of(medication));
         //When
         medicineJpaTest.selectPatientMedicineById(patientId, medicineId);
         //Then
@@ -95,12 +95,12 @@ class MedicineJpaDataAccessServiceTest {
     void selectPatientMedicineByBrandName() {
         // Given
         int patientId = 1;
-        when(medicineRepository.findByPatientIdAndBrandName(patientId, medicine.getBrandName()))
-                .thenReturn(medicine);
+        when(medicineRepository.findByPatientIdAndBrandName(patientId, medication.getBrandName()))
+                .thenReturn(Optional.of(medication));
         //When
-        medicineJpaTest.selectPatientMedicineByBrandName(patientId, medicine.getBrandName());
+        medicineJpaTest.selectPatientMedicineByBrandName(patientId, medication.getBrandName());
         //Then
-        verify(medicineRepository).findByPatientIdAndBrandName(patientId, medicine.getBrandName());
+        verify(medicineRepository).findByPatientIdAndBrandName(patientId, medication.getBrandName());
     }
 
 
@@ -109,9 +109,9 @@ class MedicineJpaDataAccessServiceTest {
     @DisplayName("Verify that saveMedicine()  can invoke save()")
     void saveMedicine() {
         //When
-        medicineJpaTest.saveMedicine(medicine);
+        medicineJpaTest.saveMedicine(medication);
         //Then
-        verify(medicineRepository).save(medicine);
+        verify(medicineRepository).save(medication);
     }
 
     @Test
@@ -121,20 +121,20 @@ class MedicineJpaDataAccessServiceTest {
         int patientId = 1;
         int medicineId = 1;
         when(medicineRepository.findByPatientIdAndId(patientId, medicineId))
-                .thenReturn(Optional.of(medicine));
+                .thenReturn(Optional.of(medication));
         //When
         medicineJpaTest.deletePatientMedicineById(patientId, medicineId);
         //Then
-        verify(medicineRepository).delete(medicine);
+        verify(medicineRepository).delete(medication);
     }
 
     @Test
     @DisplayName("Verify that doesPatientMedicineExists() can invoke existsMedicineByBrandName()")
     void doesPatientMedicineExists() {
         //When
-        medicineJpaTest.doesPatientMedicineExists(patient.getEmail(), medicine.getBrandName());
+        medicineJpaTest.doesPatientMedicineExists(patient.getEmail(), medication.getBrandName());
         //Then
-        verify(medicineRepository).existsMedicineByPatient_EmailAndBrandName(patient.getEmail(), medicine.getBrandName());
+        verify(medicineRepository).existsMedicineByPatient_EmailAndBrandName(patient.getEmail(), medication.getBrandName());
     }
 
     @Test
@@ -142,11 +142,11 @@ class MedicineJpaDataAccessServiceTest {
     void updateMedicine() {
         // Given
         String newBrandName = "Nevlop";
-        medicine.setBrandName(newBrandName);
+        medication.setBrandName(newBrandName);
         //When
-        medicineJpaTest.updateMedicine(medicine);
+        medicineJpaTest.updateMedicine(medication);
         //Then
-        verify(medicineRepository).save(medicine);
-        assertThat(medicine.getBrandName()).isEqualTo(newBrandName);
+        verify(medicineRepository).save(medication);
+        assertThat(medication.getBrandName()).isEqualTo(newBrandName);
     }
 }

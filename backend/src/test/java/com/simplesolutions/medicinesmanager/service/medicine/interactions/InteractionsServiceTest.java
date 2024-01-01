@@ -4,10 +4,10 @@ import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.model.InteractionType;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.dto.MedicationInteractionRequest;
+import com.simplesolutions.medicinesmanager.dto.interactiondto.MedicationInteractionDTO;
 import com.simplesolutions.medicinesmanager.service.medicine.MedicineDao;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -41,9 +41,9 @@ class InteractionsServiceTest {
     // Entities
     @Value("#{'${medicine.picture-url}'}")
     private String DEFAULT_PICTURE_URL;
-    Medicine medicine;
+    Medication medication;
     MedicationInteractions interaction;
-    MedicationInteractionRequest interactionRegistrationTest;
+    MedicationInteractionDTO interactionRegistrationTest;
 
     @BeforeEach
     void setUp() {
@@ -53,7 +53,7 @@ class InteractionsServiceTest {
                 .name("U" + faker.lorem().word())
                 .Type(InteractionType.MILD)
                 .build();
-        medicine = Medicine.builder()
+        medication = Medication.builder()
                 .pictureUrl(DEFAULT_PICTURE_URL)
                 .brandName(faker.lorem().characters(5))
                 .activeIngredient(faker.lorem().characters(10))
@@ -63,7 +63,7 @@ class InteractionsServiceTest {
                 .build();
         // Random is used to retrieve random value from InteractionType enum
         Random random = new Random();
-        interactionRegistrationTest = new MedicationInteractionRequest(
+        interactionRegistrationTest = new MedicationInteractionDTO(
                 "U" + faker.lorem().word(),
                 InteractionType.values()[random.nextInt(InteractionType.values().length)]
         );
@@ -71,20 +71,20 @@ class InteractionsServiceTest {
     }
     @Nested
     @DisplayName("For getMedicineInteractions Method")
-    class InteractionsService_getMedicineInteractions {
+    class InteractionsService_getMedicationInteractions {
 
         @Test
         @DisplayName("verify that getMedicineInteractions() can invoke selectMedicineInteractions dao")
         void getMedicineInteractions_returnInteractions() {
             // Given
             int patientId = 1;
-            when(interactionDao.selectMedicineInteractions(patientId, medicine.getId()))
+            when(interactionDao.selectMedicineInteractions(patientId, medication.getId()))
                     .thenReturn(Collections.singletonList(interaction));
             //When
             List<MedicationInteractions> actualInteractions = interactionsTest
-                    .getMedicineInteractions(patientId, medicine.getId());
+                    .getMedicineInteractions(patientId, medication.getId());
             //Then
-            verify(interactionDao).selectMedicineInteractions(patientId, medicine.getId());
+            verify(interactionDao).selectMedicineInteractions(patientId, medication.getId());
             assertThat(actualInteractions).isNotEmpty();
         }
 
@@ -93,32 +93,32 @@ class InteractionsServiceTest {
         void getMedicineInteractions_returnEmptyList() {
             // Given
             int patientId = 1;
-            when(interactionDao.selectMedicineInteractions(patientId, medicine.getId()))
+            when(interactionDao.selectMedicineInteractions(patientId, medication.getId()))
                     .thenReturn(Collections.emptyList());
             //When
             List<MedicationInteractions> actualInteractions = interactionsTest
-                    .getMedicineInteractions(patientId, medicine.getId());
+                    .getMedicineInteractions(patientId, medication.getId());
             //Then
-            verify(interactionDao).selectMedicineInteractions(patientId, medicine.getId());
+            verify(interactionDao).selectMedicineInteractions(patientId, medication.getId());
             assertThat(actualInteractions).isEmpty();
         }
     }
 
     @Nested
     @DisplayName("For getMedicineInteractionByName Method")
-    class InteractionsService_getMedicineInteractionByName {
+    class InteractionsService_getMedicationInteractionByName {
 
         @Test
         @DisplayName("verify that getMedicineInteractionByName can invoke selectMedicineInteractionByName Dao")
         void getMedicineInteractionByName_returnInteraction() {
             // Given
-            when(interactionDao.selectMedicineInteractionByName(medicine.getId(), interaction.getName()))
+            when(interactionDao.selectMedicineInteractionByName(medication.getId(), interaction.getName()))
                     .thenReturn(interaction);
             //When
             MedicationInteractions actualInteraction = interactionsTest
-                    .getMedicineInteractionByName(medicine.getId(), interaction.getName());
+                    .getMedicineInteractionByName(medication.getId(), interaction.getName());
             //Then
-            verify(interactionDao).selectMedicineInteractionByName(medicine.getId(), interaction.getName());
+            verify(interactionDao).selectMedicineInteractionByName(medication.getId(), interaction.getName());
             assertThat(actualInteraction).isNotNull();
             assertThat(actualInteraction).isEqualTo(interaction);
         }
@@ -128,15 +128,15 @@ class InteractionsServiceTest {
         void getMedicineInteractionByName_throwResourceNotFound() {
             // Given
             String invalidCapitalizedName = "Nonexistent interaction";
-            when(interactionDao.selectMedicineInteractionByName(medicine.getId(), invalidCapitalizedName))
+            when(interactionDao.selectMedicineInteractionByName(medication.getId(), invalidCapitalizedName))
                     .thenReturn(null);
             //When
             assertThatThrownBy(() -> interactionsTest
-                    .getMedicineInteractionByName(medicine.getId(), invalidCapitalizedName))
+                    .getMedicineInteractionByName(medication.getId(), invalidCapitalizedName))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessage("This interaction %s doesn't exist".formatted(invalidCapitalizedName));
             //Then
-            verify(interactionDao).selectMedicineInteractionByName(medicine.getId(), invalidCapitalizedName);
+            verify(interactionDao).selectMedicineInteractionByName(medication.getId(), invalidCapitalizedName);
         }
     }
 
@@ -147,13 +147,13 @@ class InteractionsServiceTest {
         @DisplayName("Verify that deleteMedicationInteractionByName can invoke deleteMedicineInteractionByName Dao")
         void deleteMedicationInteractionByName_success() {
             // Given
-            when(interactionDao.doesMedicineInteractionExists(medicine.getId(), interaction.getName()))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interaction.getName()))
                     .thenReturn(true);
-            doNothing().when(interactionDao).deleteMedicineInteractionByName(medicine.getId(), interaction.getName());
+            doNothing().when(interactionDao).deleteMedicineInteractionByName(medication.getId(), interaction.getName());
             //When
-            interactionsTest.deleteMedicationInteractionByName(medicine.getId(), interaction.getName());
+            interactionsTest.deleteMedicationInteractionByName(medication.getId(), interaction.getName());
             //Then
-            verify(interactionDao).deleteMedicineInteractionByName(medicine.getId(), interaction.getName());
+            verify(interactionDao).deleteMedicineInteractionByName(medication.getId(), interaction.getName());
         }
 
         @Test
@@ -161,53 +161,53 @@ class InteractionsServiceTest {
         void deleteMedicationInteractionByName_throwResourceNotFound() {
             // Given
             String invalidInteractionName = "Dababy";
-            when(interactionDao.doesMedicineInteractionExists(medicine.getId(), invalidInteractionName))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), invalidInteractionName))
                     .thenReturn(false);
             //When
             assertThatThrownBy(() -> interactionsTest
-                    .deleteMedicationInteractionByName(medicine.getId(), invalidInteractionName))
+                    .deleteMedicationInteractionByName(medication.getId(), invalidInteractionName))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("Medicine Interaction %s wasn't found".formatted(invalidInteractionName));
+                    .hasMessage("Medication Interaction %s wasn't found".formatted(invalidInteractionName));
             //Then
             verify(interactionDao, never())
-                    .deleteMedicineInteractionByName(medicine.getId(), invalidInteractionName);
+                    .deleteMedicineInteractionByName(medication.getId(), invalidInteractionName);
 
         }
     }
 
     @Nested
     @DisplayName("For savePatientMedicine Method")
-    class InteractionsService_saveMedicineInteraction {
+    class InteractionsService_saveMedicationInteraction {
 
         @Test
         @DisplayName("Verify that savePatientMedicine Throws DuplicateResource with existing interaction")
         void saveMedicineInteraction_throwDuplicateResourceException() {
             // Given
-            when(interactionDao.doesMedicineInteractionExists(medicine.getId(), interactionRegistrationTest.getName()))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.getName()))
                     .thenReturn(true);
             //When
-            assertThatThrownBy(() -> interactionsTest.saveMedicineInteraction(interactionRegistrationTest, medicine))
+            assertThatThrownBy(() -> interactionsTest.saveMedicineInteraction(interactionRegistrationTest, medication))
                     .isInstanceOf(DuplicateResourceException.class)
-                    .hasMessage("Medicine's Interaction (%s) already Exists"
+                    .hasMessage("Medication's Interaction (%s) already Exists"
                             .formatted(interactionRegistrationTest.getName()));
             //Then
             verify(interactionDao, never()).saveMedicineInteraction(any());
         }
 
         @Test
-        @DisplayName("Verify that savePatientMedicine Throws ResourceNotFound with nonexistent medicine")
+        @DisplayName("Verify that savePatientMedicine Throws ResourceNotFound with nonexistent medication")
         void saveMedicineInteraction_throwResourceNotFound() {
             // Given
-            when(interactionDao.doesMedicineInteractionExists(medicine.getId(), interactionRegistrationTest.getName()))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.getName()))
                     .thenReturn(false);
             // email is needed for this exception
-            medicine.setPatient(Patient.builder().email("patient@example.com").build());
-            when(medicineDao.doesPatientMedicineExists(medicine.getPatient().getEmail(), medicine.getBrandName()))
+            medication.setPatient(Patient.builder().email("patient@example.com").build());
+            when(medicineDao.doesPatientMedicineExists(medication.getPatient().getEmail(), medication.getBrandName()))
                     .thenReturn(false);
             //When
-            assertThatThrownBy(() -> interactionsTest.saveMedicineInteraction(interactionRegistrationTest, medicine))
+            assertThatThrownBy(() -> interactionsTest.saveMedicineInteraction(interactionRegistrationTest, medication))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("Medicine %s doesn't exist".formatted(medicine.getBrandName()));
+                    .hasMessage("Medication %s doesn't exist".formatted(medication.getBrandName()));
             //Then
             verify(interactionDao, never()).saveMedicineInteraction(any());
         }
@@ -216,13 +216,13 @@ class InteractionsServiceTest {
         @DisplayName("Verify that savePatientMedicine can invoke saveMedicineInteraction")
         void saveMedicineInteraction_Success() {
             // Given
-            when(interactionDao.doesMedicineInteractionExists(medicine.getId(), interactionRegistrationTest.getName()))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.getName()))
                     .thenReturn(false);
-            medicine.setPatient(Patient.builder().email("patient@example.com").build());
-            when(medicineDao.doesPatientMedicineExists(medicine.getPatient().getEmail(), medicine.getBrandName()))
+            medication.setPatient(Patient.builder().email("patient@example.com").build());
+            when(medicineDao.doesPatientMedicineExists(medication.getPatient().getEmail(), medication.getBrandName()))
                     .thenReturn(true);
             //When
-            interactionsTest.saveMedicineInteraction(interactionRegistrationTest, medicine);
+            interactionsTest.saveMedicineInteraction(interactionRegistrationTest, medication);
             ArgumentCaptor<MedicationInteractions> interactionArgumentCaptor = ArgumentCaptor.forClass(MedicationInteractions.class);
             //Then
             verify(interactionDao).saveMedicineInteraction(interactionArgumentCaptor.capture());

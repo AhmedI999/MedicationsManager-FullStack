@@ -1,4 +1,4 @@
-package com.simplesolutions.medicinesmanager.dto;
+package com.simplesolutions.medicinesmanager.dto.medicationsdto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +18,7 @@ public class MedicineRegistrationRequest {
     @NotBlank(message = "Brand name is required")
     final String brandName;
     final String activeIngredient;
-    @NotNull(message = "times medicine taken daily is required")
+    @NotNull(message = "times medication taken daily is required")
     @Min(value = 1, message = "Must be greater than 0")
     final int timesDaily;
     @NotBlank(message = "for safety reasons, instructions are required")

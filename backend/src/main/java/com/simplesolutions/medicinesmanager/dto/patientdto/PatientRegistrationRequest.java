@@ -1,4 +1,4 @@
-package com.simplesolutions.medicinesmanager.dto;
+package com.simplesolutions.medicinesmanager.dto.patientdto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

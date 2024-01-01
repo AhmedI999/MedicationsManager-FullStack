@@ -22,6 +22,11 @@ public class PatientJpaDataAccessService implements PatientDao {
     }
 
     @Override
+    public Optional<Patient> selectPatientByEmail(String email) {
+        return patientRepository.findByEmail(email);
+    }
+
+    @Override
     public void savePatient(Patient patient) {
         patientRepository.save(patient);
     }

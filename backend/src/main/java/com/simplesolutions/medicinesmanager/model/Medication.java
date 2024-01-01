@@ -15,7 +15,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "medicine")
-public class Medicine {
+public class Medication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;

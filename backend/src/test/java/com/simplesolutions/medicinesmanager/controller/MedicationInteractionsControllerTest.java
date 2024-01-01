@@ -1,15 +1,18 @@
 package com.simplesolutions.medicinesmanager.controller;
 
 import com.github.javafaker.Faker;
+import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicationResponseDTO;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
 import com.simplesolutions.medicinesmanager.model.InteractionType;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.dto.MedicationInteractionRequest;
-import com.simplesolutions.medicinesmanager.dto.MedicineRegistrationRequest;
-import com.simplesolutions.medicinesmanager.dto.PatientRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.interactiondto.MedicationInteractionDTO;
+import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicineRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRequest;
 import com.simplesolutions.medicinesmanager.repository.MedicineRepository;
 import com.simplesolutions.medicinesmanager.repository.PatientRepository;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +29,17 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DisplayName("Medicine Interactions controller Integration Tests")
-class MedicineInteractionsControllerTest {
+@DisplayName("Medication Interactions controller Integration Tests")
+@Transactional
+class MedicationInteractionsControllerTest {
     @Autowired
     WebTestClient webTestClient;
     @Autowired
@@ -45,18 +51,17 @@ class MedicineInteractionsControllerTest {
     @Value("#{'${medicine.picture-url}'}")
     String DEFAULT_PICTURE_URL;
     Faker faker;
-    MedicationInteractionRequest interactionRequest;
-    MedicationInteractions expectedInteraction;
+    MedicationInteractionDTO interactionRequest;
+    MedicationInteractionDTO expectedInteraction;
     MedicineRegistrationRequest medicineRequest;
-    Medicine expectedMedicine;
+    MedicationResponseDTO expectedMedication;
     int medicineInDB_Id;
     PatientRegistrationRequest patientRequest;
-    Patient expectedPatient;
+    PatientResponseDTO expectedPatient;
     int patientInDB_Id;
 
-    // Patient and Medicine Response spec
-    WebTestClient.ResponseSpec savePatientStatusAssertion;
-    WebTestClient.ResponseSpec saveMedicineStatusAssertion;
+    // Patient and Medication Response spec
+    String savePatient_getToken;
     // Interaction Status assertion
     StatusAssertions saveInteractionStatusAssertion;
 
@@ -71,26 +76,24 @@ class MedicineInteractionsControllerTest {
                 faker.name().firstName(),
                 faker.name().lastName(),
                 faker.number().randomDigitNotZero());
-        expectedPatient = Patient.builder()
-                .email(patientRequest.getEmail())
-                .password(patientRequest.getPassword())
-                .firstname(patientRequest.getFirstname())
-                .lastname(patientRequest.getLastname())
-                .age(patientRequest.getAge())
-                .patientMedicines(new ArrayList<>())
-                .build();
+        expectedPatient = new PatientResponseDTO(
+                null,
+                patientRequest.getEmail(),
+                patientRequest.getFirstname(),
+                patientRequest.getLastname(),
+                patientRequest.getAge(),
+                List.of("ROLE_USER"));
         // Interaction
         Random random = new Random();
-        interactionRequest = new MedicationInteractionRequest(
+        interactionRequest = new MedicationInteractionDTO(
                 "U" + faker.lorem().word(),
                 InteractionType.values()[random.nextInt(InteractionType.values().length)]
         );
-        expectedInteraction = MedicationInteractions.builder()
-                .name(interactionRequest.getName())
-                .Type(interactionRequest.getType())
-                .medicine(expectedMedicine)
-                .build();
-        // Medicine
+        expectedInteraction = new MedicationInteractionDTO(
+                interactionRequest.getName(),
+                interactionRequest.getType()
+        );
+        // Medication
         medicineRequest = new MedicineRegistrationRequest(
                 DEFAULT_PICTURE_URL,
                 "U" + faker.lorem().word(),
@@ -98,56 +101,62 @@ class MedicineInteractionsControllerTest {
                 faker.random().nextInt(1, 5),
                 faker.lorem().characters());
 
-        expectedMedicine = Medicine.builder()
-                .pictureUrl(DEFAULT_PICTURE_URL)
-                .brandName(medicineRequest.getBrandName())
-                .activeIngredient(medicineRequest.getActiveIngredient())
-                .timesDaily(medicineRequest.getTimesDaily())
-                .instructions(medicineRequest.getInstructions())
-                .interactions(new ArrayList<>())
-                .patient(expectedPatient)
-                .build();
+        expectedMedication = new MedicationResponseDTO(
+                null,
+                medicineRequest.getPictureUrl(),
+                medicineRequest.getBrandName(),
+                medicineRequest.getActiveIngredient(),
+                medicineRequest.getTimesDaily(),
+                medicineRequest.getInstructions(),
+                new ArrayList<>()
+        );
 
-        // patient Response specs
-        savePatientStatusAssertion = webTestClient.post()
-                .uri(path)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(patientRequest), PatientRegistrationRequest.class)
-                .exchange()
-                .expectStatus().isOk();
+        // Send a post-request to save a patient, ensuring return is 200, and retrieving the jwt token
+        savePatient_getToken = Objects.requireNonNull(webTestClient.post()
+                        .uri(path)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Mono.just(patientRequest), PatientRegistrationRequest.class)
+                        .exchange()
+                        .expectStatus().isOk()
+                        .returnResult(Void.class)
+                        .getResponseHeaders()
+                        .get(AUTHORIZATION))
+                .get(0);
 
         // Retrieving Patient id from Database
-        patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).getId();
+        patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
 
 
-        // Medicine Response specs
-        saveMedicineStatusAssertion = webTestClient.post()
+        // Saving Medication
+        webTestClient.post()
                 .uri(path + "/{patientId}/medicines", patientInDB_Id)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(medicineRequest), MedicineRegistrationRequest.class)
+                .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
                 .expectStatus().isOk();
 
-        // Retrieving Medicine id from Database
+        // Retrieving Medication id from Database
         medicineInDB_Id = medicineRepository
-                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.getBrandName()).getId();
+                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.getBrandName()).orElseThrow().getId();
 
         // Interaction Status assertion
         saveInteractionStatusAssertion = webTestClient.post()
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions", patientInDB_Id, medicineInDB_Id)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(interactionRequest), MedicationInteractionRequest.class)
+                .body(Mono.just(interactionRequest), MedicationInteractionDTO.class)
+                .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange().expectStatus();
 
     }
 
     @Test
-    @DisplayName("Ensure that saveMedicationInteraction can save interaction successfully to specific medicine")
+    @DisplayName("Ensure that saveMedicationInteraction can save interaction successfully to specific medication")
     void saveMedicationInteraction() {
-        // Saving interaction to the medicine and verifying the result is 200
+        // Saving interaction to the medication and verifying the result is 200
         saveInteractionStatusAssertion.isOk();
     }
 
@@ -156,20 +165,21 @@ class MedicineInteractionsControllerTest {
     void getMedicationInteraction() {
         // saving interaction
         saveInteractionStatusAssertion.isOk();
-        // Retrieving Patient, Medicine, and Interaction id from Database
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).getId();
+        // Retrieving Patient, Medication, and Interaction id from Database
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
         int medicineInDB_Id = medicineRepository
-                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.getBrandName()).getId();
+                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.getBrandName()).orElseThrow().getId();
         // Retrieving the interaction
         webTestClient.get()
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions/{name}",
                         patientInDB_Id, medicineInDB_Id, interactionRequest.getName())
                 .accept(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
-                .expectBody(new ParameterizedTypeReference<MedicationInteractions>() {
+                .expectBody(new ParameterizedTypeReference<MedicationInteractionDTO>() {
                 })
                 .consumeWith(response -> {
-                    MedicationInteractions actualInteraction = response.getResponseBody();
+                    MedicationInteractionDTO actualInteraction = response.getResponseBody();
                     assertThat(actualInteraction)
                             .usingRecursiveComparison()
                             .ignoringFields("id")
@@ -180,15 +190,16 @@ class MedicineInteractionsControllerTest {
     @Test
     @DisplayName("Ensure that getAllMedicationInteractions endPoint can retrieve interactions ")
     void getAllMedicationInteractions() {
-        // Saving Interaction for medicine
+        // Saving Interaction for medication
         saveInteractionStatusAssertion.isOk();
         // Retrieving List of interactions
-        List<MedicationInteractions> allMedicationInteractions = webTestClient.get()
+        List<MedicationInteractionDTO> allMedicationInteractions = webTestClient.get()
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions", patientInDB_Id, medicineInDB_Id)
                 .accept(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(new ParameterizedTypeReference<MedicationInteractions>() {
+                .expectBodyList(new ParameterizedTypeReference<MedicationInteractionDTO>() {
                 })
                 .returnResult().getResponseBody();
         // Verifying that the saved interaction is the same as the expected one
@@ -200,13 +211,14 @@ class MedicineInteractionsControllerTest {
     @Test
     @DisplayName("Ensure that deleteMedicationInteraction endPoint can delete interaction by name")
     void deleteMedicationInteraction() {
-        // Saving Interaction for medicine
+        // Saving Interaction for medication
         saveInteractionStatusAssertion.isOk();
         // Deleting the interaction
         webTestClient.delete()
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions/{name}",
                         patientInDB_Id, medicineInDB_Id, interactionRequest.getName())
                 .accept(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
                 .expectStatus().isOk();
         // Verifying that interaction no longer exists
@@ -214,6 +226,7 @@ class MedicineInteractionsControllerTest {
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions/{name}",
                         patientInDB_Id, medicineInDB_Id, interactionRequest.getName())
                 .accept(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
                 .expectStatus().isNotFound();
     }

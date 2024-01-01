@@ -3,8 +3,8 @@ package com.simplesolutions.medicinesmanager.service.medicine.interactions;
 import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.model.InteractionType;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Medicine;
 import com.simplesolutions.medicinesmanager.repository.MedicationInteractionRepository;
 import com.simplesolutions.medicinesmanager.repository.MedicineRepository;
 import lombok.AccessLevel;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("For InteractionsJpaDataAccessService Class")
 class InteractionsJpaDataAccessServiceTest {
     InteractionsJpaDataAccessService interactionJpaTest;
-    Medicine medicine;
+    Medication medication;
     MedicationInteractions interaction;
     @Mock
     MedicineRepository medicineRepository;
@@ -48,9 +48,9 @@ class InteractionsJpaDataAccessServiceTest {
         interaction = MedicationInteractions.builder()
                 .name("U" + faker.lorem().word())
                 .Type(InteractionType.MILD)
-                .medicine(medicine)
+                .medicine(medication)
                 .build();
-        medicine = Medicine.builder()
+        medication = Medication.builder()
                 .pictureUrl(DEFAULT_PICTURE_URL)
                 .brandName(faker.lorem().characters(5))
                 .activeIngredient(faker.lorem().characters(10))
@@ -58,7 +58,7 @@ class InteractionsJpaDataAccessServiceTest {
                 .instructions(faker.lorem().characters())
                 .interactions(Collections.singletonList(interaction))
                 .build();
-        interaction.setMedicine(medicine);
+        interaction.setMedicine(medication);
 
     }
 
@@ -67,13 +67,13 @@ class InteractionsJpaDataAccessServiceTest {
     void selectMedicineInteractionByName() {
         // Given
         String interactionName = "Prednisone";
-        when(interactionRepository.findByMedicineIdAndName(medicine.getId(), interactionName))
+        when(interactionRepository.findByMedicineIdAndName(medication.getId(), interactionName))
                 .thenReturn(interaction);
         //When
         MedicationInteractions actualInteraction = interactionJpaTest
-                .selectMedicineInteractionByName(medicine.getId(), interactionName);
+                .selectMedicineInteractionByName(medication.getId(), interactionName);
         //Then
-        verify(interactionRepository).findByMedicineIdAndName(medicine.getId(), interactionName);
+        verify(interactionRepository).findByMedicineIdAndName(medication.getId(), interactionName);
         assertThat(actualInteraction)
                 .usingRecursiveComparison()
                 .ignoringFields("id")
@@ -81,25 +81,25 @@ class InteractionsJpaDataAccessServiceTest {
     }
     @Nested
     @DisplayName("For selectMedicineInteractions method")
-    class InteractionsDataAccessService_selectMedicineInteractions {
+    class InteractionsDataAccessService_selectMedicationInteractions {
 
         @Test
         @DisplayName("Verify that selectMedicineInteractions() can invoke findByPatientIdAndId()")
         void selectMedicineInteractions_returnListOfInteractions() {
             // Given
             int patientId = 1;
-            when(medicineRepository.findByPatientIdAndId(patientId, medicine.getId()))
-                    .thenReturn(Optional.of(medicine));
+            when(medicineRepository.findByPatientIdAndId(patientId, medication.getId()))
+                    .thenReturn(Optional.of(medication));
             //When
             List<MedicationInteractions> actualInteractionsList = interactionJpaTest
-                    .selectMedicineInteractions(patientId, medicine.getId());
+                    .selectMedicineInteractions(patientId, medication.getId());
             //Then
-            verify(medicineRepository).findByPatientIdAndId(patientId, medicine.getId());
-            assertThat(actualInteractionsList).isEqualTo(medicine.getInteractions());
+            verify(medicineRepository).findByPatientIdAndId(patientId, medication.getId());
+            assertThat(actualInteractionsList).isEqualTo(medication.getInteractions());
         }
 
         @Test
-        @DisplayName("Verify that selectMedicineInteractions() throws Resource not found with invalid medicine")
+        @DisplayName("Verify that selectMedicineInteractions() throws Resource not found with invalid medication")
         void selectMedicineInteractions_throwResourceNotFound() {
             // Given
             int patientId = 1;
@@ -110,7 +110,7 @@ class InteractionsJpaDataAccessServiceTest {
             assertThatThrownBy(() -> interactionJpaTest
                     .selectMedicineInteractions(patientId, invalidMedicineId))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage(" Medicine doesn't exist");
+                    .hasMessage(" Medication doesn't exist");
             //Then
             verify(medicineRepository).findByPatientIdAndId(patientId, invalidMedicineId);
         }
@@ -129,10 +129,10 @@ class InteractionsJpaDataAccessServiceTest {
     void deleteMedicineInteractionByName() {
         // Given
         String interactionName = "Nebivolol";
-        when(interactionRepository.findByMedicineIdAndName(medicine.getId(), interactionName))
+        when(interactionRepository.findByMedicineIdAndName(medication.getId(), interactionName))
                 .thenReturn(interaction);
         //When
-        interactionJpaTest.deleteMedicineInteractionByName(medicine.getId(), interactionName);
+        interactionJpaTest.deleteMedicineInteractionByName(medication.getId(), interactionName);
         //Then
         verify(interactionRepository).delete(interaction);
     }
@@ -140,8 +140,8 @@ class InteractionsJpaDataAccessServiceTest {
     @Test
     void doesMedicineInteractionExists() {
         //When
-        interactionJpaTest.doesMedicineInteractionExists(medicine.getId(), interaction.getName());
+        interactionJpaTest.doesMedicineInteractionExists(medication.getId(), interaction.getName());
         //Then
-        verify(interactionRepository).existsByMedicineIdAndName(medicine.getId(), interaction.getName());
+        verify(interactionRepository).existsByMedicineIdAndName(medication.getId(), interaction.getName());
     }
 }

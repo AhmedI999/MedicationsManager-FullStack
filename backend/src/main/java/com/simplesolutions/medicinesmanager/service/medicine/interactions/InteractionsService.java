@@ -2,9 +2,9 @@ package com.simplesolutions.medicinesmanager.service.medicine.interactions;
 
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
+import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Medicine;
-import com.simplesolutions.medicinesmanager.dto.MedicationInteractionRequest;
+import com.simplesolutions.medicinesmanager.dto.interactiondto.MedicationInteractionDTO;
 import com.simplesolutions.medicinesmanager.service.medicine.MedicineDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,25 +40,25 @@ public class InteractionsService {
         String capitalizedName = name.substring(0, 1).toUpperCase() +
                 name.substring(1).toLowerCase();
         if (!interactionDao.doesMedicineInteractionExists(medicineId, capitalizedName))
-            throw new ResourceNotFoundException("Medicine Interaction %s wasn't found".formatted(capitalizedName));
+            throw new ResourceNotFoundException("Medication Interaction %s wasn't found".formatted(capitalizedName));
         interactionDao.deleteMedicineInteractionByName(medicineId, capitalizedName);
     }
-    public void saveMedicineInteraction(MedicationInteractionRequest request, Medicine medicine){
-        if (interactionDao.doesMedicineInteractionExists(medicine.getId(),request.getName())) {
-            throw new DuplicateResourceException("Medicine's Interaction (%s) already Exists"
+    public void saveMedicineInteraction(MedicationInteractionDTO request, Medication medication){
+        if (interactionDao.doesMedicineInteractionExists(medication.getId(),request.getName())) {
+            throw new DuplicateResourceException("Medication's Interaction (%s) already Exists"
                     .formatted(request.getName()));
         }
         String capitalizedName = request.getName().substring(0, 1).toUpperCase() +
                 request.getName().substring(1).toLowerCase();
 
         MedicationInteractions interaction = MedicationInteractions.builder()
-                .name(capitalizedName)
+                .name(capitalizedName.trim())
                 .Type(request.getType())
                 .build();
-        if (!medicineDao.doesPatientMedicineExists( medicine.getPatient().getEmail() ,medicine.getBrandName())){
-            throw new ResourceNotFoundException("Medicine %s doesn't exist".formatted(medicine.getBrandName()));
+        if (!medicineDao.doesPatientMedicineExists( medication.getPatient().getEmail() , medication.getBrandName())){
+            throw new ResourceNotFoundException("Medication %s doesn't exist".formatted(medication.getBrandName()));
         }
-        interaction.setMedicine(medicine);
+        interaction.setMedicine(medication);
         interactionDao.saveMedicineInteraction(interaction);
     }
 
