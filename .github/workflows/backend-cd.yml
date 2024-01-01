@@ -118,7 +118,7 @@ jobs:
           git pull
           git add ../Dockerrun.aws.json
           git commit -m "Update Dockerrun.aws.json docker image with new tag ${{ steps.build-number.outputs.BUILD_NUMBER }}"
-          git push origin HEAD:master HEAD:Fullstack-Dev
+          git push origin HEAD:master
       - name: Send Slack Message
         run: >
           curl -X POST -H 'Content-type: application/json' 
