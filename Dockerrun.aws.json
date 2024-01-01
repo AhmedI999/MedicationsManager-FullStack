@@ -1,0 +1,47 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "medicinemanager-api",
+      "image": "ahmedi999/medicinesmanager-api:09.12.2023.18.30.48",
+      "essential": true,
+      "memory": 256,
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "containerPort": 8080
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://URLHERE:5332/medicinemanager"
+        },
+        {
+          "name": "SPRING_JPA_hibernate_ddl-auto",
+          "value": "update"
+        },
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://URLHERE:5432/medicinemanagertest"
+        },
+        {
+          "name": "SPRING_JPA_hibernate_ddl-auto",
+          "value": "update"
+        }
+      ]
+    },
+    {
+      "name": "medicinesmanager-react",
+      "image": "ahmedi999/medicinesmanager-react:27.12.2023.17.19.50",
+      "essential": true,
+      "memory": 256,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 5173
+        }
+      ]
+    }
+  ]
+}
