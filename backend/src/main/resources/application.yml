@@ -23,7 +23,16 @@ spring:
     user: ahmed
     password: ahmedroot
 
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
 
 logging:
   level:
     org.flywaydb: trace
+
+# Default value for picture url
+medicine:
+  picture-url: "https://i.imgur.com/qMA0qhd.png"
+
+

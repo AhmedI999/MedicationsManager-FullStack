@@ -1,12 +1,14 @@
 package com.simplesolutions.medicinesmanager.service.patient;
 
 import com.github.javafaker.Faker;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientDTOMapper;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
 import com.simplesolutions.medicinesmanager.exception.UpdateException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.paylod.PatientRegistrationRequest;
-import com.simplesolutions.medicinesmanager.paylod.PatientUpdateRequest;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientUpdateRequest;
 import jakarta.validation.ConstraintViolation;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.*;
@@ -29,10 +32,15 @@ import static org.mockito.Mockito.*;
 class PatientServiceTest {
     @Mock
     PatientDao patientDao;
+    @Mock
+    PasswordEncoder passwordEncoder;
     PatientService patientServiceTest;
+    PatientDTOMapper patientDTOMapper;
     Faker faker;
     // patient for unit tests
     Patient patient;
+    // expected patient dto
+    PatientResponseDTO expected;
     // patient for constrained patient tests
     PatientRegistrationRequest patientRegistrationTest;
     // validator for testing validation
@@ -40,7 +48,9 @@ class PatientServiceTest {
 
     @BeforeEach
     void setUp() {
-        patientServiceTest = new PatientService(patientDao);
+        patientDTOMapper = new PatientDTOMapper();
+        patientServiceTest = new PatientService(patientDao, patientDTOMapper, passwordEncoder);
+
         faker = new Faker();
         patient = Patient.builder()
                 .id(1)
@@ -50,12 +60,12 @@ class PatientServiceTest {
                 .lastname(faker.name().lastName())
                 .age(faker.number().randomDigitNotZero())
                 .build();
-        validatorFactory = new LocalValidatorFactoryBean();
-        validatorFactory.afterPropertiesSet();
-
+        expected = patientDTOMapper.apply(patient);
         patientRegistrationTest = createPatientRegistrationRequest(
                 faker.internet().safeEmailAddress() + "-" + UUID.randomUUID());
 
+        validatorFactory = new LocalValidatorFactoryBean();
+        validatorFactory.afterPropertiesSet();
     }
     private PatientRegistrationRequest createPatientRegistrationRequest(String email){
         return new PatientRegistrationRequest(
@@ -83,16 +93,16 @@ class PatientServiceTest {
             patientServiceTest.getAllPatients();
             //Then
             verify(patientDao).selectAllPatients();
-            assertThat(patientServiceTest.getAllPatients()).isNotNull();
+            assertThat(patientServiceTest.getAllPatients()).isNotEmpty();
         }
 
         @Test
-        @DisplayName("Verify that getAllPatients() throw Not found when empty")
+        @DisplayName("Verify that getAllPatients() return empty list")
         void getAllPatients_ThrowsResourceNotFound() {
             //Given
             when(patientDao.selectAllPatients()).thenReturn(Collections.emptyList());
             //When
-            List<Patient> actual = patientServiceTest.getAllPatients();
+            List<PatientResponseDTO> actual = patientServiceTest.getAllPatients();
             //Then
             verify(patientDao).selectAllPatients();
             assertThat(actual).isNotNull();
@@ -110,10 +120,10 @@ class PatientServiceTest {
             int patientId = 1;
             when(patientDao.selectPatientById(patientId)).thenReturn(Optional.of(patient));
             //When
-            Patient actual = patientServiceTest.getPatientById(patientId);
+            PatientResponseDTO actual = patientServiceTest.getPatientById(patientId);
             //Then
             verify(patientDao).selectPatientById(patientId);
-            assertThat(actual).isNotNull();
+            assertThat(actual).isEqualTo(expected);
         }
 
         @Test
@@ -125,9 +135,74 @@ class PatientServiceTest {
                     .thenReturn(Optional.empty());
             //When
             assertThatThrownBy(() -> patientServiceTest.getPatientById(invalidPatientId))
-                    .isInstanceOf(ResourceNotFoundException.class);
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("patient with id [%s] not found".formatted(invalidPatientId));
             //Then
             verify(patientDao).selectPatientById(invalidPatientId);
+
+        }
+    }
+    @Nested
+    @DisplayName("getPatientEntityById unit test")
+    class PatientService_getPatientEntityById {
+        @Test
+        @DisplayName("Verify that getPatientEntityById() can invoke selectPatientById() dao")
+        void getPatientEntityById_returnsPatient() {
+            // Given
+            int patientId = 1;
+            when(patientDao.selectPatientById(patientId)).thenReturn(Optional.of(patient));
+            //When
+            Patient actual = patientServiceTest.getPatientEntityById(patientId);
+            //Then
+            verify(patientDao).selectPatientById(patientId);
+            assertThat(actual).isEqualTo(patient);
+        }
+
+        @Test
+        @DisplayName("Verify that getPatientById() Throws ResourceNotFound when id is invalid")
+        void getPatientEntityById_ThrowsResourceNotFound() {
+            // Given
+            int invalidPatientId = -1;
+            when(patientDao.selectPatientById(invalidPatientId))
+                    .thenReturn(Optional.empty());
+            //When
+            assertThatThrownBy(() -> patientServiceTest.getPatientEntityById(invalidPatientId))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("patient with id [%s] not found".formatted(invalidPatientId));
+            //Then
+            verify(patientDao).selectPatientById(invalidPatientId);
+
+        }
+    }
+
+    @Nested
+    @DisplayName("getPatientByEmail unit test")
+    class PatientService_getPatientByEmail {
+        @Test
+        @DisplayName("Verify that getPatientByEmail() can invoke selectPatientByEmail() dao")
+        void getPatientByEmail_returnsPatient() {
+            // Given
+            when(patientDao.selectPatientByEmail(patient.getEmail()))
+                    .thenReturn(Optional.of(patient));
+            //When
+            PatientResponseDTO actual = patientServiceTest.getPatientByEmail(patient.getEmail());
+            //Then
+            verify(patientDao).selectPatientByEmail(patient.getEmail());
+            assertThat(actual).isEqualTo(expected);
+        }
+
+        @Test
+        @DisplayName("Verify that getPatientById() Throws ResourceNotFound when id is invalid")
+        void getPatientById_ThrowsResourceNotFound() {
+            // Given
+            when(patientDao.selectPatientByEmail(patient.getEmail()))
+                    .thenReturn(Optional.empty());
+            //When
+            assertThatThrownBy(() -> patientServiceTest.getPatientByEmail(patient.getEmail()))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("patient with email [%s] not found".formatted(patient.getEmail()));
+            //Then
+            verify(patientDao).selectPatientByEmail(patient.getEmail());
 
         }
     }
@@ -156,8 +231,7 @@ class PatientServiceTest {
             String invalidEmail = "invalidEmail@example.com";
             when(patientDao.doesPatientExists(invalidEmail)).thenThrow(ResourceNotFoundException.class);
             //When
-            assertThatThrownBy(
-                    () -> patientServiceTest.doesPatientExists(invalidEmail))
+            assertThatThrownBy(() -> patientServiceTest.doesPatientExists(invalidEmail))
                     .isInstanceOf(ResourceNotFoundException.class);
             //Then
             verify(patientDao).doesPatientExists(invalidEmail);
@@ -169,15 +243,21 @@ class PatientServiceTest {
     class PatientService_savePatient {
 
         @Test
-        @DisplayName("Verify that savePatient() can invoke savePatient() in dao")
+        @DisplayName("Verify that savePatient() can invoke savePatient() with bcrypt password in dao")
         void savePatient_Success() {
             // Given
             when(patientDao.doesPatientExists(patientRegistrationTest.getEmail())).thenReturn(false);
+            String passwordHash = "$@#$Hashed@$!PasswordGF#!";
+            when(passwordEncoder.encode(patientRegistrationTest.getPassword()))
+                    .thenReturn(passwordHash);
             //When
             patientServiceTest.savePatient(patientRegistrationTest);
+            ArgumentCaptor<Patient> patientArgumentCaptor = ArgumentCaptor.forClass(Patient.class);
             //Then
-            verify(patientDao).savePatient(any(Patient.class));
+            verify(patientDao).savePatient(patientArgumentCaptor.capture());
             verify(patientDao).doesPatientExists(patientRegistrationTest.getEmail());
+            Patient capturedPatient = patientArgumentCaptor.getValue();
+            assertThat(capturedPatient.getPassword()).isEqualTo(passwordHash);
         }
 
         @Test
@@ -217,7 +297,7 @@ class PatientServiceTest {
             //When
             assertThatThrownBy(() -> patientServiceTest.savePatient(patientRegistrationTest))
                     .isInstanceOf(DuplicateResourceException.class)
-                    .hasMessage("Patient already Exists");
+                    .hasMessage("Patient with email:%s. already exists".formatted(patientRegistrationTest.getEmail()));
             //Then
             verify(patientDao).doesPatientExists(patientRegistrationTest.getEmail());
             verify(patientDao, never()).savePatient(any());
@@ -278,6 +358,21 @@ class PatientServiceTest {
             // Ensure that the patient's email has been updated I.E captured and patient in db emails are the same
             assertThat(capturedPatient.getEmail()).isEqualTo(patient.getEmail());
         }
+        @Test
+        @DisplayName("Verify that editPatientDetails throw ResourceNotFoundException")
+        void editPatientDetails_throwResourceNotFoundException(){
+            // given
+            when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.empty());
+            // when
+            assertThatThrownBy(() ->
+                    patientServiceTest.editPatientDetails(patient.getId(),
+                            PatientUpdateRequest.builder().email("nonExistentPatientEmail").build()))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("patient with id [%s] not found".formatted(patient.getId()));
+            // then
+            verify(patientDao).selectPatientById(patient.getId());
+
+        }
 
         @Test
         @DisplayName("Verify that editPatientDetails Throw DuplicateResourceException")
@@ -285,7 +380,7 @@ class PatientServiceTest {
             // Given
             when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.of(patient));
             String duplicateEmail = "duplicate@example.com";
-            // since you want an existing patient vs another patient with same email
+            // since you want an existing patient vs another patient with the same email
             when(patientDao.doesPatientExists(duplicateEmail)).thenReturn(true);
             //When
             assertThatThrownBy(() ->

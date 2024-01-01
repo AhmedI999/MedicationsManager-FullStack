@@ -60,8 +60,20 @@ class PatientJpaDataAccessServiceTest {
         Optional<Patient> actual = patientJpaTest.selectPatientById(id);
         //Then
         verify(patientRepository).findById(id);
-        assertThat(Optional.of(patient)).isEqualTo(actual);
+        assertThat(actual).isPresent().contains(patient);
     }
+    @Test
+    @DisplayName("Verify that selectPatientByEmail() can invoke findByEmail()")
+    void selectPatientByEmail() {
+        // Given
+        when(patientRepository.findByEmail(patient.getEmail())).thenReturn(Optional.of(patient));
+        //When
+        Optional<Patient> actual = patientJpaTest.selectPatientByEmail(patient.getEmail());
+        //Then
+        verify(patientRepository).findByEmail(patient.getEmail());
+        assertThat(actual).isPresent().contains(patient);
+    }
+
 
 
     @Test

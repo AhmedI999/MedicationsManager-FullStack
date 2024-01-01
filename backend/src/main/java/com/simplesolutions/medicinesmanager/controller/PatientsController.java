@@ -1,12 +1,13 @@
 package com.simplesolutions.medicinesmanager.controller;
 
-import com.simplesolutions.medicinesmanager.model.Patient;
-import com.simplesolutions.medicinesmanager.paylod.PatientRegistrationRequest;
-import com.simplesolutions.medicinesmanager.paylod.PatientResponse;
-import com.simplesolutions.medicinesmanager.paylod.PatientUpdateRequest;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientUpdateRequest;
+import com.simplesolutions.medicinesmanager.security.jwt.JWTUtil;
 import com.simplesolutions.medicinesmanager.service.patient.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,34 +18,34 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PatientsController {
     private final PatientService patientService;
+    private final JWTUtil jwtUtil;
 
     @GetMapping
-    public List<Patient> getAllPatients() {
+    public List<PatientResponseDTO> getAllPatients() {
         return patientService.getAllPatients();
     }
-
     @GetMapping("{patientId}")
-    public ResponseEntity<PatientResponse> getPatient(@PathVariable("patientId") Integer id) {
-        Patient patient = patientService.getPatientById(id);
-        return ResponseEntity.ok( new PatientResponse(patient.getEmail(), patient.getFirstname()
-                , patient.getLastname(),patient.getAge(), patient.getPatientMedicines()));
+    public PatientResponseDTO getPatient(@PathVariable("patientId") Integer id) {
+        return patientService.getPatientById(id);
     }
 
     @PostMapping
-    private ResponseEntity<String> savePatient(@RequestBody @Valid PatientRegistrationRequest request){
+    private ResponseEntity<?> savePatient(@RequestBody @Valid PatientRegistrationRequest request){
         patientService.savePatient(request);
-        // for now, we will return success string
-        return ResponseEntity.ok("Patient saved successfully!");
+        String jwtToken = jwtUtil.issueToken(request.getEmail(), "ROLE_USER");
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, jwtToken)
+                .body("Patient with email:%s. is saved successfully".formatted(request.getEmail()));
     }
 
-    @DeleteMapping("/{patientId}")
+    @DeleteMapping("{patientId}")
     public ResponseEntity<String> deletePatient(@PathVariable("patientId") Integer id) {
         patientService.deletePatient(id);
         return ResponseEntity.ok("Patient deleted successfully");
     }
 
     @PutMapping("{patientId}")
-    public ResponseEntity<Patient> editPatientDetails(@PathVariable("patientId") Integer patientId,
+    public ResponseEntity<PatientResponseDTO> editPatientDetails(@PathVariable("patientId") Integer patientId,
                                                               @RequestBody @Valid PatientUpdateRequest request){
         patientService.editPatientDetails(patientId, request);
         return ResponseEntity.ok(patientService.getPatientById(patientId));
