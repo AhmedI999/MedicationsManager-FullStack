@@ -20,6 +20,7 @@ public class PatientsController {
     private final PatientService patientService;
     private final JWTUtil jwtUtil;
 
+
     @GetMapping
     public List<PatientResponseDTO> getAllPatients() {
         return patientService.getAllPatients();
