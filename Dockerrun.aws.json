@@ -12,24 +12,24 @@
           "containerPort": 8080
         }
       ],
-     "environment": [
-       {
-       "name": "SPRING_DATASOURCE_URL",
-       "value": "jdbc:postgresql://URLHERE:5332/medicinemanager"
-     },
-       {
-        "name": "SPRING_JPA_hibernate_ddl-auto",
-         "value": "update"
-       },
-       {
-         "name": "SPRING_DATASOURCE_URL",
-         "value": "jdbc:postgresql://URLHERE:5432/medicinemanagertest"
-       },
-       {
-         "name": "SPRING_JPA_hibernate_ddl-auto",
-         "value": "update"
-       }
-     ]
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://URLHERE:5332/medicinemanager"
+        },
+        {
+          "name": "SPRING_JPA_hibernate_ddl-auto",
+          "value": "update"
+        },
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://URLHERE:5432/medicinemanagertest"
+        },
+        {
+          "name": "SPRING_JPA_hibernate_ddl-auto",
+          "value": "update"
+        }
+      ]
     },
     {
       "name": "medicinesmanager-react",
