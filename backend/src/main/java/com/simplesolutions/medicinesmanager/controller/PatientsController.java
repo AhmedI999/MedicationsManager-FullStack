@@ -17,6 +17,7 @@ import java.util.List;
 @RequestMapping("api/v1/patients")
 @RequiredArgsConstructor
 public class PatientsController {
+
     private final PatientService patientService;
     private final JWTUtil jwtUtil;
 
