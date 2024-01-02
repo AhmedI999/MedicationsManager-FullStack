@@ -136,7 +136,7 @@ class PatientServiceTest {
             //When
             assertThatThrownBy(() -> patientServiceTest.getPatientById(invalidPatientId))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("patient with id [%s] not found".formatted(invalidPatientId));
+                    .hasMessage("patient with id %s not found".formatted(invalidPatientId));
             //Then
             verify(patientDao).selectPatientById(invalidPatientId);
 
@@ -168,7 +168,7 @@ class PatientServiceTest {
             //When
             assertThatThrownBy(() -> patientServiceTest.getPatientEntityById(invalidPatientId))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("patient with id [%s] not found".formatted(invalidPatientId));
+                    .hasMessage("patient with id %s not found".formatted(invalidPatientId));
             //Then
             verify(patientDao).selectPatientById(invalidPatientId);
 
@@ -200,7 +200,7 @@ class PatientServiceTest {
             //When
             assertThatThrownBy(() -> patientServiceTest.getPatientByEmail(patient.getEmail()))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("patient with email [%s] not found".formatted(patient.getEmail()));
+                    .hasMessage("patient with email %s was not found".formatted(patient.getEmail()));
             //Then
             verify(patientDao).selectPatientByEmail(patient.getEmail());
 
@@ -297,7 +297,7 @@ class PatientServiceTest {
             //When
             assertThatThrownBy(() -> patientServiceTest.savePatient(patientRegistrationTest))
                     .isInstanceOf(DuplicateResourceException.class)
-                    .hasMessage("Patient with email:%s. already exists".formatted(patientRegistrationTest.getEmail()));
+                    .hasMessage("Patient with email %s already exists".formatted(patientRegistrationTest.getEmail()));
             //Then
             verify(patientDao).doesPatientExists(patientRegistrationTest.getEmail());
             verify(patientDao, never()).savePatient(any());
@@ -329,7 +329,7 @@ class PatientServiceTest {
             //When
             assertThatThrownBy(() -> patientServiceTest.deletePatient(invalidId))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("patient with id [%s] not found".formatted(invalidId));
+                    .hasMessage("patient with id %s not found".formatted(invalidId));
             //Then
             verify(patientDao, never()).deletePatientById(invalidId);
 
@@ -368,7 +368,7 @@ class PatientServiceTest {
                     patientServiceTest.editPatientDetails(patient.getId(),
                             PatientUpdateRequest.builder().email("nonExistentPatientEmail").build()))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("patient with id [%s] not found".formatted(patient.getId()));
+                    .hasMessage("patient with id %s not found".formatted(patient.getId()));
             // then
             verify(patientDao).selectPatientById(patient.getId());
 

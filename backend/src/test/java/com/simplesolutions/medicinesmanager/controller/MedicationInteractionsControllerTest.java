@@ -1,18 +1,14 @@
 package com.simplesolutions.medicinesmanager.controller;
 
 import com.github.javafaker.Faker;
-import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicationResponseDTO;
-import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
-import com.simplesolutions.medicinesmanager.model.InteractionType;
-import com.simplesolutions.medicinesmanager.model.Medication;
-import com.simplesolutions.medicinesmanager.model.MedicationInteractions;
-import com.simplesolutions.medicinesmanager.model.Patient;
 import com.simplesolutions.medicinesmanager.dto.interactiondto.MedicationInteractionDTO;
+import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicationResponseDTO;
 import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicineRegistrationRequest;
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRequest;
+import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
+import com.simplesolutions.medicinesmanager.model.InteractionType;
 import com.simplesolutions.medicinesmanager.repository.MedicineRepository;
 import com.simplesolutions.medicinesmanager.repository.PatientRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +34,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DisplayName("Medication Interactions controller Integration Tests")
-@Transactional
 class MedicationInteractionsControllerTest {
     @Autowired
     WebTestClient webTestClient;

@@ -32,18 +32,18 @@ public class PatientService {
         return patientDao.selectPatientById(id)
                 .map(patientDTOMapper)
                 .orElseThrow(() ->
-                new ResourceNotFoundException("patient with id [%s] not found".formatted(id)));
+                new ResourceNotFoundException("patient with id %s not found".formatted(id)));
     }
     public Patient getPatientEntityById(Integer id){
         return patientDao.selectPatientById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("patient with id [%s] not found".formatted(id)));
+                        new ResourceNotFoundException("patient with id %s not found".formatted(id)));
     }
     public PatientResponseDTO getPatientByEmail(String email){
         return patientDao.selectPatientByEmail(email)
                 .map(patientDTOMapper)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("patient with email [%s] not found".formatted(email)));
+                        () -> new ResourceNotFoundException("patient with email %s was not found".formatted(email)));
     }
     public boolean doesPatientExists(String email) {
         return patientDao.doesPatientExists(email);
@@ -51,7 +51,7 @@ public class PatientService {
 
     public void savePatient(PatientRegistrationRequest request){
         if (doesPatientExists(request.getEmail())) {
-        throw new DuplicateResourceException("Patient with email:%s. already exists".formatted(request.getEmail()));
+        throw new DuplicateResourceException("Patient with email %s already exists".formatted(request.getEmail()));
     }
             Patient patient = Patient.builder()
                     .email(request.getEmail().trim())
@@ -65,13 +65,13 @@ public class PatientService {
     }
     public void deletePatient(Integer id){
         Patient patient = patientDao.selectPatientById(id).orElseThrow(() ->
-                        new ResourceNotFoundException("patient with id [%s] not found".formatted(id)));
+                        new ResourceNotFoundException("patient with id %s not found".formatted(id)));
 
             patientDao.deletePatientById(patient.getId());
     }
     public void editPatientDetails(Integer id, PatientUpdateRequest request){
         Patient patient = patientDao.selectPatientById(id).orElseThrow(
-                        () -> new ResourceNotFoundException("patient with id [%s] not found".formatted(id)));
+                        () -> new ResourceNotFoundException("patient with id %s not found".formatted(id)));
 
         boolean changes = false;
         if (request.getEmail() != null && !request.getEmail().trim().equals(patient.getEmail())) {
