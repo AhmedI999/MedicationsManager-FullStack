@@ -35,7 +35,7 @@ public class PatientsController {
         String jwtToken = jwtUtil.issueToken(request.getEmail(), "ROLE_USER");
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtToken)
-                .body("Patient with email:%s. is saved successfully".formatted(request.getEmail()));
+                .body("Patient with email %s is saved successfully".formatted(request.getEmail()));
     }
 
     @DeleteMapping("{patientId}")

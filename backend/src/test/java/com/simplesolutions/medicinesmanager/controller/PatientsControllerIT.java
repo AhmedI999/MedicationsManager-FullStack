@@ -91,7 +91,7 @@ class PatientsControllerIT {
                     DuplicateResourceException responseBody = response.getResponseBody();
                     assert responseBody != null;
                     assertThat(responseBody.getMessage())
-                            .isEqualTo("Patient with email:%s. already exists".formatted(patientRequest.getEmail()));
+                            .isEqualTo("Patient with email %s already exists".formatted(patientRequest.getEmail()));
                 });
     }
 
@@ -183,7 +183,7 @@ class PatientsControllerIT {
                     ResourceNotFoundException responseBody = response.getResponseBody();
                     assert responseBody != null;
                     assertThat(responseBody.getMessage())
-                            .isEqualTo("patient with id [%s] not found".formatted(patientInDB_Id));
+                            .isEqualTo("patient with id %s not found".formatted(patientInDB_Id));
                 });
     }
 

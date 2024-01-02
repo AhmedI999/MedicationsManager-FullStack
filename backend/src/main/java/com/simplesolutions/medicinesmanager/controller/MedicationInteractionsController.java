@@ -31,12 +31,12 @@ public class MedicationInteractionsController {
         return interactionsService.getMedicineInteractions(patientId, medicineId);
     }
     @PostMapping("{patientId}/medicines/{medicineId}/interactions")
-    public ResponseEntity<MedicationInteractionDTO> saveMedicationInteraction(@PathVariable("patientId") Integer patientId,
+    public ResponseEntity<String> saveMedicationInteraction(@PathVariable("patientId") Integer patientId,
                                                                               @PathVariable("medicineId") Integer medicineId,
                                                                               @RequestBody MedicationInteractionDTO request) {
         Medication medication = medicineService.getPatientMedicineEntityById(patientId, medicineId);
         interactionsService.saveMedicineInteraction(request, medication);
-        return ResponseEntity.ok(new MedicationInteractionDTO(request.getName(), request.getType()));
+        return ResponseEntity.ok("The new Interaction Saved Successfully");
     }
     @DeleteMapping("{patientId}/medicines/{medicineId}/interactions/{name}")
     public ResponseEntity<String> deleteMedicationInteraction(@PathVariable("patientId") Integer patientId,
@@ -46,7 +46,6 @@ public class MedicationInteractionsController {
         interactionsService.deleteMedicationInteractionByName(medicineId, name);
         return ResponseEntity.ok("Interaction deleted Successfully");
     }
-
 
 
 }
