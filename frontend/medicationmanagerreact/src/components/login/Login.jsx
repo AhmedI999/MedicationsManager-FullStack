@@ -12,7 +12,8 @@ import * as Yup from 'yup';
 import {useAuth} from "../context/AuthContext.jsx";
 import {errorNotification} from "../../services/Notifications.js";
 import {useNavigate} from "react-router-dom";
-import {setCookie} from "../../services/cookieUtils.js";
+import {isCookieValid, setCookie} from "../../services/cookieUtils.js";
+import {useEffect} from "react";
 
 const MyTextInput = ({label, ...props}) => {
     const [field, meta] = useField(props);
@@ -86,6 +87,12 @@ const LoginForm = () => {
 };
 
 const Login = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (isCookieValid('jwt')){
+            navigate("/medications")
+        }
+    });
     return (
         <Stack minH={'100vh'} direction={{ base: 'column', md: 'row' }}>
             <Flex p={8} flex={1} align={'center'} justifyContent={'center'}>

@@ -8,7 +8,7 @@ const getToken = async () => {
     const encryptedToken = getCookie("jwt");
     const jwt = await decryptData(encryptedToken, secret);
     if (!jwt)
-        console.error("Error:", "Authentication Failed");
+        console.error("ErrorPage:", "Authentication Failed");
     return jwt
 };
 

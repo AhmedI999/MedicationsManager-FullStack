@@ -17,5 +17,19 @@ export const getCookie = (name) => {
 export const deleteCookie = (name) => {
     document.cookie = `${name}=; expires=Thu, 08 Feb 1999 00:00:00 UTC; path=/;`;
 };
+export const isCookieValid = (name) => {
+    const cookieValue = getCookie(name);
 
+    if (cookieValue !== null) {
+        const expirationDate = new Date(document.cookie.split(`${name}=`)[1]);
+        if (expirationDate && expirationDate < new Date()) {
+            return false;
+        }
+        // The cookie exists and is valid
+        return true;
+    } else {
+        // The cookie does not exist
+        return false;
+    }
+};
 

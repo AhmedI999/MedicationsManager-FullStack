@@ -16,7 +16,7 @@ const usePatient = () => {
                 setLoading(false);
             })
             .catch((error) => {
-                errorNotification('Error fetching patient data:', error);
+                errorNotification('ErrorPage fetching patient data:', error);
                 setLoading(false);
             });
     }, []);

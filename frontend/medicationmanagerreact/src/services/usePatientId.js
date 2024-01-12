@@ -5,7 +5,7 @@ import {getPatientById} from "./client.js";
 export const getPatientId = () => {
     const patientId = getCookie('i');
     if (patientId === null) {
-        errorNotification("Getting User Info", "Error Retrieving User info")
+        errorNotification("Getting User Info", "ErrorPage Retrieving User info")
         return;
     }
     return patientId;
