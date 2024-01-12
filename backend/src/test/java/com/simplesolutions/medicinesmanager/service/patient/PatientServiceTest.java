@@ -55,7 +55,7 @@ class PatientServiceTest {
         patient = Patient.builder()
                 .id(1)
                 .email(faker.internet().safeEmailAddress() + "-" + UUID.randomUUID())
-                .password(faker.internet().password())
+                .password(faker.internet().password() + "U@")
                 .firstname(faker.name().firstName())
                 .lastname(faker.name().lastName())
                 .age(faker.number().randomDigitNotZero())
@@ -67,10 +67,11 @@ class PatientServiceTest {
         validatorFactory = new LocalValidatorFactoryBean();
         validatorFactory.afterPropertiesSet();
     }
-    private PatientRegistrationRequest createPatientRegistrationRequest(String email){
+
+    private PatientRegistrationRequest createPatientRegistrationRequest(String email) {
         return new PatientRegistrationRequest(
                 email,
-                faker.internet().password() + "P@",
+                faker.internet().password() + "U@",
                 faker.name().firstName(),
                 faker.name().lastName(),
                 faker.number().randomDigitNotZero()
@@ -81,6 +82,7 @@ class PatientServiceTest {
     void tearDown() {
         patientDao.deletePatientById(patient.getId());
     }
+
     @Nested
     @DisplayName("getAllPatients Unit test")
     class PatientService_getAllPatients {
@@ -142,6 +144,7 @@ class PatientServiceTest {
 
         }
     }
+
     @Nested
     @DisplayName("getPatientEntityById unit test")
     class PatientService_getPatientEntityById {
@@ -276,6 +279,7 @@ class PatientServiceTest {
                     .contains("Field is Required", "Must be a valid email address");
 
         }
+
         @Test
         @DisplayName("Verify that savePatient() Throws PatientRegistrationConstraints_invalidEmail ")
         void savePatient_ConstraintsException_invalidEmail() {
@@ -289,6 +293,7 @@ class PatientServiceTest {
             assertThat(violations).hasSize(1);
             assertThat(violations.iterator().next().getMessage()).contains("Must be a valid email address");
         }
+
         @Test
         @DisplayName("Verify that savePatient() Throws DuplicateResource")
         void savePatient_DuplicateResourceException() {
@@ -303,6 +308,7 @@ class PatientServiceTest {
             verify(patientDao, never()).savePatient(any());
         }
     }
+
     @Nested
     @DisplayName("deletePatient  unit test")
     class PatientService_deletePatient {
@@ -337,6 +343,103 @@ class PatientServiceTest {
     }
 
     @Nested
+    @DisplayName("Edit Patient password unit tests")
+    class PatientService_editPatientPassword {
+        @Test
+        @DisplayName("Verify that editPatientDetails can update the password")
+        void editPatientDetails_Success() {
+            // Given
+            String currentPassword = "CurrentP@ssword123";
+            String newPassword = "NewP@ssword123";
+
+            PatientUpdateRequest request = PatientUpdateRequest.builder()
+                    .currentPassword(currentPassword)
+                    .password(newPassword)
+                    .build();
+            when(patientDao.selectPatientById(patient.getId()))
+                    .thenReturn(Optional.of(patient));
+            when(patientServiceTest.isOldPasswordValid(currentPassword, patient))
+                    .thenReturn(true);
+            // When
+            patientServiceTest.editPatientPassword(patient.getId(), request);
+
+            // Then
+            verify(patientDao).updatePatient(patient);
+        }
+
+        @Test
+        @DisplayName("Verify that editPatientDetails throw updateException with invalid new password")
+        void editPatientDetails_throwUpdateException_invalidNewPassword() {
+            // Given
+            String currentPassword = "CurrentP@ssword123";
+            String newPassword = "";
+
+            PatientUpdateRequest request = PatientUpdateRequest.builder()
+                    .currentPassword(currentPassword)
+                    .password(newPassword)
+                    .build();
+            when(patientDao.selectPatientById(patient.getId()))
+                    .thenReturn(Optional.of(patient));
+            when(patientServiceTest.isOldPasswordValid(currentPassword, patient))
+                    .thenReturn(true);
+
+            // When
+            assertThatThrownBy(() -> patientServiceTest.editPatientPassword(patient.getId(), request))
+                    .isInstanceOf(UpdateException.class)
+                    .hasMessage("New password Can't be empty");
+
+            // Then
+            verify(patientDao, never()).updatePatient(any());
+        }
+
+        @Test
+        @DisplayName("Verify that editPatientDetails throw updateException with invalid current password")
+        void editPatientDetails_throwUpdateException() {
+            // Given
+            String currentPassword = "invalidPass";
+            String newPassword = "NewP@ssword123";
+
+            PatientUpdateRequest request = PatientUpdateRequest.builder()
+                    .currentPassword(currentPassword)
+                    .password(newPassword)
+                    .build();
+            when(patientDao.selectPatientById(patient.getId()))
+                    .thenReturn(Optional.of(patient));
+            when(patientServiceTest.isOldPasswordValid(currentPassword, patient))
+                    .thenReturn(false);
+            // When
+            assertThatThrownBy(() -> patientServiceTest.editPatientPassword(patient.getId(), request))
+                    .isInstanceOf(UpdateException.class)
+                    .hasMessage("Current password is incorrect");
+
+            // Then
+            verify(patientDao, never()).updatePatient(any());
+        }
+
+        @Test
+        @DisplayName("Verify that editPatientDetails throw updateException with null or empty current password")
+        void editPatientDetails_throwUpdateException_emptyCurrentPassword() {
+            // Given
+            String currentPassword = "";
+            String newPassword = "NewP@ssword123";
+
+            PatientUpdateRequest request = PatientUpdateRequest.builder()
+                    .currentPassword(currentPassword)
+                    .password(newPassword)
+                    .build();
+            when(patientDao.selectPatientById(patient.getId()))
+                    .thenReturn(Optional.of(patient));
+            // When
+            assertThatThrownBy(() -> patientServiceTest.editPatientPassword(patient.getId(), request))
+                    .isInstanceOf(UpdateException.class)
+                    .hasMessage("Current password can't be null or empty");
+
+            // Then
+            verify(patientDao, never()).updatePatient(any());
+        }
+    }
+
+    @Nested
     @DisplayName("editPatientDetails unit tests")
     class PatientService_editPatientDetails {
         @Test
@@ -358,9 +461,10 @@ class PatientServiceTest {
             // Ensure that the patient's email has been updated I.E captured and patient in db emails are the same
             assertThat(capturedPatient.getEmail()).isEqualTo(patient.getEmail());
         }
+
         @Test
         @DisplayName("Verify that editPatientDetails throw ResourceNotFoundException")
-        void editPatientDetails_throwResourceNotFoundException(){
+        void editPatientDetails_throwResourceNotFoundException() {
             // given
             when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.empty());
             // when
@@ -387,7 +491,7 @@ class PatientServiceTest {
                     patientServiceTest.editPatientDetails(patient.getId(),
                             PatientUpdateRequest.builder().email(duplicateEmail).build()))
                     .isInstanceOf(DuplicateResourceException.class)
-                    .hasMessage("email already taken");
+                    .hasMessage("email already registered");
             //Then
             verify(patientDao, never()).updatePatient(any());
         }
@@ -427,6 +531,25 @@ class PatientServiceTest {
             // Ensure that the patient's email has been updated I.E captured and patient in db emails are the same
             assertThat(capturedPatient.getLastname()).isEqualTo(patient.getLastname());
         }
+
+        @Test
+        @DisplayName("Verify that editPatientDetails can invoke updatePatient for valid age")
+        void editPatientDetails_validAgeUpdated() {
+            // Given
+            when(patientDao.selectPatientById(patient.getId())).thenReturn(Optional.of(patient));
+            Integer age = 29;
+            //When
+            patientServiceTest.editPatientDetails(patient.getId(),
+                    PatientUpdateRequest.builder().age(age).build());
+            //Then
+            ArgumentCaptor<Patient> patientArgumentCaptor = ArgumentCaptor.forClass(Patient.class);
+            // ensure that patientDao has been called for the updated(captured) Patient object
+            verify(patientDao).updatePatient(patientArgumentCaptor.capture());
+            Patient capturedPatient = patientArgumentCaptor.getValue();
+            // Ensure that the patient's email has been updated I.E captured and patient in db emails are the same
+            assertThat(capturedPatient.getAge()).isEqualTo(patient.getAge());
+        }
+
 
         @Test
         @DisplayName("Verify that editPatientDetails Throw UpdateException")

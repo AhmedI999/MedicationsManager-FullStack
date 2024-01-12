@@ -98,6 +98,7 @@ class MedicationInteractionsControllerTest {
 
         expectedMedication = new MedicationResponseDTO(
                 null,
+                null,
                 medicineRequest.getPictureUrl(),
                 medicineRequest.getBrandName(),
                 medicineRequest.getActiveIngredient(),

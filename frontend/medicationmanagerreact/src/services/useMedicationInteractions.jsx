@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from "react";
 import {getMedicationInteractions} from "./client.js";
 import {errorNotification} from "./Notifications.js";
+import {getPatientId} from "./usePatientId.js";
 
 const useMedicationInteractions = (medicationId) => {
     const [interactions, setInteractions] = useState([]);
@@ -9,7 +10,7 @@ const useMedicationInteractions = (medicationId) => {
     const fetchInteractions = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await getMedicationInteractions(1, medicationId);
+            const res = await getMedicationInteractions(getPatientId(), medicationId);
             setInteractions(res.data);
         } catch (err) {
             errorNotification(`Getting Interactions`,
@@ -20,11 +21,11 @@ const useMedicationInteractions = (medicationId) => {
     }, [medicationId]);
 
     useEffect(() => {
-        fetchInteractions().then((res) => console.log(res));
+        fetchInteractions()
     }, [fetchInteractions]);
 
     const refetchInteractions = useCallback(() => {
-        fetchInteractions().then((res) => console.log(res));
+        fetchInteractions()
     }, [fetchInteractions]);
 
     return { interactions, loading, refetchInteractions };

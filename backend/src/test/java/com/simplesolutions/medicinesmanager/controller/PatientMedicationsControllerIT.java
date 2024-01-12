@@ -100,6 +100,7 @@ class PatientMedicationsControllerIT {
         // expected Medication To return
         expectedMedication = new MedicationResponseDTO(
                 null,
+                null,
                 medicineRequest.getPictureUrl(),
                 medicineRequest.getBrandName(),
                 medicineRequest.getActiveIngredient(),

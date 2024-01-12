@@ -9,6 +9,7 @@ import {
 import React from "react";
 import {deleteMedication} from "../../services/client.js";
 import {errorNotification, successNotification} from "../../services/Notifications.js";
+import {getPatientId} from "../../services/usePatientId.js";
 
 function DeleteMedicationConfirmation({brandName, id, fetchMedications}) {
 
@@ -16,7 +17,7 @@ function DeleteMedicationConfirmation({brandName, id, fetchMedications}) {
     const cancelRef = React.useRef();
 
     const handleDeleteMedication = () => {
-        deleteMedication(1, id).then( () => successNotification(
+        deleteMedication(getPatientId(), id).then( () => successNotification(
             `Delete Medication ${brandName}`, `${brandName} has been deleted successfully`
         )).catch(err => {
             errorNotification(`Delete Medication ${brandName}`,

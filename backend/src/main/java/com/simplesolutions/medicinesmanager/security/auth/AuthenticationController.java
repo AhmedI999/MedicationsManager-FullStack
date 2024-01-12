@@ -15,12 +15,10 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("login")
-    public ResponseEntity<?> login (@RequestBody AuthenticationRequest request ) {
+    public ResponseEntity<?> login (@RequestBody AuthenticationRequest request) {
         String jwtToken = authenticationService.login(request);
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtToken)
                 .body("You have logged in successfully");
     }
-
-
 }

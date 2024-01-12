@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -57,7 +58,7 @@ public class PatientService {
                     .email(request.getEmail().trim())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .firstname(request.getFirstname().trim())
-                    .lastname(request.getLastname().trim())
+                    .lastname(request.getLastname())
                     .age(request.getAge())
                     .build();
             patientDao.savePatient(patient);
@@ -69,19 +70,37 @@ public class PatientService {
 
             patientDao.deletePatientById(patient.getId());
     }
+    public boolean isOldPasswordValid ( String currentPassword, Patient patient) {
+        if (currentPassword == null || currentPassword.isEmpty()){
+            throw new UpdateException("Current password can't be null or empty");
+        }
+        return passwordEncoder.matches(currentPassword, patient.getPassword());
+    }
+    public void editPatientPassword(Integer id, PatientUpdateRequest request){
+        Patient patient = patientDao.selectPatientById(id).orElseThrow(
+                () -> new ResourceNotFoundException("patient with id %s not found".formatted(id)));
+        if (isOldPasswordValid(request.getCurrentPassword(), patient)){
+            if (request.getPassword() == null || request.getPassword().isEmpty()) {
+                throw new UpdateException("New password Can't be empty");
+            }
+            patient.setPassword(passwordEncoder.encode(request.getPassword()));
+            patientDao.updatePatient(patient);
+        } else throw new UpdateException("Current password is incorrect");
+    }
     public void editPatientDetails(Integer id, PatientUpdateRequest request){
         Patient patient = patientDao.selectPatientById(id).orElseThrow(
                         () -> new ResourceNotFoundException("patient with id %s not found".formatted(id)));
-
         boolean changes = false;
-        if (request.getEmail() != null && !request.getEmail().trim().equals(patient.getEmail())) {
-            if (patientDao.doesPatientExists(request.getEmail())) {
-                throw new DuplicateResourceException(
-                        "email already taken"
-                );
+        if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            if (!Objects.equals(patient.getEmail(), request.getEmail()) ) {
+                if (patientDao.doesPatientExists(request.getEmail())) {
+                    throw new DuplicateResourceException(
+                            "email already registered"
+                    );
+                }
+                patient.setEmail(request.getEmail().trim());
+                changes = true;
             }
-            patient.setEmail(request.getEmail().trim());
-            changes = true;
         }
         if (request.getFirstname() != null && !request.getFirstname().equals(patient.getFirstname())) {
             patient.setFirstname(request.getFirstname().trim());
@@ -89,9 +108,14 @@ public class PatientService {
         }
 
         if (request.getLastname() != null && !request.getLastname().equals(patient.getLastname())) {
-            patient.setLastname(request.getLastname().trim());
+            patient.setLastname(request.getLastname());
             changes = true;
         }
+        if (request.getAge() != null && !request.getAge().equals(patient.getAge())) {
+            patient.setAge(request.getAge());
+            changes = true;
+        }
+
         if (!changes) {
             throw new UpdateException("no data changes found");
         }

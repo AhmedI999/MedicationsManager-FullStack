@@ -4,10 +4,18 @@ import {
     chakra,
 } from '@chakra-ui/react';
 import MoreDetailsPopover from "./MoreDetailsPopover.jsx";
-import DeleteMedicationConfrimation from "./shared/DeleteMedicationConfrimation.jsx";
+import DeleteMedicationConfirmation from "../medications/DeleteMedicationConfrimation.jsx";
 import EditMedicationDrawer from "./EditMedicationDrawer.jsx";
 
-const MedsCard = ( { pictureUrl, activeIngredient, brandName, id , instructions, medicineNumber, timesDaily, fetchMedications } ) => {
+const MedsCard = ( { pictureUrl,
+                       activeIngredient,
+                       brandName,
+                       id ,
+                       instructions,
+                       medicineNumber,
+                       timesDaily,
+                       fetchMedications,
+                       patientId } ) => {
     return (
         <Flex
             bg="#edf3f8"
@@ -92,6 +100,7 @@ const MedsCard = ( { pictureUrl, activeIngredient, brandName, id , instructions,
                                 instructions={instructions}
                                 medicineNumber={medicineNumber}
                                 timesDaily={timesDaily}
+                                patientId = {patientId}
                             />
                         </MoreDetailsPopover>
                         <EditMedicationDrawer
@@ -102,8 +111,9 @@ const MedsCard = ( { pictureUrl, activeIngredient, brandName, id , instructions,
                             instructions={instructions}
                             timesDaily={timesDaily}
                             fetchMedications={fetchMedications}
+                            patientId={patientId}
                         />
-                        <DeleteMedicationConfrimation
+                        <DeleteMedicationConfirmation
                             brandName={brandName}
                             id={id}
                             fetchMedications={fetchMedications}

@@ -6,25 +6,24 @@ import {
     PopoverHeader,
     PopoverBody,
     PopoverFooter,
-    chakra, Flex, List, ListItem, ListIcon, useDisclosure, Spinner, Text
+    chakra, List, ListItem, ListIcon, useDisclosure, Spinner, Text
 } from "@chakra-ui/react";
 import {MdOutlineMedication} from "react-icons/md";
 import {useEffect, useState} from "react";
-import {getMedicationInteractions} from "../services/client.js";
-import SideBarWithNavBar from "./shared/SideBarWithNavBar.jsx";
-import useMedicationInteractions from "../services/useMedicationInteractions.jsx";
-import InteractionForm from "./shared/InteractionForm.jsx";
-import DeleteMedicationInteractionConfirmation from "./shared/DeleteMedicationInteractionConfrimation.jsx";
+import SideBarWithNavBar from "../shared/SideBarWithNavBar.jsx";
+import useMedicationInteractions from "../../services/useMedicationInteractions.jsx";
+import InteractionForm from "../medicationinteractions/InteractionForm.jsx";
+import DeleteMedicationInteractionConfirmation from "../medicationinteractions/DeleteMedicationInteractionConfrimation.jsx";
 
 const MoreDetailsPopover = ({children}) => {
     const {
-        pictureUrl,
         activeIngredient,
         brandName,
         id,
         instructions,
         medicineNumber,
         timesDaily,
+        patientId
     } = children.props;
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { interactions, loading, refetchInteractions } = useMedicationInteractions(id);
@@ -58,9 +57,9 @@ const MoreDetailsPopover = ({children}) => {
             <PopoverTrigger>
                 <Button
                     align="center"
-                    px="4"
-                    pl="0"
-                    py="2"
+                    px="6"
+                    pl="7"
+                    py="4"
                     cursor="pointer"
                     color="inherit"
                     _dark={{
@@ -73,7 +72,7 @@ const MoreDetailsPopover = ({children}) => {
                         },
                         color: "blue.900",
                     }}
-                    ml="auto"
+                    ml={"auto"}
                     mx={16}
                 >
                     More Details
@@ -114,6 +113,7 @@ const MoreDetailsPopover = ({children}) => {
                                             {...interaction}
                                             medicationId={id}
                                             refetchInteractions={refetchInteractions}
+                                            patientId={patientId}
                                         />
                                     </ListItem>
                                 ))}
@@ -127,6 +127,7 @@ const MoreDetailsPopover = ({children}) => {
                     <InteractionForm
                         medicationId={id}
                         refetchInteractions={refetchInteractions}
+                        patientId={patientId}
                     />
                 </PopoverBody>
                 <PopoverFooter>

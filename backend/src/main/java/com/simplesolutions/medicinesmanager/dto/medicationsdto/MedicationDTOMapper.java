@@ -13,7 +13,8 @@ public class MedicationDTOMapper implements Function<Medication, MedicationRespo
 
     @Override
     public MedicationResponseDTO apply(Medication medication) {
-        return new MedicationResponseDTO (
+        return new MedicationResponseDTO(
+                medication.getId(),
                 medication.getMedicineNumber(),
                 medication.getPictureUrl(),
                 medication.getBrandName(),

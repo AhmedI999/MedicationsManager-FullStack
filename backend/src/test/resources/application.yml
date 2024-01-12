@@ -23,6 +23,9 @@ spring:
     user: ahmed
     password: ahmedroot
 
+jwt:
+  token-expiration: 1
+
 cors:
   allowed-origins: "*"
   allowed-methods: "*"

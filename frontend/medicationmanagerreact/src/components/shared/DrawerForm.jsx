@@ -8,11 +8,11 @@ import {
     DrawerOverlay,
     Flex, useDisclosure
 } from "@chakra-ui/react";
-import AddMedicationForm from "./AddMedicationForm.jsx";
+import AddMedicationForm from "../medications/AddMedicationForm.jsx";
 
 
 
-const DrawerForm = ({medications, fetchMedications}) =>{
+const DrawerForm = ({medications, fetchMedications, patientId}) =>{
     const { isOpen, onOpen, onClose } = useDisclosure()
     return <>
         <Drawer isOpen={isOpen} onClose={onClose} placement={"left"} size={"xl"}>
@@ -21,7 +21,7 @@ const DrawerForm = ({medications, fetchMedications}) =>{
                 <DrawerCloseButton />
                 <DrawerHeader>Add a New Medication</DrawerHeader>
                 <DrawerBody>
-                    <AddMedicationForm medications={medications} fetchMedications={fetchMedications}/>
+                    <AddMedicationForm medications={medications} fetchMedications={fetchMedications} patientId={patientId}/>
                 </DrawerBody>
                 <DrawerFooter>
                     <Button onClick={onClose}>

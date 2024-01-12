@@ -1,8 +1,6 @@
 package com.simplesolutions.medicinesmanager.dto.patientdto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +17,7 @@ public class PatientRegistrationRequest {
             message = "Password should contain at least 1 uppercase and 1 special Character")
     @Size(min = 6, message = "Password Must be at least 6 characters")
     final String password;
+    @Pattern(regexp = "^.+$", message = "Field can't be empty")
     final String firstname;
     final String lastname;
     final int age;
