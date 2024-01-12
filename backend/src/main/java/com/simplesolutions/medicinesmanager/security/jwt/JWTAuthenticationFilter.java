@@ -1,6 +1,7 @@
 package com.simplesolutions.medicinesmanager.security.jwt;
 
 import com.simplesolutions.medicinesmanager.model.PatientUserDetailsService;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

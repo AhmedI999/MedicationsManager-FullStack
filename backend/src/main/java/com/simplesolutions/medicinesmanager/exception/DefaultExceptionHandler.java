@@ -1,5 +1,6 @@
 package com.simplesolutions.medicinesmanager.exception;
 
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
-    // todo some exceptions not tested yet
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleException(ResourceNotFoundException e,
                                                     HttpServletRequest request){
@@ -33,7 +34,6 @@ public class DefaultExceptionHandler {
                 LocalDateTime.now());
         return new ResponseEntity<>(apiError, HttpStatus.CONFLICT);
     }
-
     @ExceptionHandler(InsufficientAuthenticationException.class)
     public ResponseEntity<ApiError> handleException(InsufficientAuthenticationException e,
                                                     HttpServletRequest request){
@@ -43,16 +43,6 @@ public class DefaultExceptionHandler {
                 HttpStatus.FORBIDDEN.value(),
                 LocalDateTime.now());
         return new ResponseEntity<>(apiError, HttpStatus.FORBIDDEN);
-    }
-    @ExceptionHandler(UpdateException.class)
-    public ResponseEntity<ApiError> handleException(UpdateException e,
-                                                    HttpServletRequest request){
-        ApiError apiError = new ApiError (
-                request.getRequestURI(),
-                e.getMessage(),
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now());
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -65,9 +55,17 @@ public class DefaultExceptionHandler {
                 LocalDateTime.now());
         return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
     }
-
-    // todo THIS HANDLER IS HERE JUST TO CATCH ANY EXCEPTION AND AFTER THAT WE IDENTIFY THE TYPE OF
-    // todo EXCEPTION AND CUSTOMIZE IT
+    @ExceptionHandler(UpdateException.class)
+    public ResponseEntity<ApiError> handleException(UpdateException e,
+                                                    HttpServletRequest request){
+        ApiError apiError = new ApiError (
+                request.getRequestURI(),
+                e.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now());
+        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+    // THIS HANDLER IS HERE JUST TO CATCH ANY REMAINING EXCEPTIONS
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleException(Exception e,
                                                     HttpServletRequest request){

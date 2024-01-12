@@ -21,7 +21,7 @@ import {
 } from '@chakra-ui/react';
 import {saveMedicationInteraction} from "../../services/client.js";
 import {errorNotification, successNotification} from "../../services/Notifications.js";
-const InteractionForm = ({ medicationId, refetchInteractions }) => {
+const InteractionForm = ({ medicationId, refetchInteractions, patientId }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
         <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose}>
@@ -30,7 +30,7 @@ const InteractionForm = ({ medicationId, refetchInteractions }) => {
             </PopoverTrigger>
 
             <PopoverContent>
-                <PopoverHeader>Interaction Form</PopoverHeader>
+                <PopoverHeader>Add Interaction</PopoverHeader>
                 <PopoverBody>
                     <Formik
                         initialValues={{
@@ -46,7 +46,7 @@ const InteractionForm = ({ medicationId, refetchInteractions }) => {
 
                             saveMedicationInteraction(
                                 { ...interaction, severity: interaction.type },
-                                1,
+                                patientId,
                                 medicationId
                             )
                                 .then( () => {

@@ -2,13 +2,12 @@ package com.simplesolutions.medicinesmanager.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +18,8 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @Service
 public class JWTUtil {
     private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
-    private static final Integer DAYS_UNTIL_TOKEN_EXPIRATION = 2;
+    @Value("#{'${jwt.token-expiration}'}")
+    private Integer DAYS_UNTIL_TOKEN_EXPIRATION;
 
     public String issueToken(
             String subject,

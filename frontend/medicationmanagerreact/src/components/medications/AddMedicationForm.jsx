@@ -2,13 +2,15 @@ import {Formik, Form, useField} from 'formik';
 import * as Yup from 'yup';
 import {
     Input,
+    Checkbox,
     Button,
     FormControl,
     FormLabel,
     FormErrorMessage, Stack
 } from '@chakra-ui/react';
-import {editMedication} from "../services/client.js";
-import {errorNotification, successNotification} from "../services/Notifications.js";
+import ApplicationTermsAndConditions from "../shared/ApplicationTermsAndConditions.jsx";
+import {saveMedication} from "../../services/client.js";
+import {errorNotification, successNotification} from "../../services/Notifications.js";
 
 const TextInput = ({ label, ...props }) => {
     const [field, meta] = useField(props);
@@ -21,22 +23,28 @@ const TextInput = ({ label, ...props }) => {
     );
 };
 
-const EditMedicationForm = ( {   pictureUrl,
-                                activeIngredient,
-                                brandName,
-                                id ,
-                                instructions,
-                                timesDaily,
-                                fetchMedications } ) => {
+const CheckboxInput = ({ children, ...props }) => {
+    const [field, meta] = useField({ ...props, type: 'checkbox' });
+    return (
+        <FormControl isInvalid={meta.touched && meta.error}>
+            <Checkbox {...field} {...props}>
+                {children}
+            </Checkbox>
+            <FormErrorMessage>{meta.error}</FormErrorMessage>
+        </FormControl>
+    );
+};
+
+const AddMedicationForm = ({ fetchMedications, patientId}) => {
     return (
         <>
             <Formik
                 initialValues={{
-                    pictureUrl: `${pictureUrl}`,
-                    brandName: `${brandName}`,
-                    activeIngredient: `${activeIngredient}`,
-                    timesDaily: `${timesDaily}`,
-                    instructions: `${instructions}`,
+                    pictureUrl: 'https://i.imgur.com/qMA0qhd.png',
+                    brandName: '',
+                    activeIngredient: '',
+                    timesDaily: 0,
+                    instructions: '',
                 }}
                 validationSchema={Yup.object({
                     pictureUrl: Yup.string()
@@ -53,19 +61,23 @@ const EditMedicationForm = ( {   pictureUrl,
                     instructions: Yup.string()
                         .trim()
                         .required('For safety reasons, instructions are required'),
+                    acceptedTerms: Yup.boolean()
+                        .required("You have to Accept the terms")
                 })}
-                onSubmit={(medication, { setSubmitting}) => {
+                validateOnMount={true}
+                onSubmit={(medicine, { setSubmitting }) => {
                     setSubmitting(true);
-                    editMedication(1, id, medication)
+                    saveMedication(medicine, patientId)
                         .then( () => {
+                            fetchMedications();
                             successNotification(
-                                `Editing ${brandName} Information`,
-                                `${brandName} Details have been updated successfully`
+                                `Adding New Medication`,
+                                `${medicine.brandName} Has been saved successfully`
                             )
                         }).catch( err => {
                         errorNotification(
-                            `Editing ${brandName} Information`,
-                            `Couldn't Edit ${brandName}. Error ${err.code}: ${err.response.data.message}`
+                            `Adding New Medication`,
+                            `Couldn't Add ${medicine.brandName}. Error ${err.code}: ${err.response.data.message}`
                         )
                     }).finally( ()=> {
                         fetchMedications();
@@ -73,7 +85,7 @@ const EditMedicationForm = ( {   pictureUrl,
                     })
                 }}
             >
-                {({ isValid , isSubmitting, dirty}) => (
+                {({ isValid , isSubmitting}) => (
                     <Form>
                         <Stack spacing="15px">
                             <TextInput label="Picture Url" name="pictureUrl" type="text" placeholder="https://i.imgur.com/qMA0qhd.png" />
@@ -81,7 +93,9 @@ const EditMedicationForm = ( {   pictureUrl,
                             <TextInput label="Active ingredient" name="activeIngredient" type="text" placeholder="Nebivolol" />
                             <TextInput label="Times daily" name="timesDaily" type="number" placeholder="1" />
                             <TextInput label="Instructions" name="instructions" type="text" placeholder="Take In the morning" />
-                            <Button isDisabled={ !(isValid && dirty) || isSubmitting } type="submit" mt={1}>Submit</Button>
+                            <CheckboxInput name="acceptedTerms" >I accept the terms and conditions</CheckboxInput>
+                            <ApplicationTermsAndConditions/>
+                            <Button isDisabled={ !isValid || isSubmitting } type="submit" mt={1}>Submit</Button>
                         </Stack>
                     </Form>
                 )}
@@ -90,4 +104,4 @@ const EditMedicationForm = ( {   pictureUrl,
     );
 };
 
-export default EditMedicationForm;
+export default AddMedicationForm;

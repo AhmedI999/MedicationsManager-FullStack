@@ -10,7 +10,7 @@ import {
     Image,
     Input,
     InputGroup,
-    InputLeftElement,
+    InputLeftElement, Spinner,
     Text,
     useColorModeValue,
     useDisclosure,
@@ -18,26 +18,20 @@ import {
 } from '@chakra-ui/react';
 
 import {FiMenu, FiSearch} from 'react-icons/fi';
-import {FaBell} from 'react-icons/fa'
 import {MdHome, MdKeyboardArrowRight, MdMedication} from 'react-icons/md'
-import {BsGearFill} from 'react-icons/bs'
-import DrawerForm from "../DrawerForm.jsx";
+import DrawerForm from "../shared/DrawerForm.jsx";
 import {CgAdd} from "react-icons/cg";
-import {useState} from "react";
-import MedsCard from "../MedsCard.jsx";
+import {useEffect, useState} from "react";
+import MedsCard from "../medications/MedsCard.jsx";
+import NavBarUserOptions from "./NavBarUserOptions.jsx";
 
 
-const SideBarWithNavBar = ({medications, fetchMedications}) => {
-    // const { medications,  fetchMedications} = useMedications(1);
+
+const SideBarWithNavBar = ({medications, fetchMedications, patientId}) => {
     const sidebar = useDisclosure();
-    const integrations = useDisclosure();
+    const medicationList = useDisclosure();
     const color = useColorModeValue("gray.600", "gray.300");
-    const [bellColor, setBellColor] = useState('grey')
-    const handleBellClick = () => {
-        // Toggle between two colors
-        const newColor = bellColor === 'grey' ? 'green' : 'grey';
-        setBellColor(newColor);
-    };
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const handleSearchChange = (event) => {
         const capitalize = (str) => {
@@ -47,6 +41,31 @@ const SideBarWithNavBar = ({medications, fetchMedications}) => {
         const newSearchTerm = event.target.value;
         setSearchTerm(capitalize(newSearchTerm));
     };
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1200);
+
+        return () => clearTimeout(timer);
+    }, []); // Empty dependency array to run the effect only once
+    const LoadSpinner = () => {
+        if (loading) {
+            return (
+                <Spinner
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                />
+            )
+        } else {
+            return (
+                <Text>No Medication Available. Add new medications</Text>
+                )
+        }
+    };
+
     const NavItem = (props) => {
         const {icon, children, ...rest} = props;
         return (
@@ -87,76 +106,78 @@ const SideBarWithNavBar = ({medications, fetchMedications}) => {
         );
     };
 
-    const SidebarContent = (props) => (
-        <Box
-            as="nav"
-            pos="fixed"
-            top="0"
-            left="0"
-            zIndex="sticky"
-            h="full"
-            pb="10"
-            overflowX="hidden"
-            overflowY="auto"
-            bg="white"
-            _dark={{
-                bg: "gray.800",
-            }}
-            border
-            color="inherit"
-            borderRightWidth="1px"
-            w="60"
-            {...props}
-        >
-            <Flex px="4" py="5" align="center">
-                <Text
-                    fontSize="xl"
-                    ml="2"
-                    color="brand.500"
-                    _dark={{
-                        color: "white",
-                    }}
-                    fontWeight="semibold"
-                >
-                    Medication Manager
-                </Text>
-                <Image
-                    borderRadius='full'
-                    boxSize='80px'
-                    src='https://i.imgur.com/2a6BAUx.jpg'
-                    alt='Stock Med image Pixaby'
-                />
-            </Flex>
-            <Flex
-                direction="column"
+    const SidebarContent = (props) => {
+        return (
+            <Box
                 as="nav"
-                fontSize="sm"
-                color="gray.600"
-                aria-label="Main Navigation"
+                pos="fixed"
+                top="0"
+                left="0"
+                zIndex="sticky"
+                h="full"
+                pb="10"
+                overflowX="hidden"
+                overflowY="auto"
+                bg="white"
+                _dark={{
+                    bg: "gray.800",
+                }}
+                border
+                color="inherit"
+                borderRightWidth="1px"
+                w="60"
+                {...props}
             >
-                <NavItem icon={MdHome}>Home</NavItem>
-                <NavItem icon={MdMedication} onClick={integrations.onToggle}>
-                    Medications
-                    <Icon
-                        as={MdKeyboardArrowRight}
-                        ml="auto"
-                        transform={integrations.isOpen && "rotate(90deg)"}
+                <Flex px="4" py="5" align="center">
+                    <Text
+                        fontSize="xl"
+                        ml="2"
+                        color="brand.500"
+                        _dark={{
+                            color: "white",
+                        }}
+                        fontWeight="semibold"
+                    >
+                        Medication Manager
+                    </Text>
+                    <Image
+                        borderRadius='full'
+                        boxSize='80px'
+                        src='https://i.imgur.com/2a6BAUx.jpg'
+                        alt='Stock Med image Pixaby'
                     />
-                </NavItem>
-                <Collapse in={integrations.isOpen}>
-                    {fetchMedications && medications.map((medication, index) => (
-                        <NavItem key={index} pl="12" py="2">
-                            {medication.brandName}
-                        </NavItem>
-                    ))}
-                </Collapse>
-                <NavItem icon={CgAdd}>
-                    <DrawerForm medications={medications} fetchMedications={fetchMedications}/>
-                </NavItem>
-                <NavItem icon={BsGearFill}>Settings</NavItem>
-            </Flex>
-        </Box>
-    );
+                </Flex>
+                <Flex
+                    direction="column"
+                    as="nav"
+                    fontSize="sm"
+                    color="gray.600"
+                    aria-label="Main Navigation"
+                >
+                    <NavItem icon={MdHome}>Home</NavItem>
+                    <NavItem icon={MdMedication} onClick={medicationList.onToggle}>
+                        Medications
+                        <Icon
+                            as={MdKeyboardArrowRight}
+                            ml="auto"
+                            transform={medicationList.isOpen && "rotate(90deg)"}
+                        />
+                    </NavItem>
+                    <Collapse in={medicationList.isOpen}>
+                        {fetchMedications && medications.map((medication, index) => (
+                            <NavItem key={index} pl="12" py="2">
+                                {medication.brandName}
+                            </NavItem>
+                        ))}
+                    </Collapse>
+                    <NavItem icon={CgAdd}>
+                        <DrawerForm medications={medications} fetchMedications={fetchMedications}
+                                    patientId={patientId}/>
+                    </NavItem>
+                </Flex>
+            </Box>
+        );
+    }
 
     return (
         <Box
@@ -224,15 +245,9 @@ const SideBarWithNavBar = ({medications, fetchMedications}) => {
                         <InputLeftElement color="gray.500">
                             <FiSearch/>
                         </InputLeftElement>
-                        <Input name="search" placeholder="Search for Medications..." onChange={handleSearchChange}/>
+                        <Input name="medicationSearch" placeholder="Search for Medications..." onChange={handleSearchChange}/>
                     </InputGroup>
-
-                    <Flex onClick={() => {
-                        handleBellClick()
-                        alert("Notification On!")
-                    }}>
-                        <Icon as={FaBell} cursor="pointer" boxSize={6} color={bellColor}/>
-                    </Flex>
+                    <NavBarUserOptions/>
                 </Flex>
                 <Box as="main" p="5">
                     { fetchMedications && medications.length > 0 ? (
@@ -240,13 +255,15 @@ const SideBarWithNavBar = ({medications, fetchMedications}) => {
                             {searchTerm.length === 0 ? (
                                 medications.map((medication, index) => (
                                     <WrapItem key={index}>
-                                        <MedsCard {...medication} fetchMedications={fetchMedications}/>
+                                        <MedsCard {...medication}
+                                                  fetchMedications={fetchMedications}
+                                                  patientId={patientId}/>
                                     </WrapItem>
                                 ))
                             ) : (
-                                medications && medications.some(med => med.brandName === searchTerm) ? (
+                                medications && medications.some(med => med.brandName.startsWith(searchTerm)) ? (
                                     medications
-                                        .filter(filteredMed => filteredMed.brandName === searchTerm)
+                                        .filter(filteredMed => filteredMed.brandName.startsWith(searchTerm))
                                         .map((filteredMedication, index) => (
                                             <WrapItem key={index}>
                                                 <MedsCard {...filteredMedication} fetchMedications={fetchMedications}/>
@@ -258,7 +275,7 @@ const SideBarWithNavBar = ({medications, fetchMedications}) => {
                             )}
                         </Wrap>
                     ) : (
-                        <Text>No Medication Available. Add new medications</Text>
+                        <LoadSpinner />
                     )}
                 </Box>
             </Box>

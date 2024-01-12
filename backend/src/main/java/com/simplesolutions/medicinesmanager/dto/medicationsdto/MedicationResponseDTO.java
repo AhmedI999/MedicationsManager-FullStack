@@ -15,6 +15,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MedicationResponseDTO {
+    final Integer id;
     final Integer medicineNumber;
     final String pictureUrl;
     final String brandName;

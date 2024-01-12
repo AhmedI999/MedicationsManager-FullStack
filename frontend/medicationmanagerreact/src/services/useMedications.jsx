@@ -8,8 +8,7 @@ const useMedications = (patientId) => {
     const [medications, setMedications] = useState([]);
     const [loading, setLoading] = useState(false);
     const [err, setError] = useState("");
-
-    const fetchMedications = useCallback(() => {
+    const fetchMedications =  useCallback(() => {
         setLoading(true);
         getPatientMedications(patientId)
             .then((res) => {

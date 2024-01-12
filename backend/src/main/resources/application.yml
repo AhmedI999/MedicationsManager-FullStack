@@ -23,8 +23,11 @@ spring:
     user: ahmed
     password: ahmedroot
 
+jwt:
+  token-expiration: 1
+
 cors:
-  allowed-origins: "*"
+  allowed-origins: "http://localhost:5173"
   allowed-methods: "*"
   allowed-headers: "*"
   exposed-headers: "*"

@@ -11,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -24,9 +26,14 @@ public class PatientsController {
     public List<PatientResponseDTO> getAllPatients() {
         return patientService.getAllPatients();
     }
-    @GetMapping("{patientId}")
+    @GetMapping("id/{patientId}")
     public PatientResponseDTO getPatient(@PathVariable("patientId") Integer id) {
         return patientService.getPatientById(id);
+    }
+    @GetMapping("{email}")
+    public PatientResponseDTO getPatientByEmail(@PathVariable("email") String encodedEmail) {
+        String email = URLDecoder.decode(encodedEmail, StandardCharsets.UTF_8);
+        return patientService.getPatientByEmail(email);
     }
 
     @PostMapping
@@ -49,6 +56,12 @@ public class PatientsController {
                                                               @RequestBody @Valid PatientUpdateRequest request){
         patientService.editPatientDetails(patientId, request);
         return ResponseEntity.ok(patientService.getPatientById(patientId));
+    }
+    @PutMapping("/{patientId}/change-password")
+    public ResponseEntity<String> changePatientPassword (@PathVariable("patientId") Integer patientId,
+                                         @RequestBody @Valid PatientUpdateRequest request) {
+        patientService.editPatientPassword(patientId, request);
+        return ResponseEntity.ok("Password Changed Successfully");
     }
 
 }

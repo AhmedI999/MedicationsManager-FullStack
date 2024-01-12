@@ -5,7 +5,7 @@ import {
     DrawerCloseButton,
     DrawerContent,
     DrawerHeader,
-    DrawerOverlay, Flex, useDisclosure
+    DrawerOverlay, useDisclosure
 } from "@chakra-ui/react";
 
 const ApplicationTermsAndConditions = () => {

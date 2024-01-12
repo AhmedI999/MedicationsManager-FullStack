@@ -18,7 +18,8 @@ const EditMedicationDrawer = (
         instructions,
         medicineNumber,
         timesDaily,
-        fetchMedications } ) => {
+        fetchMedications,
+        patientId} ) => {
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     return <>
@@ -37,6 +38,7 @@ const EditMedicationDrawer = (
                         medicineNumber={medicineNumber}
                         timesDaily={timesDaily}
                         fetchMedications={fetchMedications}
+                        patientId={patientId}
                     />
                 </DrawerBody>
 

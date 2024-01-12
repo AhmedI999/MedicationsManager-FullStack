@@ -13,14 +13,13 @@ import { CloseIcon } from '@chakra-ui/icons';
 import { Circle } from '@chakra-ui/react';
 
 
-// eslint-disable-next-line react/prop-types
-function DeleteMedicationInteractionConfirmation( { medicationId, name, refetchInteractions } ) {
+function DeleteMedicationInteractionConfirmation( { medicationId, name, refetchInteractions, patientId } ) {
 
     const {isOpen, onOpen, onClose} = useDisclosure();
     const cancelRef = React.useRef();
 
     const handleDeleteInteraction = () => {
-        deleteMedicationInteraction(1, medicationId, name).then( () => successNotification(
+        deleteMedicationInteraction(patientId, medicationId, name).then( () => successNotification(
             `Delete Interaction ${name}`, `${name} has been deleted successfully`
         )).catch(err => {
             errorNotification(`Delete Interaction ${name}`,
