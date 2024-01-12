@@ -7,7 +7,6 @@ import {getPatientByEmail as getUser} from "../../services/client.js";
 import {encryptData} from "../../services/JwtEncryptionUtil.jsx";
 import {errorNotification, successNotification} from "../../services/Notifications.js";
 import {deleteCookie, getCookie, setCookie} from "../../services/cookieUtils.js";
-import {useNavigate} from "react-router-dom";
 
 
 const AuthContext = createContext({});
