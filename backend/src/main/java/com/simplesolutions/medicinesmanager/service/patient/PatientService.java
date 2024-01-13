@@ -62,7 +62,6 @@ public class PatientService {
                     .age(request.getAge())
                     .build();
             patientDao.savePatient(patient);
-
     }
     public void deletePatient(Integer id){
         Patient patient = patientDao.selectPatientById(id).orElseThrow(() ->

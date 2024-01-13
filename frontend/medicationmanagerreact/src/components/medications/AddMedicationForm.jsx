@@ -2,13 +2,11 @@ import {Formik, Form, useField} from 'formik';
 import * as Yup from 'yup';
 import {
     Input,
-    Checkbox,
     Button,
     FormControl,
     FormLabel,
     FormErrorMessage, Stack
 } from '@chakra-ui/react';
-import ApplicationTermsAndConditions from "../shared/ApplicationTermsAndConditions.jsx";
 import {saveMedication} from "../../services/client.js";
 import {errorNotification, successNotification} from "../../services/Notifications.js";
 
@@ -18,18 +16,6 @@ const TextInput = ({ label, ...props }) => {
         <FormControl isInvalid={meta.touched && meta.error}>
             <FormLabel htmlFor={props.id || props.name}>{label}</FormLabel>
             <Input {...field} {...props} />
-            <FormErrorMessage>{meta.error}</FormErrorMessage>
-        </FormControl>
-    );
-};
-
-const CheckboxInput = ({ children, ...props }) => {
-    const [field, meta] = useField({ ...props, type: 'checkbox' });
-    return (
-        <FormControl isInvalid={meta.touched && meta.error}>
-            <Checkbox {...field} {...props}>
-                {children}
-            </Checkbox>
             <FormErrorMessage>{meta.error}</FormErrorMessage>
         </FormControl>
     );
@@ -61,8 +47,6 @@ const AddMedicationForm = ({ fetchMedications, patientId}) => {
                     instructions: Yup.string()
                         .trim()
                         .required('For safety reasons, instructions are required'),
-                    acceptedTerms: Yup.boolean()
-                        .required("You have to Accept the terms")
                 })}
                 validateOnMount={true}
                 onSubmit={(medicine, { setSubmitting }) => {
@@ -93,8 +77,6 @@ const AddMedicationForm = ({ fetchMedications, patientId}) => {
                             <TextInput label="Active ingredient" name="activeIngredient" type="text" placeholder="Nebivolol" />
                             <TextInput label="Times daily" name="timesDaily" type="number" placeholder="1" />
                             <TextInput label="Instructions" name="instructions" type="text" placeholder="Take In the morning" />
-                            <CheckboxInput name="acceptedTerms" >I accept the terms and conditions</CheckboxInput>
-                            <ApplicationTermsAndConditions/>
                             <Button isDisabled={ !isValid || isSubmitting } type="submit" mt={1}>Submit</Button>
                         </Stack>
                     </Form>

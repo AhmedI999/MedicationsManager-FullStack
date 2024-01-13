@@ -17,7 +17,7 @@ public class PatientRegistrationRequest {
             message = "Password should contain at least 1 uppercase and 1 special Character")
     @Size(min = 6, message = "Password Must be at least 6 characters")
     final String password;
-    @Pattern(regexp = "^.+$", message = "Field can't be empty")
+    @NotBlank(message = "Field is Required")
     final String firstname;
     final String lastname;
     final int age;

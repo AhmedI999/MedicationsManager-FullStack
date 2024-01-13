@@ -8,6 +8,7 @@ import Login from "./components/login/Login.jsx";
 import AuthProvider from "./components/context/AuthContext.jsx";
 import ProtectedRoute from "./components/shared/ProtectedRoute.jsx";
 import NotFoundPage from "./components/shared/NotFoundPage.jsx";
+import CreateAccount from "./components/login/CreateAccount.jsx";
 
 const {ToastContainer} = createStandaloneToast()
 const router = createBrowserRouter( [
@@ -20,8 +21,12 @@ const router = createBrowserRouter( [
         element: <ProtectedRoute><App/></ProtectedRoute>
     },
     {
+      path: "/create-account",
+      element: <CreateAccount />
+    },
+    {
       path: "*",
-      element: <NotFoundPage />
+      element: <ProtectedRoute><NotFoundPage /></ProtectedRoute>
     },
 
     ])

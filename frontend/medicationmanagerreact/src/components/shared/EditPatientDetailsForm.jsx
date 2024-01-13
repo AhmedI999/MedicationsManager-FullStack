@@ -1,9 +1,10 @@
-    import {Button, Divider, FormControl, FormErrorMessage, FormLabel, Input, Stack} from "@chakra-ui/react";
+    import {Button, Divider, FormControl, FormErrorMessage, FormLabel, Input, Stack, Text} from "@chakra-ui/react";
     import * as Yup from "yup";
     import {editPatient} from "../../services/client.js";
     import {errorNotification, successNotification} from "../../services/Notifications.js";
     import {useNavigate} from "react-router-dom";
     import {Field, Form, Formik} from "formik";
+    import CloseAccount from "./CloseAccount.jsx";
 
 
     const TextInput = ({label, name, type}) => (
@@ -24,7 +25,6 @@
     );
 
     const EditPatientDetailsForm = ({patientData, refresh, close, logout}) => {
-        const navigate = useNavigate();
         const {
             id,
             email,
@@ -53,7 +53,7 @@
                         .trim()
                         .required("Last name can't be empty"),
                     age: Yup.number()
-                        .min(1),
+                        .max(110, "Age must be a Valid number"),
                 })}
                 onSubmit={(patient, {setSubmitting}) => {
                     setSubmitting(true);
@@ -97,6 +97,8 @@
                             <Button isDisabled={isValid && !dirty || isSubmitting} type="submit" mt={1}>
                                 Submit
                             </Button>
+                            <Divider/>
+                            <CloseAccount />
                         </Stack>
                     </Form>
                 )}
@@ -105,9 +107,3 @@
     };
 
     export default EditPatientDetailsForm;
-    // currentPassword: Yup.string()
-    //     .trim(),
-    //     password: Yup.string()
-    //     .trim()
-    //     .optional()
-    //     .matches("/^(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).*$/", "Password must contain at least 1 Uppercase character and 1 special character"),

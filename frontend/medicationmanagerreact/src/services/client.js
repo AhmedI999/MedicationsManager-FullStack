@@ -54,7 +54,28 @@ export const editPatientPassword = async (patientId, Password) => {
         throw error;
     }
 }
-
+export const savePatient = async (patient) => {
+    try {
+        return await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients`,
+            patient
+        )
+    } catch ( error ){
+        errorNotification("Creating account", 'Error Creating account. Contact Admin')
+        console.error(error); // for now. remember to remove
+        throw error;
+    }
+}
+export const deletePatient = async (patientId) => {
+    try {
+        const token = await getToken();
+        return await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+    } catch ( error ){
+        errorNotification("Changing Password", `Error Changing User Password ${error.code}: ${error.response.data.message}`)
+        throw error;
+    }
+}
 
 export const getPatientMedications= async (patientId) => {
     try {
