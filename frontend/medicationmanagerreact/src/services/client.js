@@ -60,9 +60,16 @@ export const savePatient = async (patient) => {
             patient
         )
     } catch ( error ){
-        errorNotification("Creating account", 'Error Creating account. Contact Admin')
-        console.error(error); // for now. remember to remove
-        throw error;
+        const message = error.response.data.message;
+
+        if (message && message.includes("already exists")){
+            errorNotification("Creating account", 'Error Creating account:\n' +
+                `${message.replace("Patient with ", "")}`)
+            throw error;
+        } else {
+            errorNotification("Creating account", 'Error Creating account: Contact Admin')
+            throw error;
+        }
     }
 }
 export const deletePatient = async (patientId) => {
