@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 import {useAuth} from "../context/AuthContext.jsx";
 import {errorNotification} from "../../services/Notifications.js";
 import {useNavigate} from "react-router-dom";
-import {isCookieValid, setCookie} from "../../services/cookieUtils.js";
+import {isCookieValid, setCookie} from "../../services/jwt/cookieUtils.js";
 import {useEffect} from "react";
 
 const MyTextInput = ({label, ...props}) => {

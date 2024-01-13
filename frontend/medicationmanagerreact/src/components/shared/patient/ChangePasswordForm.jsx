@@ -5,10 +5,9 @@ import {
 
 } from "@chakra-ui/react";
 import { Form, Formik, useField} from "formik";
-import {useNavigate} from "react-router-dom";
 import * as Yup from "yup";
-import {editPatientPassword} from "../../services/client.js";
-import {errorNotification, successNotification} from "../../services/Notifications.js";
+import {editPatientPassword} from "../../../services/client.js";
+import {errorNotification, successNotification} from "../../../services/Notifications.js";
 const TextInput = ({ label, ...props }) => {
     const [field, meta] = useField(props);
     return (
@@ -20,8 +19,6 @@ const TextInput = ({ label, ...props }) => {
     );
 };
 const ChangePasswordForm = ({id, logout}) => {
-    const navigate = useNavigate();
-
         return (
             <Formik
                 initialValues={{

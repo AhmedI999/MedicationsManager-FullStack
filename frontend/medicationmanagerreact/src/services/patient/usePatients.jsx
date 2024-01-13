@@ -1,8 +1,8 @@
 import {useState, useEffect, useCallback} from 'react';
 import {getPatientId} from "./usePatientId.js";
-import {getPatientById} from "./client.js";
-import {errorNotification} from "./Notifications.js";
 import {Spinner} from "@chakra-ui/react";
+import {getPatientById} from "../client.js";
+import {errorNotification} from "../Notifications.js";
 
 const usePatient = () => {
     const [loading, setLoading] = useState(true);

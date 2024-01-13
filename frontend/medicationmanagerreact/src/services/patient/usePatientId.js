@@ -1,6 +1,7 @@
-import {getCookie} from "./cookieUtils.js";
-import {errorNotification} from "./Notifications.js";
-import {getPatientById} from "./client.js";
+import {getCookie} from "../jwt/cookieUtils.js";
+import {errorNotification} from "../Notifications.js";
+import {getPatientById} from "../client.js";
+
 
 export const getPatientId = () => {
     const patientId = getCookie('i');

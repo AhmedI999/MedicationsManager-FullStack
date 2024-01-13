@@ -12,7 +12,7 @@ import * as Yup from 'yup';
 import {successNotification} from "../../services/Notifications.js";
 import {useNavigate} from "react-router-dom";
 import {savePatient} from "../../services/client.js";
-import ApplicationTermsAndConditions from "../shared/ApplicationTermsAndConditions.jsx";
+import ApplicationTermsAndConditions from "../shared/utils/ApplicationTermsAndConditions.jsx";
 
 const MyTextInput = ({label, ...props}) => {
     const [field, meta] = useField(props);

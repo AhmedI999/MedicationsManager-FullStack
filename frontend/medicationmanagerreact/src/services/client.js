@@ -1,7 +1,8 @@
 import {errorNotification} from "./Notifications.js";
 import axios from "axios";
-import {getCookie} from "./cookieUtils.js";
-import {decryptData} from "./JwtEncryptionUtil.jsx";
+import {getCookie} from "./jwt/cookieUtils.js";
+import {decryptData} from "./jwt/JwtEncryptionUtil.jsx";
+
 
 const getToken = async () => {
     const secret = "@nEh;=uPkZt&Xvd(5№6'Ek>M~Rbv~%>j"

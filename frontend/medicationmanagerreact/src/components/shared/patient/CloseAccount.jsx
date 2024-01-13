@@ -7,11 +7,11 @@ import {
     useDisclosure
 } from "@chakra-ui/react";
 import React from "react";
-import {deletePatient} from "../../services/client.js";
-import {errorNotification, successNotification} from "../../services/Notifications.js";
-import {getPatientId} from "../../services/usePatientId.js";
 import {useNavigate} from "react-router-dom";
-import {deleteCookie} from "../../services/cookieUtils.js";
+import {deletePatient} from "../../../services/client.js";
+import {getPatientId} from "../../../services/patient/usePatientId.js";
+import {errorNotification, successNotification} from "../../../services/Notifications.js";
+import {deleteCookie} from "../../../services/jwt/cookieUtils.js";
 
 function CloseAccount() {
 

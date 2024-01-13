@@ -9,7 +9,7 @@ import {
 import React from "react";
 import {deleteMedication} from "../../services/client.js";
 import {errorNotification, successNotification} from "../../services/Notifications.js";
-import {getPatientId} from "../../services/usePatientId.js";
+import {getPatientId} from "../../services/patient/usePatientId.js";
 
 function DeleteMedicationConfirmation({brandName, id, fetchMedications}) {
 

@@ -1,5 +1,5 @@
 import ErrorPage from "./ErrorPage.jsx";
-import {isCookieValid} from "../../services/cookieUtils.js";
+import {isCookieValid} from "../../services/jwt/cookieUtils.js";
 
 const isUserAuthenticated = () => {
     return isCookieValid('jwt');

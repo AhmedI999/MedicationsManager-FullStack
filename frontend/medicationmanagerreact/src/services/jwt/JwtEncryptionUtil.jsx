@@ -51,8 +51,7 @@ export const encryptData = async (secretData, password) => {
         buff.set(salt, 0);
         buff.set(iv, salt.byteLength);
         buff.set(encryptedContentArr, salt.byteLength + iv.byteLength);
-        const base64Buff = buff_to_base64(buff);
-        return base64Buff;
+        return buff_to_base64(buff);
     } catch (e) {
         console.log(`Error - ${e}`);
         return "";

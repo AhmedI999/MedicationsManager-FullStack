@@ -1,8 +1,8 @@
 import {useCallback, useEffect, useState} from "react";
-import {getPatientMedications} from "./client.js";
-import {errorNotification} from "./Notifications.js";
-import SideBarWithNavBar from "../components/shared/SideBarWithNavBar.jsx";
 import {Box, Spinner, Text} from "@chakra-ui/react";
+import {getPatientMedications} from "../client.js";
+import {errorNotification} from "../Notifications.js";
+import SideBarWithNavBar from "../../components/shared/SideBarWithNavBar.jsx";
 
 const useMedications = (patientId) => {
     const [medications, setMedications] = useState([]);
