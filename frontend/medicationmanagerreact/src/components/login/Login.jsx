@@ -6,7 +6,7 @@ import {
     Input,
     Stack,
     Image, Box, Alert, AlertIcon,
-    Text,
+    Link,
 } from '@chakra-ui/react'
 import {Form, Formik, useField} from "formik";
 import * as Yup from 'yup';
@@ -79,15 +79,14 @@ const LoginForm = () => {
                             type={"password"}
                             placeholder={"Type your password"}
                         />
-                        <Text position="relative"
+                        <br/>
+                        <Link position="relative"
                               align="right"
-                              mb={15}
-                              cursor="pointer"
-                              _hover={{ textDecoration: 'underline' }}
-                              onClick={() => navigate("/create-account")}
+                              color={"blue.400"}
+                              href={"/Signup"}
                         >
-                            Create an account
-                        </Text>
+                            Don't have an account? Signup now!
+                        </Link>
                         <Button isDisabled={ !isValid || isSubmitting } type="submit">Login</Button>
                     </Stack>
                 </Form>

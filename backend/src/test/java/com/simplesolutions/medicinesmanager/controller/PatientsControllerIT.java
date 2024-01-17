@@ -56,10 +56,10 @@ class PatientsControllerIT {
         );
         expectedPatient = new PatientResponseDTO (
                 null,
-                patientRequest.getEmail(),
-                patientRequest.getFirstname(),
-                patientRequest.getLastname(),
-                patientRequest.getAge(),
+                patientRequest.email(),
+                patientRequest.firstname(),
+                patientRequest.lastname(),
+                patientRequest.age(),
                 List.of("ROLE_USER")
         );
 
@@ -95,7 +95,7 @@ class PatientsControllerIT {
                     DuplicateResourceException responseBody = response.getResponseBody();
                     assert responseBody != null;
                     assertThat(responseBody.getMessage())
-                            .isEqualTo("Patient with email %s already exists".formatted(patientRequest.getEmail()));
+                            .isEqualTo("Patient with email %s already exists".formatted(patientRequest.email()));
                 });
     }
     @Nested
@@ -148,7 +148,7 @@ class PatientsControllerIT {
     void getPatient_ById() {
             // Patient is saved in setUp()
         // Getting the id of the patient saved in the database
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         // the reason behind not including the password below is mainly for security
         webTestClient.get()
                 .uri(path + "/id/{patientId}", patientInDB_Id)
@@ -171,7 +171,7 @@ class PatientsControllerIT {
             // Patient is saved in setUp()
         // the reason behind not including the password below is mainly for security
         webTestClient.get()
-                .uri(path + "/{email}", patientRequest.getEmail())
+                .uri(path + "/{email}", patientRequest.email())
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
@@ -209,7 +209,7 @@ class PatientsControllerIT {
                 .exchange()
                 .expectStatus().isOk();
         // retrieving patient's id
-        int patientInDB_Id = patientRepository.findByEmail(patientTest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientTest.email()).orElseThrow().getId();
             //deleting the patient
         webTestClient.delete()
                 .uri(path + "/{patientId}", patientInDB_Id)
@@ -243,7 +243,7 @@ class PatientsControllerIT {
         void editPatientDetails() {
             // Patient is saved in setUp()
             // retrieving patient's id
-            int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+            int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
             // what we are going to update
             PatientUpdateRequest updateRequest = PatientUpdateRequest.builder().firstname("NewFirstname").build();
             // Updating
@@ -267,7 +267,7 @@ class PatientsControllerIT {
                     .consumeWith(response -> {
                         PatientResponseDTO actualPatient = response.getResponseBody();
                         assert actualPatient != null;
-                        assertThat(actualPatient.getFirstname())
+                        assertThat(actualPatient.firstname())
                                 .isEqualTo(updateRequest.getFirstname());
                     });
         }
@@ -277,7 +277,7 @@ class PatientsControllerIT {
     void editPatientDetails_throwsSignatureException() {
         // Patient is saved in setUp()
         // retrieving patient's id
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         // what we are going to update
         PatientUpdateRequest updateRequest = PatientUpdateRequest.builder().firstname("NewFirstname").build();
         // Updating
@@ -305,10 +305,10 @@ class PatientsControllerIT {
     void changePatientPassword() {
         // Patient is saved in setUp()
     // retrieving patient's id
-    int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+    int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
     // what we are going to update
     PatientUpdateRequest updateRequest = PatientUpdateRequest.builder()
-            .currentPassword(patientRequest.getPassword())
+            .currentPassword(patientRequest.password())
             .password("P@ssword12345")
             .build();
     // Updating
@@ -322,7 +322,7 @@ class PatientsControllerIT {
             .expectStatus().isOk();
 
     // confirming that we can log in with the new password
-    AuthenticationRequest loginRequest = new AuthenticationRequest(patientRequest.getEmail(), updateRequest.getPassword());
+    AuthenticationRequest loginRequest = new AuthenticationRequest(patientRequest.email(), updateRequest.getPassword());
     webTestClient.post()
             .uri("api/v1/auth/login")
             .accept(MediaType.APPLICATION_JSON)

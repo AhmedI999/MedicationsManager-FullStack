@@ -44,16 +44,16 @@ public class InteractionsService {
         interactionDao.deleteMedicineInteractionByName(medicineId, capitalizedName);
     }
     public void saveMedicineInteraction(MedicationInteractionDTO request, Medication medication){
-        if (interactionDao.doesMedicineInteractionExists(medication.getId(),request.getName())) {
+        if (interactionDao.doesMedicineInteractionExists(medication.getId(),request.name())) {
             throw new DuplicateResourceException("Medication's Interaction (%s) already Exists"
-                    .formatted(request.getName()));
+                    .formatted(request.name()));
         }
-        String capitalizedName = request.getName().substring(0, 1).toUpperCase() +
-                request.getName().substring(1).toLowerCase();
+        String capitalizedName = request.name().substring(0, 1).toUpperCase() +
+                request.name().substring(1).toLowerCase();
 
         MedicationInteractions interaction = MedicationInteractions.builder()
                 .name(capitalizedName.trim())
-                .Type(request.getType())
+                .Type(request.type())
                 .build();
         if (!medicineDao.doesPatientMedicineExists( medication.getPatient().getEmail() , medication.getBrandName())){
             throw new ResourceNotFoundException("Medication %s doesn't exist".formatted(medication.getBrandName()));

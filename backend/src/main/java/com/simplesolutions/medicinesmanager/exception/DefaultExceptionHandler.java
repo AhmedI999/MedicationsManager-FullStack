@@ -1,6 +1,5 @@
 package com.simplesolutions.medicinesmanager.exception;
 
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

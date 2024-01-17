@@ -4,8 +4,6 @@ import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicationResponseDTO;
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
-import com.simplesolutions.medicinesmanager.model.Medication;
-import com.simplesolutions.medicinesmanager.model.Patient;
 import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicineRegistrationRequest;
 import com.simplesolutions.medicinesmanager.dto.medicationsdto.MedicineUpdateRequest;
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRequest;
@@ -45,7 +43,6 @@ class PatientMedicationsControllerIT {
     MedicineRepository medicineRepository;
     // Mapping for the controller
     static final String path = "/api/v1/patients";
-    Faker faker;
     PatientRegistrationRequest patientRequest;
     MedicineRegistrationRequest medicineRequest;
     PatientResponseDTO expectedPatient;
@@ -58,7 +55,7 @@ class PatientMedicationsControllerIT {
 
     @BeforeEach
     void setUp() {
-        faker = new Faker();
+        Faker faker = new Faker();
         // generate patientRegistrationRequest
         patientRequest = new PatientRegistrationRequest(
                 faker.internet().safeEmailAddress(),
@@ -70,10 +67,10 @@ class PatientMedicationsControllerIT {
 
         expectedPatient = new PatientResponseDTO(
                 null,
-                patientRequest.getEmail(),
-                patientRequest.getFirstname(),
-                patientRequest.getLastname(),
-                patientRequest.getAge(),
+                patientRequest.email(),
+                patientRequest.firstname(),
+                patientRequest.lastname(),
+                patientRequest.age(),
                 List.of("ROLE_USER")
         );
         // Send a post-request to save a patient, ensuring return is 200, and retrieving the jwt token
@@ -101,15 +98,15 @@ class PatientMedicationsControllerIT {
         expectedMedication = new MedicationResponseDTO(
                 null,
                 null,
-                medicineRequest.getPictureUrl(),
-                medicineRequest.getBrandName(),
-                medicineRequest.getActiveIngredient(),
-                medicineRequest.getTimesDaily(),
-                medicineRequest.getInstructions(),
+                medicineRequest.pictureUrl(),
+                medicineRequest.brandName(),
+                medicineRequest.activeIngredient(),
+                medicineRequest.timesDaily(),
+                medicineRequest.instructions(),
                 new ArrayList<>()
         );
         // webTestClientRequest called to save Medication
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         saveMedicineStatusAssertions = webTestClient.post()
                 .uri(path + "/{patientId}/medicines", patientInDB_Id)
                 .accept(MediaType.APPLICATION_JSON)
@@ -127,10 +124,7 @@ class PatientMedicationsControllerIT {
     @Test
     @DisplayName("Ensure that savePatientMedicine endpoint can save a medication and add it to Patient")
     void savePatientMedicine() {
-            // Patient is saved in setUp()
-        // saving medication and verifying that response is 200
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
-        expectedPatient.setId(patientInDB_Id);
+        // Patient is saved in setUp()
         saveMedicineStatusAssertions.isOk();
     }
 
@@ -139,11 +133,11 @@ class PatientMedicationsControllerIT {
     void getMedicine_saveMedicine_retrieveById() {
             // Patient is saved in setUp()
         // saving medication and verifying that response is 200
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         saveMedicineStatusAssertions.isOk();
         // getting the saved medication id
         int medicineInDB_Id = medicineRepository
-                .findByPatientIdAndBrandName(patientInDB_Id, expectedMedication.getBrandName()).orElseThrow().getId();
+                .findByPatientIdAndBrandName(patientInDB_Id, expectedMedication.brandName()).orElseThrow().getId();
         // Retrieving the medication
         webTestClient.get()
                 .uri(path + "/{patientId}/medicines/id/{medicineId}", patientInDB_Id, medicineInDB_Id)
@@ -166,11 +160,11 @@ class PatientMedicationsControllerIT {
     void getMedicine_saveMedicine_retrieveByBrandName() {
             // Patient is saved in setUp()
         // saving medication and verifying that response is 200
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         saveMedicineStatusAssertions.isOk();
         // Retrieving the medication
         webTestClient.get()
-                .uri(path + "/{patientId}/medicines/{brandName}", patientInDB_Id, medicineRequest.getBrandName())
+                .uri(path + "/{patientId}/medicines/{brandName}", patientInDB_Id, medicineRequest.brandName())
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
@@ -191,7 +185,7 @@ class PatientMedicationsControllerIT {
     void getAllPatientMedicines() {
             // Patient is saved in setUp()
         // saving medication and verifying that response is 200
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         saveMedicineStatusAssertions.isOk();
         // get all patient medicines
         List<MedicationResponseDTO> allMedications = webTestClient.get()
@@ -213,11 +207,11 @@ class PatientMedicationsControllerIT {
     void deleteMedicine() {
             // Patient is saved in setUp()
         // saving medication and verifying that response is 200
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         saveMedicineStatusAssertions.isOk();
         // getting the saved medication id
         int medicineInDB_Id = medicineRepository
-                .findByPatientIdAndBrandName(patientInDB_Id, expectedMedication.getBrandName()).orElseThrow().getId();
+                .findByPatientIdAndBrandName(patientInDB_Id, expectedMedication.brandName()).orElseThrow().getId();
         // deleting the medication
         webTestClient.delete()
                 .uri(path + "/{patientId}/medicines/{medicineId}", patientInDB_Id, medicineInDB_Id)
@@ -246,11 +240,11 @@ class PatientMedicationsControllerIT {
     void editMedicineDetails() {
             // Patient is saved in setUp()
         // saving medication and verifying that response is 200
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         saveMedicineStatusAssertions.isOk();
         // getting the saved medication id
         int medicineInDB_Id = medicineRepository
-                .findByPatientIdAndBrandName(patientInDB_Id, expectedMedication.getBrandName()).orElseThrow().getId();
+                .findByPatientIdAndBrandName(patientInDB_Id, expectedMedication.brandName()).orElseThrow().getId();
         // what we are going to update in medication
         // adding editing pictureUrl to test it
         MedicineUpdateRequest updateRequest = MedicineUpdateRequest.builder()
@@ -277,9 +271,9 @@ class PatientMedicationsControllerIT {
                 .consumeWith(response -> {
                     MedicationResponseDTO actualMedication = response.getResponseBody();
                     assert actualMedication != null;
-                    assertThat(actualMedication.getActiveIngredient())
+                    assertThat(actualMedication.activeIngredient())
                                 .isEqualTo(updateRequest.getActiveIngredient());
-                    assertThat(actualMedication.getPictureUrl())
+                    assertThat(actualMedication.pictureUrl())
                             .isEqualTo(updateRequest.getPictureUrl());
                 });
     }

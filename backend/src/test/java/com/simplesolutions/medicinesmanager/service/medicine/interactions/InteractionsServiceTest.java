@@ -183,13 +183,13 @@ class InteractionsServiceTest {
         @DisplayName("Verify that savePatientMedicine Throws DuplicateResource with existing interaction")
         void saveMedicineInteraction_throwDuplicateResourceException() {
             // Given
-            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.getName()))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.name()))
                     .thenReturn(true);
             //When
             assertThatThrownBy(() -> interactionsTest.saveMedicineInteraction(interactionRegistrationTest, medication))
                     .isInstanceOf(DuplicateResourceException.class)
                     .hasMessage("Medication's Interaction (%s) already Exists"
-                            .formatted(interactionRegistrationTest.getName()));
+                            .formatted(interactionRegistrationTest.name()));
             //Then
             verify(interactionDao, never()).saveMedicineInteraction(any());
         }
@@ -198,7 +198,7 @@ class InteractionsServiceTest {
         @DisplayName("Verify that savePatientMedicine Throws ResourceNotFound with nonexistent medication")
         void saveMedicineInteraction_throwResourceNotFound() {
             // Given
-            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.getName()))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.name()))
                     .thenReturn(false);
             // email is needed for this exception
             medication.setPatient(Patient.builder().email("patient@example.com").build());
@@ -216,7 +216,7 @@ class InteractionsServiceTest {
         @DisplayName("Verify that savePatientMedicine can invoke saveMedicineInteraction")
         void saveMedicineInteraction_Success() {
             // Given
-            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.getName()))
+            when(interactionDao.doesMedicineInteractionExists(medication.getId(), interactionRegistrationTest.name()))
                     .thenReturn(false);
             medication.setPatient(Patient.builder().email("patient@example.com").build());
             when(medicineDao.doesPatientMedicineExists(medication.getPatient().getEmail(), medication.getBrandName()))
@@ -227,7 +227,7 @@ class InteractionsServiceTest {
             //Then
             verify(interactionDao).saveMedicineInteraction(interactionArgumentCaptor.capture());
             MedicationInteractions interaction = interactionArgumentCaptor.getValue();
-            assertThat(interaction.getName()).isEqualTo(interactionRegistrationTest.getName());
+            assertThat(interaction.getName()).isEqualTo(interactionRegistrationTest.name());
         }
     }
 

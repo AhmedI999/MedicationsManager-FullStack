@@ -21,7 +21,7 @@ const router = createBrowserRouter( [
         element: <ProtectedRoute><App/></ProtectedRoute>
     },
     {
-      path: "/create-account",
+      path: "/Signup",
       element: <CreateAccount />
     },
     {

@@ -32,16 +32,11 @@ export const getPatientByEmail = async (email) => {
     )
 }
 export const editPatient = async (patientId, patient) => {
-    try {
-        const token = await getToken();
-        return await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}`,
-            patient,
-            { headers: { Authorization: `Bearer ${token}` } }
-        )
-    } catch ( error ){
-        errorNotification("Updating User", `Error Updating User details ${error.code}: ${error.response.data.message}`)
-        throw error;
-    }
+    const token = await getToken();
+    return await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}`,
+        patient,
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
 }
 export const editPatientPassword = async (patientId, Password) => {
     try {

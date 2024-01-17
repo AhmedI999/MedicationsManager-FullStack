@@ -26,7 +26,7 @@ public class MedicationDTOMapper implements Function<Medication, MedicationRespo
                                 interaction.getName(),
                                 interaction.getType()
                         ))
-                        .sorted(Comparator.comparing(MedicationInteractionDTO::getType))
+                        .sorted(Comparator.comparing(MedicationInteractionDTO::type))
                         .collect(Collectors.toList())
         );
     }

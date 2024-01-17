@@ -5,7 +5,7 @@ import {
     Heading,
     Input,
     Stack,
-    Image, Box, Alert, AlertIcon, FormControl, Checkbox, FormErrorMessage,
+    Image, Box, Alert, AlertIcon, FormControl, Checkbox, FormErrorMessage, Link
 } from '@chakra-ui/react'
 import {Form, Formik, useField} from "formik";
 import * as Yup from 'yup';
@@ -66,10 +66,14 @@ const CreateAccountForm = () => {
                         .min(6, "Password should be at least 6 characters"),
                     firstname: Yup.string()
                         .trim()
-                        .required("First name can't be empty"),
+                        .matches(/^[A-Za-z]+$/, "Only alphabetic characters are allowed")
+                        .required("First name is required"),
                     lastname: Yup.string()
-                        .trim(),
+                        .trim()
+                        .matches(/^[A-Za-z]+$/, "Only alphabetic characters are allowed")
+                        .required("Last name is required"),
                     age: Yup.number()
+                        .min(1, "Age must be at least 1")
                         .max(110, "Age must be a Valid number"),
                     acceptedTerms: Yup.boolean()
                         .required("You have to Accept the terms")
@@ -82,8 +86,8 @@ const CreateAccountForm = () => {
                 if (newPatient.lastname === ''){
                     delete newPatient.lastname
                 }
-                // remove age if not entered and if it is valid, then parse the string
-                if (newPatient.age === '' || isNaN(parseInt(newPatient.age, 10))){
+                // remove age if not entered and if it is not valid, then parse the string if valid
+                if (newPatient.age.trim() === '' || isNaN(parseInt(newPatient.age, 10))){
                     delete newPatient.age
                 } else {
                     newPatient.age = parseInt(newPatient.age, 10);
@@ -102,12 +106,14 @@ const CreateAccountForm = () => {
                         <MyTextInput label={"Email *"} name={"email"} type={"email"} placeholder={"john@example.com"}/>
                         <MyTextInput label={"Password *"} name={"password"} type={"password"} placeholder={"Type your password"}/>
                         <MyTextInput label={"First Name *"} name={"firstname"} type={"text"} placeholder={"John"}/>
-                        <MyTextInput label={"Last name"} name={"lastname"} type={"text"} placeholder={"Doe"}/>
+                        <MyTextInput label={"Last name *"} name={"lastname"} type={"text"} placeholder={"Doe"}/>
                         <MyTextInput label={"Age"} name={"age"} type={"number"}/>
                         <CheckboxInput name="acceptedTerms" >I accept the terms and conditions</CheckboxInput>
                         <ApplicationTermsAndConditions/>
                         <Button isDisabled={ !isValid || isSubmitting } type="submit">Create Account</Button>
                     </Stack>
+                    <br/>
+                    <Link color={"blue.400"} href={"/"}>Have an account? Login now!</Link>
                 </Form>
             )}
         </Formik>
