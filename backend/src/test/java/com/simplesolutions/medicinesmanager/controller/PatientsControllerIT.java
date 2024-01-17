@@ -50,8 +50,9 @@ class PatientsControllerIT {
         patientRequest = new PatientRegistrationRequest(
                 faker.internet().safeEmailAddress(),
                 faker.internet().password() + "P@",
-                faker.name().firstName(),
-                faker.name().lastName(),
+                // faker.name() caused issues with alphabetic validation
+                faker.lorem().word(),
+                faker.lorem().word(),
                 faker.number().randomDigitNotZero()
         );
         expectedPatient = new PatientResponseDTO (
