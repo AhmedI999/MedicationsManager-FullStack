@@ -33,7 +33,7 @@
     },
     {
       "name": "medicinesmanager-react",
-      "image": "ahmedi999/medicinesmanager-react:13.01.2024.15.02.19",
+      "image": "ahmedi999/medicinesmanager-react:13.01.2024.15.56.56",
       "essential": true,
       "memory": 256,
       "portMappings": [
