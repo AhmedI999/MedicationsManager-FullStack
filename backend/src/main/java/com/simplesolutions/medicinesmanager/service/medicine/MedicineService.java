@@ -36,7 +36,7 @@ public class MedicineService {
         }
         return medications.stream()
                 .map(medicationDTOMapper)
-                .sorted(Comparator.comparing(MedicationResponseDTO::getMedicineNumber))
+                .sorted(Comparator.comparing(MedicationResponseDTO::medicineNumber))
                 .collect(Collectors.toList());
 
     }
@@ -64,21 +64,21 @@ public class MedicineService {
         return medicineDao.doesPatientMedicineExists(email, brandName);
     }
     public void savePatientMedicine(MedicineRegistrationRequest request, Patient patient){
-        if (doesMedicineExists(patient.getEmail(), request.getBrandName()))
+        if (doesMedicineExists(patient.getEmail(), request.brandName()))
             throw new DuplicateResourceException("Patient's medication (%s) already Exists"
-                    .formatted(request.getBrandName()));
-        String capitalizedName = request.getBrandName().substring(0, 1).toUpperCase() +
-                request.getBrandName().substring(1).toLowerCase();
+                    .formatted(request.brandName()));
+        String capitalizedName = request.brandName().substring(0, 1).toUpperCase() +
+                request.brandName().substring(1).toLowerCase();
         Medication medication = Medication.builder()
-                .pictureUrl(request.getPictureUrl())
+                .pictureUrl(request.pictureUrl())
                 .brandName(capitalizedName)
-                .activeIngredient(request.getActiveIngredient())
-                .timesDaily(request.getTimesDaily())
-                .instructions(request.getInstructions())
+                .activeIngredient(request.activeIngredient())
+                .timesDaily(request.timesDaily())
+                .instructions(request.instructions())
                 .build();
         if (!patientDao.doesPatientExists(patient.getEmail()))
             throw new ResourceNotFoundException("Patient doesn't exist");
-        if (request.getPictureUrl() == null || request.getPictureUrl().isEmpty())
+        if (request.pictureUrl() == null || request.pictureUrl().isEmpty())
             medication.setPictureUrl(DEFAULT_PICTURE_URL);
         medication.setPatient(patient);
         medicineDao.saveMedicine(medication);

@@ -6,13 +6,15 @@ import {
     Input,
     Stack,
     Image, Box, Alert, AlertIcon,
+    Link,
 } from '@chakra-ui/react'
 import {Form, Formik, useField} from "formik";
 import * as Yup from 'yup';
 import {useAuth} from "../context/AuthContext.jsx";
 import {errorNotification} from "../../services/Notifications.js";
 import {useNavigate} from "react-router-dom";
-import {setCookie} from "../../services/cookieUtils.js";
+import {isCookieValid, setCookie} from "../../services/jwt/cookieUtils.js";
+import {useEffect} from "react";
 
 const MyTextInput = ({label, ...props}) => {
     const [field, meta] = useField(props);
@@ -77,6 +79,14 @@ const LoginForm = () => {
                             type={"password"}
                             placeholder={"Type your password"}
                         />
+                        <br/>
+                        <Link position="relative"
+                              align="right"
+                              color={"blue.400"}
+                              href={"/Signup"}
+                        >
+                            Don't have an account? Signup now!
+                        </Link>
                         <Button isDisabled={ !isValid || isSubmitting } type="submit">Login</Button>
                     </Stack>
                 </Form>
@@ -84,8 +94,13 @@ const LoginForm = () => {
         </Formik>
     )
 };
-
 const Login = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (isCookieValid('jwt')){
+            navigate("/medications")
+        }
+    });
     return (
         <Stack minH={'100vh'} direction={{ base: 'column', md: 'row' }}>
             <Flex p={8} flex={1} align={'center'} justifyContent={'center'}>

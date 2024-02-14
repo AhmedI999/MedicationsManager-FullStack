@@ -73,10 +73,10 @@ class MedicationInteractionsControllerTest {
                 faker.number().randomDigitNotZero());
         expectedPatient = new PatientResponseDTO(
                 null,
-                patientRequest.getEmail(),
-                patientRequest.getFirstname(),
-                patientRequest.getLastname(),
-                patientRequest.getAge(),
+                patientRequest.email(),
+                patientRequest.firstname(),
+                patientRequest.lastname(),
+                patientRequest.age(),
                 List.of("ROLE_USER"));
         // Interaction
         Random random = new Random();
@@ -85,8 +85,8 @@ class MedicationInteractionsControllerTest {
                 InteractionType.values()[random.nextInt(InteractionType.values().length)]
         );
         expectedInteraction = new MedicationInteractionDTO(
-                interactionRequest.getName(),
-                interactionRequest.getType()
+                interactionRequest.name(),
+                interactionRequest.type()
         );
         // Medication
         medicineRequest = new MedicineRegistrationRequest(
@@ -99,11 +99,11 @@ class MedicationInteractionsControllerTest {
         expectedMedication = new MedicationResponseDTO(
                 null,
                 null,
-                medicineRequest.getPictureUrl(),
-                medicineRequest.getBrandName(),
-                medicineRequest.getActiveIngredient(),
-                medicineRequest.getTimesDaily(),
-                medicineRequest.getInstructions(),
+                medicineRequest.pictureUrl(),
+                medicineRequest.brandName(),
+                medicineRequest.activeIngredient(),
+                medicineRequest.timesDaily(),
+                medicineRequest.instructions(),
                 new ArrayList<>()
         );
 
@@ -121,7 +121,7 @@ class MedicationInteractionsControllerTest {
                 .get(0);
 
         // Retrieving Patient id from Database
-        patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
 
 
         // Saving Medication
@@ -136,7 +136,7 @@ class MedicationInteractionsControllerTest {
 
         // Retrieving Medication id from Database
         medicineInDB_Id = medicineRepository
-                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.getBrandName()).orElseThrow().getId();
+                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.brandName()).orElseThrow().getId();
 
         // Interaction Status assertion
         saveInteractionStatusAssertion = webTestClient.post()
@@ -162,13 +162,13 @@ class MedicationInteractionsControllerTest {
         // saving interaction
         saveInteractionStatusAssertion.isOk();
         // Retrieving Patient, Medication, and Interaction id from Database
-        int patientInDB_Id = patientRepository.findByEmail(patientRequest.getEmail()).orElseThrow().getId();
+        int patientInDB_Id = patientRepository.findByEmail(patientRequest.email()).orElseThrow().getId();
         int medicineInDB_Id = medicineRepository
-                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.getBrandName()).orElseThrow().getId();
+                .findByPatientIdAndBrandName(patientInDB_Id, medicineRequest.brandName()).orElseThrow().getId();
         // Retrieving the interaction
         webTestClient.get()
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions/{name}",
-                        patientInDB_Id, medicineInDB_Id, interactionRequest.getName())
+                        patientInDB_Id, medicineInDB_Id, interactionRequest.name())
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
@@ -212,7 +212,7 @@ class MedicationInteractionsControllerTest {
         // Deleting the interaction
         webTestClient.delete()
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions/{name}",
-                        patientInDB_Id, medicineInDB_Id, interactionRequest.getName())
+                        patientInDB_Id, medicineInDB_Id, interactionRequest.name())
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()
@@ -220,7 +220,7 @@ class MedicationInteractionsControllerTest {
         // Verifying that interaction no longer exists
         webTestClient.get()
                 .uri(path + "/{patientId}/medicines/{medicineId}/interactions/{name}",
-                        patientInDB_Id, medicineInDB_Id, interactionRequest.getName())
+                        patientInDB_Id, medicineInDB_Id, interactionRequest.name())
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s".formatted(savePatient_getToken)))
                 .exchange()

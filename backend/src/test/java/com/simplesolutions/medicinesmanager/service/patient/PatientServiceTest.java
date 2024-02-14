@@ -249,16 +249,16 @@ class PatientServiceTest {
         @DisplayName("Verify that savePatient() can invoke savePatient() with bcrypt password in dao")
         void savePatient_Success() {
             // Given
-            when(patientDao.doesPatientExists(patientRegistrationTest.getEmail())).thenReturn(false);
+            when(patientDao.doesPatientExists(patientRegistrationTest.email())).thenReturn(false);
             String passwordHash = "$@#$Hashed@$!PasswordGF#!";
-            when(passwordEncoder.encode(patientRegistrationTest.getPassword()))
+            when(passwordEncoder.encode(patientRegistrationTest.password()))
                     .thenReturn(passwordHash);
             //When
             patientServiceTest.savePatient(patientRegistrationTest);
             ArgumentCaptor<Patient> patientArgumentCaptor = ArgumentCaptor.forClass(Patient.class);
             //Then
             verify(patientDao).savePatient(patientArgumentCaptor.capture());
-            verify(patientDao).doesPatientExists(patientRegistrationTest.getEmail());
+            verify(patientDao).doesPatientExists(patientRegistrationTest.email());
             Patient capturedPatient = patientArgumentCaptor.getValue();
             assertThat(capturedPatient.getPassword()).isEqualTo(passwordHash);
         }
@@ -298,13 +298,13 @@ class PatientServiceTest {
         @DisplayName("Verify that savePatient() Throws DuplicateResource")
         void savePatient_DuplicateResourceException() {
             // Given
-            when(patientDao.doesPatientExists(patientRegistrationTest.getEmail())).thenReturn(true);
+            when(patientDao.doesPatientExists(patientRegistrationTest.email())).thenReturn(true);
             //When
             assertThatThrownBy(() -> patientServiceTest.savePatient(patientRegistrationTest))
                     .isInstanceOf(DuplicateResourceException.class)
-                    .hasMessage("Patient with email %s already exists".formatted(patientRegistrationTest.getEmail()));
+                    .hasMessage("Patient with email %s already exists".formatted(patientRegistrationTest.email()));
             //Then
-            verify(patientDao).doesPatientExists(patientRegistrationTest.getEmail());
+            verify(patientDao).doesPatientExists(patientRegistrationTest.email());
             verify(patientDao, never()).savePatient(any());
         }
     }
@@ -387,6 +387,32 @@ class PatientServiceTest {
             assertThatThrownBy(() -> patientServiceTest.editPatientPassword(patient.getId(), request))
                     .isInstanceOf(UpdateException.class)
                     .hasMessage("New password Can't be empty");
+
+            // Then
+            verify(patientDao, never()).updatePatient(any());
+        }
+        @Test
+        @DisplayName("Verify that editPatientDetails throw updateException with identical passwords")
+        void editPatientDetails_throwUpdateException_identicalPasswords() {
+            // Given
+            String currentPassword = "P@ssword123";
+            String newPassword = "P@ssword123";
+
+            PatientUpdateRequest request = PatientUpdateRequest.builder()
+                    .currentPassword(currentPassword)
+                    .password(newPassword)
+                    .build();
+            when(patientDao.selectPatientById(patient.getId()))
+                    .thenReturn(Optional.of(patient));
+            when(patientServiceTest.isOldPasswordValid(currentPassword, patient))
+                    .thenReturn(true);
+            when(patientServiceTest.isOldAndNewPasswordIdentical(newPassword, patient))
+                    .thenReturn(true);
+
+            // When
+            assertThatThrownBy(() -> patientServiceTest.editPatientPassword(patient.getId(), request))
+                    .isInstanceOf(DuplicateResourceException.class)
+                    .hasMessage("Passwords are identical");
 
             // Then
             verify(patientDao, never()).updatePatient(any());

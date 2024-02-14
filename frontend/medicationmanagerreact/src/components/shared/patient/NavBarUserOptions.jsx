@@ -15,11 +15,11 @@ import {
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon } from '@chakra-ui/icons';
 import PatientDrawer from "./PatientDrawer.jsx";
-import usePatients from "../../services/usePatients.jsx";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {deleteCookie, getCookie} from "../../services/cookieUtils.js";
-import {errorNotification, successNotification} from "../../services/Notifications.js";
+import usePatients from "../../../services/patient/usePatients.jsx";
+import {deleteCookie, getCookie} from "../../../services/jwt/cookieUtils.js";
+import {errorNotification, successNotification} from "../../../services/Notifications.js";
 
 export default function Nav() {
     const { colorMode, toggleColorMode } = useColorMode();

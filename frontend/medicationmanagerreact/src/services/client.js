@@ -1,14 +1,15 @@
 import {errorNotification} from "./Notifications.js";
 import axios from "axios";
-import {getCookie} from "./cookieUtils.js";
-import {decryptData} from "./JwtEncryptionUtil.jsx";
+import {getCookie} from "./jwt/cookieUtils.js";
+import {decryptData} from "./jwt/JwtEncryptionUtil.jsx";
+
 
 const getToken = async () => {
     const secret = "@nEh;=uPkZt&Xvd(5№6'Ek>M~Rbv~%>j"
     const encryptedToken = getCookie("jwt");
     const jwt = await decryptData(encryptedToken, secret);
     if (!jwt)
-        console.error("Error:", "Authentication Failed");
+        console.error("ErrorPage:", "Authentication Failed");
     return jwt
 };
 
@@ -31,16 +32,11 @@ export const getPatientByEmail = async (email) => {
     )
 }
 export const editPatient = async (patientId, patient) => {
-    try {
-        const token = await getToken();
-        return await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}`,
-            patient,
-            { headers: { Authorization: `Bearer ${token}` } }
-        )
-    } catch ( error ){
-        errorNotification("Updating User", `Error Updating User details ${error.code}: ${error.response.data.message}`)
-        throw error;
-    }
+    const token = await getToken();
+    return await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}`,
+        patient,
+        { headers: { Authorization: `Bearer ${token}` } }
+    )
 }
 export const editPatientPassword = async (patientId, Password) => {
     try {
@@ -54,7 +50,35 @@ export const editPatientPassword = async (patientId, Password) => {
         throw error;
     }
 }
+export const savePatient = async (patient) => {
+    try {
+        return await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients`,
+            patient
+        )
+    } catch ( error ){
+        const message = error.response.data.message;
 
+        if (message && message.includes("already exists")){
+            errorNotification("Creating account", 'Error Creating account:\n' +
+                `${message.replace("Patient with ", "")}`)
+            throw error;
+        } else {
+            errorNotification("Creating account", 'Error Creating account: Contact Admin')
+            throw error;
+        }
+    }
+}
+export const deletePatient = async (patientId) => {
+    try {
+        const token = await getToken();
+        return await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/v1/patients/${patientId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+    } catch ( error ){
+        errorNotification("Changing Password", `Error Changing User Password ${error.code}: ${error.response.data.message}`)
+        throw error;
+    }
+}
 
 export const getPatientMedications= async (patientId) => {
     try {

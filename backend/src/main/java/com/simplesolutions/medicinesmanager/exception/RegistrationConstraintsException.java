@@ -13,10 +13,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -40,6 +37,9 @@ public class RegistrationConstraintsException extends ResponseEntityExceptionHan
                 .map(fieldError -> {
                     Map<String, String> fieldErrorMap = new LinkedHashMap<>();
                     fieldErrorMap.put("field", fieldError.getField());
+                    if (Objects.requireNonNull(fieldError.getDefaultMessage()).contains("Failed to convert value")){
+                        fieldErrorMap.put("error", "Type Mismatch Error. Make sure to use the correct data types");
+                    }
                     fieldErrorMap.put("error", fieldError.getDefaultMessage());
                     return fieldErrorMap;
                 })

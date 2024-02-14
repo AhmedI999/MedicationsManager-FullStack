@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useState} from "react";
-import {getMedicationInteractions} from "./client.js";
-import {errorNotification} from "./Notifications.js";
-import {getPatientId} from "./usePatientId.js";
+import {getMedicationInteractions} from "../client.js";
+import {getPatientId} from "../patient/usePatientId.js";
+import {errorNotification} from "../Notifications.js";
+
 
 const useMedicationInteractions = (medicationId) => {
     const [interactions, setInteractions] = useState([]);

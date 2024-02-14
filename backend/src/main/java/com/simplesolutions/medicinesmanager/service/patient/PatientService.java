@@ -51,18 +51,17 @@ public class PatientService {
     }
 
     public void savePatient(PatientRegistrationRequest request){
-        if (doesPatientExists(request.getEmail())) {
-        throw new DuplicateResourceException("Patient with email %s already exists".formatted(request.getEmail()));
+        if (doesPatientExists(request.email())) {
+        throw new DuplicateResourceException("Patient with email %s already exists".formatted(request.email()));
     }
             Patient patient = Patient.builder()
-                    .email(request.getEmail().trim())
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .firstname(request.getFirstname().trim())
-                    .lastname(request.getLastname())
-                    .age(request.getAge())
+                    .email(request.email().trim())
+                    .password(passwordEncoder.encode(request.password()))
+                    .firstname(request.firstname().trim())
+                    .lastname(request.lastname())
+                    .age(request.age())
                     .build();
             patientDao.savePatient(patient);
-
     }
     public void deletePatient(Integer id){
         Patient patient = patientDao.selectPatientById(id).orElseThrow(() ->
@@ -70,11 +69,14 @@ public class PatientService {
 
             patientDao.deletePatientById(patient.getId());
     }
-    public boolean isOldPasswordValid ( String currentPassword, Patient patient) {
+    protected boolean isOldPasswordValid ( String currentPassword, Patient patient) {
         if (currentPassword == null || currentPassword.isEmpty()){
             throw new UpdateException("Current password can't be null or empty");
         }
         return passwordEncoder.matches(currentPassword, patient.getPassword());
+    }
+    protected boolean isOldAndNewPasswordIdentical (String newPassword, Patient patient) {
+        return passwordEncoder.matches(newPassword, patient.getPassword());
     }
     public void editPatientPassword(Integer id, PatientUpdateRequest request){
         Patient patient = patientDao.selectPatientById(id).orElseThrow(
@@ -82,6 +84,9 @@ public class PatientService {
         if (isOldPasswordValid(request.getCurrentPassword(), patient)){
             if (request.getPassword() == null || request.getPassword().isEmpty()) {
                 throw new UpdateException("New password Can't be empty");
+            }
+            if (isOldAndNewPasswordIdentical(request.getPassword(), patient)){
+                throw new DuplicateResourceException("Passwords are identical");
             }
             patient.setPassword(passwordEncoder.encode(request.getPassword()));
             patientDao.updatePatient(patient);

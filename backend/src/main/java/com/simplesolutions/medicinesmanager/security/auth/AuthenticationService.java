@@ -25,7 +25,7 @@ public class AuthenticationService {
         );
         Patient principal = ( Patient ) authentication.getPrincipal();
         PatientResponseDTO patientDto = patientDTOMapper.apply(principal);
-        return jwtUtil.issueToken(patientDto.getEmail(), patientDto.getRoles());
+        return jwtUtil.issueToken(patientDto.email(), patientDto.roles());
     }
 
 

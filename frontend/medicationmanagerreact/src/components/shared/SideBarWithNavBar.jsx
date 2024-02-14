@@ -19,13 +19,11 @@ import {
 
 import {FiMenu, FiSearch} from 'react-icons/fi';
 import {MdHome, MdKeyboardArrowRight, MdMedication} from 'react-icons/md'
-import DrawerForm from "../shared/DrawerForm.jsx";
 import {CgAdd} from "react-icons/cg";
 import {useEffect, useState} from "react";
 import MedsCard from "../medications/MedsCard.jsx";
-import NavBarUserOptions from "./NavBarUserOptions.jsx";
-
-
+import DrawerForm from "./patient/DrawerForm.jsx";
+import NavBarUserOptions from "../shared/patient/NavBarUserOptions.jsx"
 
 const SideBarWithNavBar = ({medications, fetchMedications, patientId}) => {
     const sidebar = useDisclosure();

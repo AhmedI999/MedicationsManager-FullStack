@@ -2,7 +2,6 @@ package com.simplesolutions.medicinesmanager.security.auth;
 
 import com.github.javafaker.Faker;
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRequest;
-import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
 import com.simplesolutions.medicinesmanager.security.jwt.JWTUtil;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -13,13 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -47,8 +42,8 @@ class AuthenticationControllerTest {
                 faker.number().randomDigitNotZero()
         );
         request = new AuthenticationRequest(
-                patientRequest.getEmail(),
-                patientRequest.getPassword()
+                patientRequest.email(),
+                patientRequest.password()
         );
 
     }
@@ -91,7 +86,7 @@ class AuthenticationControllerTest {
                 .expectStatus().isOk()
                 // checking that the token in AUTHORIZATION header is valid
                 .expectHeader().value(HttpHeaders.AUTHORIZATION,
-                        jwtToken -> assertThat(jwtUtil.isTokenValid(jwtToken, patientRequest.getEmail())).isTrue())
+                        jwtToken -> assertThat(jwtUtil.isTokenValid(jwtToken, patientRequest.email())).isTrue())
                 // checking the body of the response
                 .expectBody(String.class)
                 .consumeWith(response -> assertThat(response.getResponseBody())

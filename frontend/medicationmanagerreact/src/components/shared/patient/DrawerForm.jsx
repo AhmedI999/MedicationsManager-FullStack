@@ -8,7 +8,7 @@ import {
     DrawerOverlay,
     Flex, useDisclosure
 } from "@chakra-ui/react";
-import AddMedicationForm from "../medications/AddMedicationForm.jsx";
+import AddMedicationForm from "../../medications/AddMedicationForm.jsx";
 
 
 

@@ -34,7 +34,7 @@ public class Patient implements UserDetails {
     @Column(name = "lastname")
     String lastname;
     @Column(name = "age")
-    int age;
+    Integer age;
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     List<Medication> patientMedications;
 

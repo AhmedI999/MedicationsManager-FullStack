@@ -11,9 +11,9 @@ import {
 import {MdOutlineMedication} from "react-icons/md";
 import {useEffect, useState} from "react";
 import SideBarWithNavBar from "../shared/SideBarWithNavBar.jsx";
-import useMedicationInteractions from "../../services/useMedicationInteractions.jsx";
 import InteractionForm from "../medicationinteractions/InteractionForm.jsx";
 import DeleteMedicationInteractionConfirmation from "../medicationinteractions/DeleteMedicationInteractionConfrimation.jsx";
+import useMedicationInteractions from "../../services/medications/useMedicationInteractions.jsx";
 
 const MoreDetailsPopover = ({children}) => {
     const {

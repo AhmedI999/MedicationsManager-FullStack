@@ -294,14 +294,14 @@ class MedicationServiceTest {
         @DisplayName("Verify that savePatientMedicine can invoke saveMedicine dao")
         void savePatientMedicine_Success() {
             //Given
-            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.getBrandName()))
+            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.brandName()))
                     .thenReturn(false);
             when(patientDao.doesPatientExists(patient.getEmail())).thenReturn(true);
             //When
             medicineTest.savePatientMedicine(medicineRegistrationTest, patient);
             //Then
             verify(medicineDao).saveMedicine(any(Medication.class));
-            verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.getBrandName());
+            verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.brandName());
             verify(patientDao).doesPatientExists(patient.getEmail());
         }
         @Test
@@ -316,7 +316,7 @@ class MedicationServiceTest {
                     faker.lorem().word()
             );
 
-            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.getBrandName()))
+            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.brandName()))
                     .thenReturn(false);
             when(patientDao.doesPatientExists(patient.getEmail())).thenReturn(true);
             //When
@@ -324,7 +324,7 @@ class MedicationServiceTest {
             ArgumentCaptor<Medication> medicineArgumentCaptor = ArgumentCaptor.forClass(Medication.class);
             //Then
             verify(medicineDao).saveMedicine(medicineArgumentCaptor.capture());
-            verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.getBrandName());
+            verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), undefinedUrlMedicine.brandName());
             Medication capturedMedication = medicineArgumentCaptor.getValue();
             assertThat(capturedMedication.getPictureUrl()).isEqualTo(DEFAULT_PICTURE_URL);
 
@@ -334,22 +334,22 @@ class MedicationServiceTest {
         @DisplayName("Verify that savePatientMedicine throw DuplicateResourceException")
         void savePatientMedicine_throwDuplicateResourceException() {
             //Given
-            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.getBrandName()))
+            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.brandName()))
                     .thenReturn(true);
             //When
             assertThatThrownBy(() -> medicineTest.savePatientMedicine(medicineRegistrationTest, patient))
                     .isInstanceOf(DuplicateResourceException.class)
-                    .hasMessage("Patient's medication (%s) already Exists".formatted(medicineRegistrationTest.getBrandName()));
+                    .hasMessage("Patient's medication (%s) already Exists".formatted(medicineRegistrationTest.brandName()));
             //Then
             verify(medicineDao, never()).saveMedicine(any());
-            verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.getBrandName());
+            verify(medicineDao).doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.brandName());
         }
 
         @Test
         @DisplayName("Verify that savePatientMedicine throw ResourceNotFoundException")
         void savePatientMedicine_throwResourceNotFoundException() {
             //Given
-            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.getBrandName()))
+            when(medicineDao.doesPatientMedicineExists(patient.getEmail(), medicineRegistrationTest.brandName()))
                     .thenReturn(false);
             when(patientDao.doesPatientExists(patient.getEmail()))
                     .thenReturn(false);
