@@ -35,8 +35,14 @@ public class Patient implements UserDetails {
     String lastname;
     @Column(name = "age")
     Integer age;
+    @Column(name = "locked")
+    boolean locked = false;
+    @Column(name = "enabled")
+    boolean enabled = false;
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     List<Medication> patientMedications;
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    List<EmailConfirmation> patientEmailConfirmations;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -57,7 +63,7 @@ public class Patient implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override
@@ -67,6 +73,6 @@ public class Patient implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

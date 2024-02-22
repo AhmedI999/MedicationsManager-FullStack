@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class PatientUserDetailsService implements UserDetailsService {
 
     private final PatientDao patientDao;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return patientDao.selectPatientByEmail(username).orElseThrow(

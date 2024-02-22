@@ -9,17 +9,21 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Service
 public class JWTUtil {
     private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
     @Value("#{'${jwt.token-expiration}'}")
     private Integer DAYS_UNTIL_TOKEN_EXPIRATION;
+    @Value("#{'${jwt.email.confirmationToken.expiresAt}'}")
+    private Integer MINUTES_UNTIL_CONFIRMATION_EXPIRATION;
 
     public String issueToken(
             String subject,
@@ -43,7 +47,15 @@ public class JWTUtil {
     public String issueToken( String subject, List<String> scopes ) {
         return issueToken(subject, Map.of("scopes", scopes));
     }
+    public String issueEmailToken( String subject ) {
 
+        return Jwts.builder()
+                .subject(subject)
+                .issuer("AhmedIbrahim")
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(MINUTES_UNTIL_CONFIRMATION_EXPIRATION, MINUTES)))
+                .compact();
+    }
     private SecretKey getSigningKey() {
         String secretString = Encoders.BASE64.encode(SECRET_KEY.getEncoded());
         return Keys.hmacShaKeyFor(secretString.getBytes());

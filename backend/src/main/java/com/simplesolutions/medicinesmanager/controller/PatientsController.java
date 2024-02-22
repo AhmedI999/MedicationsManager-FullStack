@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -36,6 +37,16 @@ import java.util.List;
 public class PatientsController {
     private final PatientService patientService;
     private final JWTUtil jwtUtil;
+
+    // MESSAGES
+    @Value("#{'${patient.save-endpoint.success.message}'}")
+    private String PATIENT_SAVED_MESSAGE;
+    @Value("#{'${patient.delete-endpoint.success.message}'}")
+    private String PATIENT_DELETE_MESSAGE;
+    @Value("#{'${patient.password-endpoint.success.message}'}")
+    private String PATIENT_CHANGE_PASSWORD_MESSAGE;
+
+
     @Operation(
             description = "Get endpoint for patients",
             summary = "This endpoint retrieve all patients, mapped by PatientResponseDto",
@@ -300,7 +311,7 @@ public class PatientsController {
         String jwtToken = jwtUtil.issueToken(request.email(), "ROLE_USER");
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtToken)
-                .body("Patient with email %s is saved successfully".formatted(request.email()));
+                .body(PATIENT_SAVED_MESSAGE.formatted(request.email()));
     }
     @Operation(
             description = "DELETE endpoint for deleting a patient using patient's Id",
@@ -382,7 +393,7 @@ public class PatientsController {
     @DeleteMapping("{patientId}")
     public ResponseEntity<String> deletePatient(@PathVariable("patientId") Integer id) {
         patientService.deletePatient(id);
-        return ResponseEntity.ok("Patient deleted successfully");
+        return ResponseEntity.ok(PATIENT_DELETE_MESSAGE);
     }
 
     @Operation(
@@ -608,7 +619,7 @@ public class PatientsController {
     public ResponseEntity<String> changePatientPassword (@PathVariable("patientId") Integer patientId,
                                          @RequestBody @Valid PatientUpdateRequest request) {
         patientService.editPatientPassword(patientId, request);
-        return ResponseEntity.ok("Password Changed Successfully");
+        return ResponseEntity.ok(PATIENT_CHANGE_PASSWORD_MESSAGE);
     }
 
 }

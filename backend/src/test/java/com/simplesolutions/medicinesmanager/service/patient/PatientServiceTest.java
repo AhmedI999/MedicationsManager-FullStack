@@ -9,6 +9,8 @@ import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.model.Patient;
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRequest;
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientUpdateRequest;
+import com.simplesolutions.medicinesmanager.service.patient.email.EmailConfirmationService;
+import com.simplesolutions.medicinesmanager.service.patient.email.sender.EmailSender;
 import jakarta.validation.ConstraintViolation;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -34,6 +36,10 @@ class PatientServiceTest {
     PatientDao patientDao;
     @Mock
     PasswordEncoder passwordEncoder;
+    @Mock
+    EmailConfirmationService emailService;
+    @Mock
+    EmailSender emailSender;
     PatientService patientServiceTest;
     PatientDTOMapper patientDTOMapper;
     Faker faker;
@@ -49,7 +55,7 @@ class PatientServiceTest {
     @BeforeEach
     void setUp() {
         patientDTOMapper = new PatientDTOMapper();
-        patientServiceTest = new PatientService(patientDao, patientDTOMapper, passwordEncoder);
+        patientServiceTest = new PatientService(patientDao,emailService, patientDTOMapper, passwordEncoder, emailSender);
 
         faker = new Faker();
         patient = Patient.builder()

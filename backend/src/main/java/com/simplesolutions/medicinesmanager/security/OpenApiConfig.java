@@ -1,4 +1,4 @@
-package com.simplesolutions.medicinesmanager.model;
+package com.simplesolutions.medicinesmanager.security;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

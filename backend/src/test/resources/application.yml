@@ -10,18 +10,37 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: MedicationsManager@gmail.com
+    password: MedicationsManagerTest123
+
+    properties:
+      transport:
+        protocol: smtp
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
 
   datasource:
     url: jdbc:postgresql://localhost:5432/medicinemanagertest
-    username: ahmed
-    password: ahmedroot
+    username: postgres
+    password: root
 
   flyway:
     baseline-on-migrate: true
     baseline-version: 1
     enabled: true
-    user: ahmed
-    password: ahmedroot
+    user: postgres
+    password: root
 
 jwt:
   token-expiration: 1
@@ -39,3 +58,4 @@ logging:
 # Default value for picture url
 medicine:
   picture-url: "https://i.imgur.com/qMA0qhd.png"
+

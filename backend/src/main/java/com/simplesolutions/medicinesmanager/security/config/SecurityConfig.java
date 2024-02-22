@@ -1,4 +1,4 @@
-package com.simplesolutions.medicinesmanager.security;
+package com.simplesolutions.medicinesmanager.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

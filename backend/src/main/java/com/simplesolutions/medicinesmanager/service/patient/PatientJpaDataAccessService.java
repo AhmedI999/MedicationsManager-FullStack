@@ -1,6 +1,7 @@
 package com.simplesolutions.medicinesmanager.service.patient;
 
 import com.simplesolutions.medicinesmanager.model.Patient;
+import com.simplesolutions.medicinesmanager.repository.EmailConfirmationRepository;
 import com.simplesolutions.medicinesmanager.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,6 +25,11 @@ public class PatientJpaDataAccessService implements PatientDao {
     @Override
     public Optional<Patient> selectPatientByEmail(String email) {
         return patientRepository.findByEmail(email);
+    }
+
+    @Override
+    public int enablePatientAccount(String email) {
+        return patientRepository.enablePatientAccount(email);
     }
 
     @Override

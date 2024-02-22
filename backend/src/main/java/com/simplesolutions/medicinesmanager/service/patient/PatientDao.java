@@ -13,6 +13,7 @@ public interface PatientDao {
     Optional<Patient> selectPatientById(Integer id);
 
     Optional<Patient> selectPatientByEmail(String email);
+    int enablePatientAccount(String email);
 
     void updatePatient(Patient patient);
 
