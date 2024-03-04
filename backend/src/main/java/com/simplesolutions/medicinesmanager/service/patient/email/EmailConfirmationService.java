@@ -18,8 +18,20 @@ import java.time.LocalDateTime;
 public class EmailConfirmationService {
     private final EmailConfirmationDao emailConfirmationDao;
     private final JWTUtil jwtUtil;
-    @Value("#{'${jwt.email.confirmationToken.expiresAt}'}")
+    @Value("#{'${authentication.email.confirmationToken.expiresAt}'}")
     private Integer MINUTES_UNTIL_CONFIRMATION_EXPIRATION;
+
+    @Value("#{'${service.email-confirmation.not-found.message}'}")
+    private String EMAIL_CONFIRMATION_NOT_FOUND;
+    @Value("#{'${service.email-confirmation.already-verified.message}'}")
+    private String EMAIL_CONFIRMATION_ALREADY_VERIFIED;
+    @Value("#{'${service.email-confirmation.confirmation-expired.message}'}")
+    private String EMAIL_CONFIRMATION_REQUEST_EXPIRED;
+    @Value("#{'${service.email-confirmation.wrong-owner.message}'}")
+    private String EMAIL_CONFIRMATION_WRONG_OWNER;
+    @Value("#{'${service.email-confirmation.token.not-found.message}'}")
+    private String EMAIL_CONFIRMATION_TOKEN_NOT_FOUND;
+
 
     public void setTokenConfirmation(String token){
         emailConfirmationDao.setTokenConfirmedAt(token);
@@ -27,22 +39,22 @@ public class EmailConfirmationService {
 
     public EmailConfirmation getEmailConfirmation(String token) {
         return emailConfirmationDao.selectEmailConfirmation(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Email confirmation doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(EMAIL_CONFIRMATION_NOT_FOUND));
     }
 
     private void validateEmailAlreadyVerified(EmailConfirmation emailConfirmation){
         if (emailConfirmation.getConfirmedAt() != null || emailConfirmation.getPatient().isEnabled()){
-            throw new EmailAlreadyVerifiedException("Your email is already verified");
+            throw new EmailAlreadyVerifiedException(EMAIL_CONFIRMATION_ALREADY_VERIFIED);
         }
     }
     private void validateEmailConfirmationExpiration (EmailConfirmation emailConfirmation){
         if (LocalDateTime.now().isAfter(emailConfirmation.getExpiresAt())){
-            throw new ConfirmationRequestExpiredException("Confirmation request is expired.");
+            throw new ConfirmationRequestExpiredException(EMAIL_CONFIRMATION_REQUEST_EXPIRED);
         }
     }
     private void validateEmailConfirmationOwnership(EmailConfirmation emailConfirmation){
         if (!emailConfirmationDao.doesPatientEmailConfirmationExists(emailConfirmation.getPatient())){
-            throw new OwnershipException("This Email Confirmation isn't assigned to this user");
+            throw new OwnershipException(EMAIL_CONFIRMATION_WRONG_OWNER);
         }
     }
 
@@ -69,7 +81,7 @@ public class EmailConfirmationService {
 
     public String getPatientLatestEmailToken (String patientEmail){
         return emailConfirmationDao.selectPatientLatestEmailToken(patientEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("Patient email token not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(EMAIL_CONFIRMATION_TOKEN_NOT_FOUND));
     }
 
 }

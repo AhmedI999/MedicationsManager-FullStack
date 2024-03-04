@@ -6,6 +6,7 @@ import com.simplesolutions.medicinesmanager.dto.interactiondto.MedicationInterac
 import com.simplesolutions.medicinesmanager.service.medicine.MedicineService;
 import com.simplesolutions.medicinesmanager.service.medicine.interactions.InteractionsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,12 @@ import java.util.List;
 public class MedicationInteractionsController {
     private final MedicineService medicineService;
     private final InteractionsService interactionsService;
+
+    // MESSAGES
+    @Value("#{'${interactions.save-endpoint.success.message}'}")
+    private String INTERACTION_SAVED_MESSAGE;
+    @Value("#{'${interactions.delete-endpoint.success.message}'}")
+    private String INTERACTION_DELETED_MESSAGE;
 
     @GetMapping("{patientId}/medicines/{medicineId}/interactions/{name}")
     public ResponseEntity<MedicationInteractionDTO> getMedicationInteraction(@PathVariable("patientId") Integer patientId,
@@ -36,7 +43,7 @@ public class MedicationInteractionsController {
                                                                               @RequestBody MedicationInteractionDTO request) {
         Medication medication = medicineService.getPatientMedicineEntityById(patientId, medicineId);
         interactionsService.saveMedicineInteraction(request, medication);
-        return ResponseEntity.ok("The new Interaction Saved Successfully");
+        return ResponseEntity.ok(INTERACTION_SAVED_MESSAGE);
     }
     @DeleteMapping("{patientId}/medicines/{medicineId}/interactions/{name}")
     public ResponseEntity<String> deleteMedicationInteraction(@PathVariable("patientId") Integer patientId,
@@ -44,7 +51,7 @@ public class MedicationInteractionsController {
                                                               @PathVariable("name") String name){
 
         interactionsService.deleteMedicationInteractionByName(medicineId, name);
-        return ResponseEntity.ok("Interaction deleted Successfully");
+        return ResponseEntity.ok(INTERACTION_DELETED_MESSAGE);
     }
 
 

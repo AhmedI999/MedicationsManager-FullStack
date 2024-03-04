@@ -4,7 +4,7 @@ import com.simplesolutions.medicinesmanager.dto.patientdto.PatientRegistrationRe
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientResponseDTO;
 import com.simplesolutions.medicinesmanager.dto.patientdto.PatientUpdateRequest;
 import com.simplesolutions.medicinesmanager.exception.DuplicateResourceException;
-import com.simplesolutions.medicinesmanager.exception.RegistrationConstraintsException;
+import com.simplesolutions.medicinesmanager.exception.ValidationException;
 import com.simplesolutions.medicinesmanager.exception.ResourceNotFoundException;
 import com.simplesolutions.medicinesmanager.exception.UpdateException;
 import com.simplesolutions.medicinesmanager.security.jwt.JWTUtil;
@@ -37,12 +37,14 @@ import java.util.List;
 public class PatientsController {
     private final PatientService patientService;
     private final JWTUtil jwtUtil;
-
+    // USERS DEFAULT ROLE
+    @Value("#{'${user.role.default}'}")
+    private String USER_DEFAULT_ROLE;
     // MESSAGES
     @Value("#{'${patient.save-endpoint.success.message}'}")
     private String PATIENT_SAVED_MESSAGE;
     @Value("#{'${patient.delete-endpoint.success.message}'}")
-    private String PATIENT_DELETE_MESSAGE;
+    private String PATIENT_DELETED_MESSAGE;
     @Value("#{'${patient.password-endpoint.success.message}'}")
     private String PATIENT_CHANGE_PASSWORD_MESSAGE;
 
@@ -286,7 +288,7 @@ public class PatientsController {
                             },
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = RegistrationConstraintsException.class),
+                                    schema = @Schema(implementation = ValidationException.class),
                                     examples = @ExampleObject(name = "exception in the case of invalid firstname",
                                             value = """
                                                     {\s
@@ -308,7 +310,7 @@ public class PatientsController {
     @PostMapping
     private ResponseEntity<?> savePatient(@RequestBody @Valid PatientRegistrationRequest request){
         patientService.savePatient(request);
-        String jwtToken = jwtUtil.issueToken(request.email(), "ROLE_USER");
+        String jwtToken = jwtUtil.issueToken(request.email(), USER_DEFAULT_ROLE);
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtToken)
                 .body(PATIENT_SAVED_MESSAGE.formatted(request.email()));
@@ -393,7 +395,7 @@ public class PatientsController {
     @DeleteMapping("{patientId}")
     public ResponseEntity<String> deletePatient(@PathVariable("patientId") Integer id) {
         patientService.deletePatient(id);
-        return ResponseEntity.ok(PATIENT_DELETE_MESSAGE);
+        return ResponseEntity.ok(PATIENT_DELETED_MESSAGE);
     }
 
     @Operation(
@@ -451,7 +453,7 @@ public class PatientsController {
                             },
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = RegistrationConstraintsException.class),
+                                    schema = @Schema(implementation = ValidationException.class),
                                     examples = @ExampleObject(name = "exception in the case of invalid firstname",
                                             value = """
                                                     {\s
@@ -548,7 +550,7 @@ public class PatientsController {
                             },
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = RegistrationConstraintsException.class),
+                                    schema = @Schema(implementation = ValidationException.class),
                                     examples = @ExampleObject(name = "exception in the case of invalid new password",
                                             value = """
                                                     {\s

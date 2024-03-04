@@ -1,6 +1,7 @@
 package com.simplesolutions.medicinesmanager.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,12 @@ import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
-    private static final String USER_DISABLED_MSG = "Please verify your email to login";
+    // MESSAGES
+
+    @Value("#{'${exception-handler.user-disabled.message}'}")
+    private String USER_DISABLED_MSG;
+    @Value("#{'${exception-handler.database.default-exception.message}'}")
+    public String DATABASE_DEFAULT_EXCEPTION_MSG;
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleException(ResourceNotFoundException e,
@@ -113,7 +119,7 @@ public class DefaultExceptionHandler {
                                                     HttpServletRequest request){
         ApiError apiError = new ApiError (
                 request.getRequestURI(),
-                "Database error contact developer",
+                DATABASE_DEFAULT_EXCEPTION_MSG,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now());
         return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);

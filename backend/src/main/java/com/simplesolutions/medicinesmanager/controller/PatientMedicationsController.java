@@ -8,6 +8,7 @@ import com.simplesolutions.medicinesmanager.service.medicine.MedicineService;
 import com.simplesolutions.medicinesmanager.service.patient.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,12 @@ import java.util.List;
 public class PatientMedicationsController {
     private final PatientService patientService;
     private final MedicineService medicineService;
+
+    // MESSAGES
+    @Value("#{'${medications.save-endpoint.success.message}'}")
+    private String MEDICATION_SAVED_MESSAGE;
+    @Value("#{'${medications.delete-endpoint.success.message}'}")
+    private String MEDICATION_DELETED_MESSAGE;
 
     @GetMapping("{patientId}/medicines/id/{medicineId}")
     public MedicationResponseDTO getMedicine(@PathVariable("patientId") Integer patientId,
@@ -39,7 +46,7 @@ public class PatientMedicationsController {
                                                       @RequestBody @Valid MedicineRegistrationRequest request){
         Patient patient = patientService.getPatientEntityById(patientId);
         medicineService.savePatientMedicine(request, patient);
-        return ResponseEntity.ok("Patient medication saved successfully");
+        return ResponseEntity.ok(MEDICATION_SAVED_MESSAGE);
     }
     @PutMapping("{patientId}/medicines/{medicineId}")
     public ResponseEntity<MedicationResponseDTO> editMedicineDetails(@PathVariable("patientId") Integer patientId,
@@ -52,6 +59,6 @@ public class PatientMedicationsController {
     public ResponseEntity<String> deleteMedicine(@PathVariable("patientId") Integer patientId,
                                                  @PathVariable("medicineId") Integer medicineId){
         medicineService.deletePatientMedicineById(patientId, medicineId);
-        return ResponseEntity.ok("Medication deleted Successfully");
+        return ResponseEntity.ok(MEDICATION_DELETED_MESSAGE);
     }
 }

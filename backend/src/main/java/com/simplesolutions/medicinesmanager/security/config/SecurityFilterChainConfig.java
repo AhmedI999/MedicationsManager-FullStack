@@ -2,10 +2,10 @@ package com.simplesolutions.medicinesmanager.security.config;
 
 import com.simplesolutions.medicinesmanager.security.jwt.JWTAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,29 +23,25 @@ public class SecurityFilterChainConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+
+    @Value("#{'${security-chain.allowed-swagger-endpoints}'.split(',')}")
+    private String[] SWAGGER_ENDPOINTS;
+
+    @Value("#{'${security-chain.unauthenticated.post-endpoints}'.split(',')}")
+    private String[] UNAUTHENTICATED_POST_ENDPOINTS;
+
+    @Value("#{'${security-chain.unauthenticated.get-endpoints}'.split(',')}")
+    private String[] UNAUTHENTICATED_GET_ENDPOINTS;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/v1/patients", "/api/v1/auth/login", "/api/v1/auth/send-verification")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/confirm")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/v3/api-docs",
-                                "/v3/api-docs/**",
-                                "/swagger-resources",
-                                "/swagger-resources/**",
-                                "/configuration/ui",
-                                "/configuration/security",
-                                "/swagger-ui/**",
-                                "/webjars/**",
-                                "/swagger-ui.html")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+                        .requestMatchers(HttpMethod.POST, UNAUTHENTICATED_POST_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, UNAUTHENTICATED_GET_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, SWAGGER_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(management ->
                         management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

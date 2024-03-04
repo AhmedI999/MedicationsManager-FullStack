@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -15,15 +16,21 @@ import org.springframework.scheduling.annotation.Async;
 @Slf4j
 public class EmailService implements EmailSender {
     private final JavaMailSender mailSender;
-    private static final String MAIL_SUBJECT = "Confirm your email";
-    private static final String SENDER_EMAIL = "MedicationManager@gmail.com";
+    @Value("#{'${service.email-sender.mail.subject}'}")
+    private String MAIL_SUBJECT;
+    @Value("#{'${service.email-sender.mail.sender-email}'}")
+    private String SENDER_EMAIL;
+    @Value("#{'${service.email-sender.mail.encoding}'}")
+    private String EMAIL_ENCODE;
+    @Value("#{'${service.email-sender.error.message}'}")
+    private String EMAIL_SENDER_ERROR;
 
     @Override
     @Async
     public void sendVerification(String to, String email) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, EMAIL_ENCODE);
             helper.setText(email, true);
             helper.setTo(to);
             helper.setSubject(MAIL_SUBJECT);
@@ -32,7 +39,7 @@ public class EmailService implements EmailSender {
             log.info("Email sent!. Mime message: {}", helper.getMimeMessage());
         } catch (MessagingException e){
             log.error("Failed to send email", e);
-            throw new VerificationSenderException("Error While sending message to the user");
+            throw new VerificationSenderException(EMAIL_SENDER_ERROR);
         }
     }
 }

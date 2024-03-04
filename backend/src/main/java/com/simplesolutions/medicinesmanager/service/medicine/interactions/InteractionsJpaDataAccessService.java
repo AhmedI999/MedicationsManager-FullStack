@@ -6,6 +6,7 @@ import com.simplesolutions.medicinesmanager.model.Medication;
 import com.simplesolutions.medicinesmanager.repository.MedicationInteractionRepository;
 import com.simplesolutions.medicinesmanager.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,6 +16,9 @@ import java.util.List;
 public class InteractionsJpaDataAccessService implements InteractionDao {
     private final MedicineRepository medicineRepository;
     private final MedicationInteractionRepository interactionRepository;
+    @Value("#{'${service.patient-medications.not-found-general.message}'}")
+    private String MEDICATION_NOT_FOUND_MSG;
+
 
     @Override
     public MedicationInteractions selectMedicineInteractionByName(Integer medicineId, String name) {
@@ -24,7 +28,7 @@ public class InteractionsJpaDataAccessService implements InteractionDao {
     @Override
     public List<MedicationInteractions> selectMedicineInteractions(Integer patientId, Integer medicineId) {
         Medication medication = medicineRepository.findByPatientIdAndId(patientId, medicineId)
-                .orElseThrow(() -> new ResourceNotFoundException(" Medication doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(MEDICATION_NOT_FOUND_MSG));
         return medication.getInteractions();
     }
 

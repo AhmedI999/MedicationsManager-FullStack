@@ -26,13 +26,32 @@ public class MedicineService {
     private final MedicationDTOMapper medicationDTOMapper;
     @Value("#{'${medicine.picture-url}'}")
     private String DEFAULT_PICTURE_URL;
+    @Value("#{'${service.patient.not-found-general.message}'}")
+    private String PATIENT_NOT_EXISTS;
+    @Value("#{'${service.patient-medications.list-empty.message}'}")
+    private String PATIENT_MEDICATIONS_EMPTY_MSG;
+    @Value("#{'${service.patient-medications.not-found-id.message}'}")
+    private String PATIENT_MEDICATION_NOT_FOUND_ID_MSG;
+    @Value("#{'${service.patient-medications.not-found-name.message}'}")
+    private String PATIENT_MEDICATION_NOT_FOUND_NAME_MSG;
+    @Value("#{'${service.patient-medications.already-exists.message}'}")
+    private String PATIENT_MEDICATION_ALREADY_EXISTS_MSG;
+    @Value("#{'${service.patient.not-found-general.message}'}")
+    private String PATIENT_NOT_FOUND_MSG;
+    @Value("#{'${service.patient-medications.not-found-general.message}'}")
+    private String MEDICATION_NOT_FOUND_MSG;
+    @Value("#{'${service.patient-medications.name-taken.message}'}")
+    private String PATIENT_MEDICATION_ALREADY_EXISTS_NAME_MSG;
+    @Value("#{'${service.patient-medications.no-details-changes.message}'}")
+    private String PATIENT_MEDICATION_UPDATE_NO_CHANGES_MSG;
+
 
     public List<MedicationResponseDTO> getPatientMedicines(Integer patientID){
         Patient patient = patientDao.selectPatientById(patientID).
-        orElseThrow(() -> new ResourceNotFoundException("Patient doesn't exist"));
+        orElseThrow(() -> new ResourceNotFoundException(PATIENT_NOT_EXISTS));
         List<Medication> medications =  medicineDao.selectPatientMedicines(patient.getId());
         if ( patient.getPatientMedications() == null ) {
-            throw new ResourceNotFoundException("Patient doesn't have medications");
+            throw new ResourceNotFoundException(PATIENT_MEDICATIONS_EMPTY_MSG);
         }
         return medications.stream()
                 .map(medicationDTOMapper)
@@ -43,11 +62,11 @@ public class MedicineService {
     public MedicationResponseDTO getPatientMedicineById(Integer patientId, Integer medicineId){
         return medicineDao.selectPatientMedicineById(patientId, medicineId)
                 .map(medicationDTOMapper)
-                .orElseThrow(() -> new ResourceNotFoundException("Medication %s wasn't found".formatted(medicineId)));
+                .orElseThrow(() -> new ResourceNotFoundException(PATIENT_MEDICATION_NOT_FOUND_ID_MSG.formatted(medicineId)));
     }
     public Medication getPatientMedicineEntityById (Integer patientId, Integer medicineId){
         return medicineDao.selectPatientMedicineById(patientId, medicineId)
-                .orElseThrow(() -> new ResourceNotFoundException("Medication %s wasn't found".formatted(medicineId)));
+                .orElseThrow(() -> new ResourceNotFoundException(PATIENT_MEDICATION_NOT_FOUND_ID_MSG.formatted(medicineId)));
     }
     public MedicationResponseDTO getPatientMedicineByBrandName (Integer patientId, String brandName){
         String capitalizedName = brandName.substring(0, 1).toUpperCase() +
@@ -55,7 +74,7 @@ public class MedicineService {
         return medicineDao.selectPatientMedicineByBrandName(patientId, capitalizedName)
                 .map(medicationDTOMapper)
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Medication %s wasn't found".formatted(capitalizedName)));
+                        () -> new ResourceNotFoundException(PATIENT_MEDICATION_NOT_FOUND_NAME_MSG.formatted(capitalizedName)));
     }
     public void deletePatientMedicineById(Integer patientId, Integer medicineId){
         medicineDao.deletePatientMedicineById(patientId, medicineId);
@@ -65,7 +84,7 @@ public class MedicineService {
     }
     public void savePatientMedicine(MedicineRegistrationRequest request, Patient patient){
         if (doesMedicineExists(patient.getEmail(), request.brandName()))
-            throw new DuplicateResourceException("Patient's medication (%s) already Exists"
+            throw new DuplicateResourceException(PATIENT_MEDICATION_ALREADY_EXISTS_MSG
                     .formatted(request.brandName()));
         String capitalizedName = request.brandName().substring(0, 1).toUpperCase() +
                 request.brandName().substring(1).toLowerCase();
@@ -77,7 +96,7 @@ public class MedicineService {
                 .instructions(request.instructions())
                 .build();
         if (!patientDao.doesPatientExists(patient.getEmail()))
-            throw new ResourceNotFoundException("Patient doesn't exist");
+            throw new ResourceNotFoundException(PATIENT_NOT_FOUND_MSG);
         if (request.pictureUrl() == null || request.pictureUrl().isEmpty())
             medication.setPictureUrl(DEFAULT_PICTURE_URL);
         medication.setPatient(patient);
@@ -85,14 +104,14 @@ public class MedicineService {
     }
     public void editMedicineDetails(Integer patientId,Integer medicineId, MedicineUpdateRequest request){
         Patient patient = patientDao.selectPatientById(patientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Patient doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(PATIENT_NOT_FOUND_MSG));
         Medication medication = medicineDao.selectPatientMedicineById(patientId, medicineId)
-                .orElseThrow(() -> new ResourceNotFoundException("Medication doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException(MEDICATION_NOT_FOUND_MSG));
         boolean changes = false;
         if (request.getBrandName() != null && !request.getBrandName().trim().equals(medication.getBrandName())) {
             if (medicineDao.doesPatientMedicineExists(patient.getEmail() , request.getBrandName())) {
                 throw new DuplicateResourceException(
-                        "Brand name already taken"
+                        PATIENT_MEDICATION_ALREADY_EXISTS_NAME_MSG
                 );
             }
             medication.setBrandName(request.getBrandName().trim());
@@ -115,7 +134,7 @@ public class MedicineService {
             changes = true;
         }
        if (!changes) {
-            throw new UpdateException("no data changes found");
+            throw new UpdateException(PATIENT_MEDICATION_UPDATE_NO_CHANGES_MSG);
         }
         medicineDao.updateMedicine(medication);
     }

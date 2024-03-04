@@ -16,13 +16,11 @@ public interface EmailConfirmationRepository extends JpaRepository<EmailConfirma
 
     Optional<EmailConfirmation> findByToken(String token);
     @Transactional
-    @Query("SELECT c.token FROM EmailConfirmation c WHERE c.patient.email = ?1 ORDER BY c.createdAt DESC")
+    @Query(name = "EmailConfirmation.getLatestPatientToken")
     Optional<String> getLatestPatientToken(String patientEmail);
     boolean existsByPatientEmail(String patientEmail);
     @Transactional
     @Modifying
-    @Query("UPDATE EmailConfirmation c " +
-            "SET c.confirmedAt = ?2 " +
-            "WHERE c.token = ?1")
+    @Query(name = "EmailConfirmation.updateConfirmedAt")
     int updateConfirmedAt(String token, LocalDateTime confirmedAt);
 }

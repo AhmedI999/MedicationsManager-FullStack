@@ -20,10 +20,13 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @Service
 public class JWTUtil {
     private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
-    @Value("#{'${jwt.token-expiration}'}")
+    @Value("#{'${authentication.jwt.token-expiration}'}")
     private Integer DAYS_UNTIL_TOKEN_EXPIRATION;
-    @Value("#{'${jwt.email.confirmationToken.expiresAt}'}")
+    @Value("#{'${authentication.email.confirmationToken.expiresAt}'}")
     private Integer MINUTES_UNTIL_CONFIRMATION_EXPIRATION;
+    @Value("#{'${authentication.jwt.issuer}'}")
+    private String TOKEN_ISSUER;
+
 
     public String issueToken(
             String subject,
@@ -32,7 +35,7 @@ public class JWTUtil {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
-                .issuer("AhmedIbrahim")
+                .issuer(TOKEN_ISSUER)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plus(DAYS_UNTIL_TOKEN_EXPIRATION, DAYS)))
                 .signWith(getSigningKey())
@@ -51,7 +54,7 @@ public class JWTUtil {
 
         return Jwts.builder()
                 .subject(subject)
-                .issuer("AhmedIbrahim")
+                .issuer(TOKEN_ISSUER)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plus(MINUTES_UNTIL_CONFIRMATION_EXPIRATION, MINUTES)))
                 .compact();

@@ -1,6 +1,6 @@
 package com.simplesolutions.medicinesmanager.exception;
 
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +18,12 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class RegistrationConstraintsException extends ResponseEntityExceptionHandler {
+public class ValidationException extends ResponseEntityExceptionHandler {
+    // MESSAGES
+
+    @Value("#{'${validation-exception.incorrect-input-type.message}'}")
+    private String INCORRECT_INPUT_TYPE_MSG;
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
@@ -38,7 +43,7 @@ public class RegistrationConstraintsException extends ResponseEntityExceptionHan
                     Map<String, String> fieldErrorMap = new LinkedHashMap<>();
                     fieldErrorMap.put("field", fieldError.getField());
                     if (Objects.requireNonNull(fieldError.getDefaultMessage()).contains("Failed to convert value")){
-                        fieldErrorMap.put("error", "Type Mismatch Error. Make sure to use the correct data types");
+                        fieldErrorMap.put("error", INCORRECT_INPUT_TYPE_MSG);
                     }
                     fieldErrorMap.put("error", fieldError.getDefaultMessage());
                     return fieldErrorMap;

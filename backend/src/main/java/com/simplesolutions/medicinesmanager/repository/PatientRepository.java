@@ -17,6 +17,6 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
     Optional<Patient> findByEmail(String email);
     @Transactional
     @Modifying
-    @Query("UPDATE Patient p SET p.enabled = TRUE WHERE p.email = ?1")
+    @Query(name = "Patients.enablePatientAccount")
     int enablePatientAccount(String email);
 }

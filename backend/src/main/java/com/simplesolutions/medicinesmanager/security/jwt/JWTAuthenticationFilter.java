@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,17 +24,24 @@ import java.io.IOException;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-    @Override
+
+    @Value("#{'${authentication.header}'}")
+    private String AUTH_HEADER;
+    @Value("#{'${authentication.type}'}")
+    private String AUTH_TYPE;
+    @Value("#{'${authentication.jwt.token-position-index}'}")
+    private Integer TOKEN_POSITION;
+   @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")){
+        String authHeader = request.getHeader(AUTH_HEADER);
+        if (authHeader == null || !authHeader.startsWith(AUTH_TYPE)){
             filterChain.doFilter(request, response);
             return;
         }
-        String jwtToken = authHeader.substring(7);
+        String jwtToken = authHeader.substring(TOKEN_POSITION);
         String subject = jwtUtil.getSubject(jwtToken);
 
         if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
