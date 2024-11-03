@@ -15,10 +15,13 @@ import java.util.Optional;
 public interface EmailConfirmationRepository extends JpaRepository<EmailConfirmation, Integer> {
 
     Optional<EmailConfirmation> findByToken(String token);
+
     @Transactional
     @Query(name = "EmailConfirmation.getLatestPatientToken")
     Optional<String> getLatestPatientToken(String patientEmail);
+
     boolean existsByPatientEmail(String patientEmail);
+
     @Transactional
     @Modifying
     @Query(name = "EmailConfirmation.updateConfirmedAt")
